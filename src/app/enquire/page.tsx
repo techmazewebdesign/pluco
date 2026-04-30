@@ -13,7 +13,7 @@ type FormData = {
   message: string;
 };
 
-const inputClass = 'w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:border-transparent bg-white';
+const inputClass = 'w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A35A] focus:border-[#C9A35A] bg-white';
 
 export default function EnquirePage() {
   const [form, setForm] = useState<FormData>({
