@@ -33,9 +33,9 @@ export default function Header() {
             <Image
               src="/images/logo-pluco.png"
               alt="Pluco Group Sp. z o.o. logo"
-              width={170}
-              height={48}
-              className="w-[130px] md:w-[170px] h-auto object-contain"
+              width={220}
+              height={56}
+              className="w-[160px] md:w-[220px] h-auto object-contain"
               style={{ opacity: 1 }}
               priority
             />

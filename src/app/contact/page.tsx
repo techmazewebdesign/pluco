@@ -109,7 +109,7 @@ export default function Contact() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
                         <label className="block text-xs font-medium mb-1.5" style={{ color: '#1E2430' }}>First Name *</label>
-                        <input name="firstName" required value={form.firstName} onChange={handleChange} className={inputClass} style={{ focusRingColor: '#C9A35A' }} />
+                        <input name="firstName" required value={form.firstName} onChange={handleChange} className={inputClass} />
                       </div>
                       <div>
                         <label className="block text-xs font-medium mb-1.5" style={{ color: '#1E2430' }}>Last Name *</label>

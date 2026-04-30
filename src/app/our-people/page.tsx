@@ -1,10 +1,7 @@
-import { Metadata } from 'next';
+'use client';
+
 import { motion } from 'framer-motion';
 
-export const metadata: Metadata = {
-  title: 'Our People - PLUCO GROUP SP. Z O.O.',
-  description: 'Meet the team at PLUCO GROUP - experienced legal and commercial consultancy professionals serving international clients.',
-};
 
 const teamMembers = [
   {

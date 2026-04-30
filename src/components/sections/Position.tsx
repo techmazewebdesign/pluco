@@ -9,9 +9,9 @@ export default function Position() {
   return (
     <section className="py-20" style={{ backgroundColor: '#071C3C' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_auto] gap-10 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr_auto] gap-10 items-center">
 
-          {/* Column 1: Courthouse illustration */}
+          {/* Column 1: Photo */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -19,13 +19,14 @@ export default function Position() {
             transition={{ duration: 0.8 }}
             className="flex items-center justify-center lg:justify-start"
           >
-            <Image
-              src="/images/couthouse-line.png"
-              alt="Courthouse illustration"
-              width={260}
-              height={180}
-              className="w-full max-w-[260px] h-auto"
-            />
+            <div className="relative w-full max-w-[320px] aspect-[4/3] rounded-xl overflow-hidden">
+              <Image
+                src="/images/position-photo.jpg"
+                alt="International legal and commercial advisory"
+                fill
+                className="object-cover"
+              />
+            </div>
           </motion.div>
 
           {/* Column 2: Label + Heading + Text */}

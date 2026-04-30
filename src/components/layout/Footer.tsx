@@ -14,9 +14,10 @@ export default function Footer() {
               <Image
                 src="/images/logo-pluco.png"
                 alt="Pluco Group Sp. z o.o. logo"
-                width={180}
-                height={40}
-                className="h-auto"
+                width={220}
+                height={56}
+                className="w-[180px] sm:w-[220px] h-auto object-contain"
+                style={{ opacity: 1 }}
               />
             </div>
             <p className="text-sm mb-1" style={{ color: '#C9A35A' }}>
