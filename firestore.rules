@@ -25,7 +25,8 @@ service cloud.firestore {
     }
     match /agents/{uid} {
       allow read: if isOwner(uid) || isAgent();
-      allow write: if hasRole('admin');
+      // Admin can write any agent doc; agents can update their own profile only
+      allow write: if hasRole('admin') || isOwner(uid);
     }
     match /clients/{uid} {
       allow read: if isOwner(uid) || isAgent();

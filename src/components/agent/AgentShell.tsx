@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Inbox, Users, FileSearch,
-  FileText, LogOut, ShieldCheck, Menu, X, Flag,
+  FileText, LogOut, ShieldCheck, Menu, X, Flag, User,
 } from 'lucide-react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -103,6 +103,11 @@ export default function AgentShell({ children }: { children: React.ReactNode }) 
 
       {/* Bottom */}
       <div className="px-3 py-4 border-t space-y-1" style={{ borderColor: '#0B234A' }}>
+        <Link href="/agent/profile" onClick={() => setMobileOpen(false)}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors"
+          style={{ color: pathname === '/agent/profile' ? '#C9A35A' : '#64748B', backgroundColor: pathname === '/agent/profile' ? '#0B234A' : 'transparent' }}>
+          <User className="w-4 h-4" />My Profile
+        </Link>
         <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium" style={{ color: '#64748B' }}>
           <ShieldCheck className="w-4 h-4" />Website
         </Link>
