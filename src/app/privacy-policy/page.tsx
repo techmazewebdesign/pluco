@@ -153,7 +153,7 @@ export default function PrivacyPolicy() {
                   please contact us:
                 </p>
                 <div className="mt-4 space-y-2">
-                  <p><strong>Email:</strong> contact@plucogroup.com</p>
+                  <p><strong>Email:</strong> info@plucogroup.com</p>
                   <p><strong>Phone:</strong> +48 22 123 4567</p>
                   <p><strong>Address:</strong> Ksawerów 3, 02-656 Warsaw, Poland</p>
                   <p><strong>KRS:</strong> 0000564904</p>
