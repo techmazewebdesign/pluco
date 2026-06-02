@@ -233,8 +233,10 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<ClientProfile>({});
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
   const [showAddMember, setShowAddMember] = useState(false);
   const [newMember, setNewMember] = useState<Partial<FamilyMember>>({ relationship: 'Child' });
@@ -242,7 +244,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      setLoading(true);
+      setLoading(true); setLoadError('');
       try {
         const [profileSnap, familySnap] = await Promise.all([
           getDoc(doc(db, 'clients', user.uid)),
@@ -250,15 +252,18 @@ export default function ProfilePage() {
         ]);
         if (profileSnap.exists()) setProfile(profileSnap.data() as ClientProfile);
         setFamilyMembers(familySnap.docs.map(d => ({ id: d.id, ...d.data() } as FamilyMember)));
-      } catch (e) { console.error(e); }
-      finally { setLoading(false); }
+      } catch (e: unknown) {
+        const code = (e as { code?: string })?.code || String(e);
+        console.error('Profile load error:', e);
+        setLoadError(`Could not load profile data (${code}). Please refresh.`);
+      } finally { setLoading(false); }
     };
     load();
   }, [user]);
 
   const handleSave = async () => {
     if (!user) return;
-    setSaving(true);
+    setSaving(true); setSaveError(''); setSaved(false);
     try {
       await setDoc(doc(db, 'clients', user.uid), {
         ...profile,
@@ -267,21 +272,31 @@ export default function ProfilePage() {
         updatedAt: new Date().toISOString(),
       }, { merge: true });
       setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
-    } catch (e) { console.error(e); }
-    finally { setSaving(false); }
+      setTimeout(() => setSaved(false), 4000);
+    } catch (e: unknown) {
+      const code = (e as { code?: string })?.code || String(e);
+      const msg = code === 'permission-denied'
+        ? 'Permission denied. Check Firestore security rules.'
+        : `Save failed: ${code}`;
+      setSaveError(msg);
+      console.error('Profile save error:', e);
+    } finally { setSaving(false); }
   };
 
   const handleAddMember = async () => {
     if (!user || !newMember.name) return;
     try {
-      const ref = await addDoc(collection(db, 'clients', user.uid, 'family'), {
+      const docRef = await addDoc(collection(db, 'clients', user.uid, 'family'), {
         ...newMember, addedAt: new Date().toISOString(),
       });
-      setFamilyMembers(prev => [...prev, { id: ref.id, name: '', relationship: 'Child', ...newMember } as FamilyMember]);
+      setFamilyMembers(prev => [...prev, { id: docRef.id, name: '', relationship: 'Child', ...newMember } as FamilyMember]);
       setNewMember({ relationship: 'Child' });
       setShowAddMember(false);
-    } catch (e) { console.error(e); }
+    } catch (e: unknown) {
+      const code = (e as { code?: string })?.code || String(e);
+      alert(`Could not add member: ${code}`);
+      console.error('Add member error:', e);
+    }
   };
 
   const handleUpdateMember = async (id: string, data: Partial<FamilyMember>) => {
@@ -290,7 +305,11 @@ export default function ProfilePage() {
       await updateDoc(doc(db, 'clients', user.uid, 'family', id), data as Record<string, unknown>);
       setFamilyMembers(prev => prev.map(m => m.id === id ? { ...m, ...data } : m));
       setEditingMember(null);
-    } catch (e) { console.error(e); }
+    } catch (e: unknown) {
+      const code = (e as { code?: string })?.code || String(e);
+      alert(`Could not update member: ${code}`);
+      console.error('Update member error:', e);
+    }
   };
 
   const handleDeleteMember = async (id: string) => {
@@ -316,15 +335,15 @@ export default function ProfilePage() {
   );
 
   return (
-    <div className="p-6 md:p-8 max-w-4xl" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="p-4 sm:p-6 md:p-8 max-w-4xl" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-serif font-bold" style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}>
+          <h1 className="text-xl font-serif font-bold" style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}>
             {isRTL ? 'پروفایل من' : 'My Profile'}
           </h1>
-          <p className="text-sm mt-1" style={{ color: '#5E6470', fontFamily: isRTL ? ff : undefined }}>
-            {isRTL ? 'اطلاعات شخصی، حرفه‌ای، مهاجرتی و خانوادگی شما' : 'Your personal, professional, immigration and family information'}
+          <p className="text-xs mt-1" style={{ color: '#5E6470', fontFamily: isRTL ? ff : undefined }}>
+            {isRTL ? 'اطلاعات شخصی، حرفه‌ای، مهاجرتی و خانوادگی' : 'Personal, professional, immigration and family information'}
           </p>
         </div>
         <AnimatePresence>
@@ -333,11 +352,25 @@ export default function ProfilePage() {
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold"
               style={{ backgroundColor: '#DCFCE7', color: '#15803D' }}>
               <CheckCircle className="w-4 h-4" />
-              {isRTL ? 'ذخیره شد' : 'Saved'}
+              {isRTL ? 'ذخیره شد' : 'Saved successfully'}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+
+      {/* Load error */}
+      {loadError && (
+        <div className="mb-4 p-3 rounded-lg text-xs" style={{ backgroundColor: '#FEE2E2', color: '#DC2626', fontFamily: isRTL ? ff : undefined }}>
+          ⚠ {loadError}
+        </div>
+      )}
+
+      {/* Save error */}
+      {saveError && (
+        <div className="mb-4 p-3 rounded-lg text-xs" style={{ backgroundColor: '#FEE2E2', color: '#DC2626', fontFamily: isRTL ? ff : undefined }}>
+          ⚠ {saveError}
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-0 border-b border-gray-200 mb-8 overflow-x-auto">
@@ -650,10 +683,21 @@ export default function ProfilePage() {
 // ── Save Button ──────────────────────────────────────────────────────
 function SaveButton({ saving, saved, onSave, isRTL, ff }: { saving: boolean; saved: boolean; onSave: () => void; isRTL: boolean; ff: string }) {
   return (
-    <div className="flex justify-end pt-4 border-t border-gray-100">
-      <button onClick={onSave} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-lg hover:brightness-110 disabled:opacity-60 transition-all" style={{ backgroundColor: '#071C3C', color: '#C9A35A', fontFamily: isRTL ? ff : undefined }}>
+    <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+      {saved && (
+        <span className="text-xs font-semibold flex items-center gap-1" style={{ color: '#15803D', fontFamily: isRTL ? ff : undefined }}>
+          <CheckCircle className="w-3.5 h-3.5" />
+          {isRTL ? 'ذخیره شد' : 'Saved'}
+        </span>
+      )}
+      <button
+        onClick={onSave}
+        disabled={saving}
+        className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-lg hover:brightness-110 disabled:opacity-60 transition-all"
+        style={{ backgroundColor: '#071C3C', color: '#C9A35A', fontFamily: isRTL ? ff : undefined }}
+      >
         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-        {isRTL ? 'ذخیره تغییرات' : 'Save Changes'}
+        {saving ? (isRTL ? 'در حال ذخیره...' : 'Saving...') : (isRTL ? 'ذخیره تغییرات' : 'Save Changes')}
       </button>
     </div>
   );
