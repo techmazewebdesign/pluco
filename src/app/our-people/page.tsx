@@ -1,12 +1,14 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import PageHero from '@/components/shared/PageHero';
 import ConsultationCTA from '@/components/shared/ConsultationCTA';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const team = [
   {
+    photo: '/images/members/Reza-ostad.JPG',
     nameEn: 'Reza Ostad',
     nameFa: 'رضا استاد',
     titleEn: 'Founder, CEO & Senior Partner',
@@ -21,6 +23,7 @@ const team = [
     bioFa: 'متخصص حقوق بین‌الملل، بانکداری، انطباق و مشاوره موکلین خصوصی. بنیان‌گذار و مدیرعامل PLUCO GROUP. رضا موکلین متحرک بین‌المللی را در زمینه مهاجرت اروپایی، برنامه‌ریزی اقامت، انطباق بانکی، محرومیت مالی، قراردادهای بین‌المللی و امور موکلین با ارزش خالص بالا مشاوره می‌دهد. او تجربه گسترده‌ای در مشاوره به موکلین از حوزه‌های قضایی پیچیده در زمینه مستندسازی قانونی وجوه، استراتژی منبع ثروت و هماهنگی حقوقی بین‌المللی دارد.',
   },
   {
+    photo: '/images/members/Sara-Rezaei.PNG',
     nameEn: 'Sara Rezaie',
     nameFa: 'سارا رضایی',
     titleEn: 'Document Handling Manager',
@@ -35,8 +38,9 @@ const team = [
     bioFa: 'مسئول مستندات موکل، سازماندهی پرونده، مدیریت اسناد، هماهنگی ترجمه، مدیریت داخلی پرونده و پشتیبانی ارتباطی در امور موکلین خصوصی. سارا اطمینان حاصل می‌کند که پرونده‌های موکلین با دقت و رازداری کامل آماده، سازماندهی و مدیریت می‌شوند.',
   },
   {
-    nameEn: 'Roozbeh Ostad',
-    nameFa: 'روزبه استاد',
+    photo: '/images/members/Rooz-ostad.PNG',
+    nameEn: 'Rooz Ostad',
+    nameFa: 'روز استاد',
     titleEn: 'Head of IT',
     titleFa: 'مدیر فناوری اطلاعات',
     credentialsEn: 'BA Business Management',
@@ -45,10 +49,11 @@ const team = [
     languagesFa: 'انگلیسی، فارسی',
     areasEn: 'IT systems · Digital infrastructure · Client portal coordination · Secure document handling · Website technology · Internal digital operations',
     areasFa: 'سیستم‌های فناوری اطلاعات · زیرساخت دیجیتال · هماهنگی پورتال موکل · مدیریت امن اسناد · فناوری وب‌سایت · عملیات دیجیتال داخلی',
-    bioEn: 'Responsible for IT systems, digital infrastructure, client portal coordination, secure document handling systems, website technology support and internal digital operations. Roozbeh ensures that PLUCO GROUP\'s digital environment meets the security and operational standards required for private client advisory work.',
+    bioEn: 'Responsible for IT systems, digital infrastructure, client portal coordination, secure document handling systems, website technology support and internal digital operations. Rooz ensures that PLUCO GROUP\'s digital environment meets the security and operational standards required for private client advisory work.',
     bioFa: 'مسئول سیستم‌های فناوری اطلاعات، زیرساخت دیجیتال، هماهنگی پورتال موکل، سیستم‌های مدیریت امن اسناد، پشتیبانی فناوری وب‌سایت و عملیات دیجیتال داخلی. روزبه اطمینان حاصل می‌کند که محیط دیجیتال PLUCO GROUP استانداردهای امنیتی و عملیاتی مورد نیاز برای کار مشاوره موکلین خصوصی را برآورده می‌کند.',
   },
   {
+    photo: '/images/members/Mohammad-hossein-heidarpour.JPG',
     nameEn: 'Mohammad Hossein Heidarpour',
     nameFa: 'محمد حسین حیدرپور',
     titleEn: 'Iranian Certified Attorney-at-Law',
@@ -63,6 +68,7 @@ const team = [
     bioFa: 'وکیل پایه یک دادگستری ایران با تمرکز علمی و حرفه‌ای بر حقوق تجاری بین‌المللی، نوآوری، مسائل حقوقی مرتبط با فناوری و حل اختلاف. در حال انجام پژوهش دکتری در حقوق. محمد حسین پشتیبانی تخصصی در مواردی که نیاز به دانش عمیق از حقوق ایران و چارچوب‌های حقوقی تجاری بین‌المللی دارند، ارائه می‌دهد.',
   },
   {
+    photo: '/images/members/Holly_Gilani.PNG',
     nameEn: 'Holly Gilani',
     nameFa: 'هولی گیلانی',
     titleEn: 'International Lawyer and Arbitrator',
@@ -115,11 +121,13 @@ export default function OurPeople() {
               >
                 <div className={`flex flex-col md:flex-row gap-8 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
                   <div className="flex-shrink-0">
-                    <div
-                      className="w-28 h-28 md:w-36 md:h-36 rounded-xl flex items-center justify-center text-2xl font-serif font-bold"
-                      style={{ backgroundColor: '#071C3C', color: '#C9A35A' }}
-                    >
-                      {member.nameEn.split(' ').map(n => n[0]).slice(0, 2).join('')}
+                    <div className="w-28 h-28 md:w-36 md:h-36 rounded-xl overflow-hidden relative flex-shrink-0" style={{ border: '2px solid #C9A35A' }}>
+                      <Image
+                        src={member.photo}
+                        alt={member.nameEn}
+                        fill
+                        className="object-cover object-top"
+                      />
                     </div>
                   </div>
                   <div className="flex-1">
