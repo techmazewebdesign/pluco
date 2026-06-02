@@ -45,7 +45,7 @@ export default function AgentDashboard() {
 
   return (
     <AgentShell>
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <div className="mb-8">
           <h1 className="text-2xl font-serif font-bold mb-1" style={{ color: '#1E2430' }}>
             Welcome back, {agent?.name}

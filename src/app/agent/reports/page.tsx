@@ -63,7 +63,7 @@ export default function AgentReports() {
 
   return (
     <AgentShell>
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <div className="mb-6">
           <h1 className="text-2xl font-serif font-bold" style={{ color: '#1E2430' }}>Reports</h1>
           <p className="text-sm mt-1" style={{ color: '#5E6470' }}>Create and send reports to info@plucogroup.com</p>

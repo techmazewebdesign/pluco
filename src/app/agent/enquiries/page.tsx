@@ -57,7 +57,7 @@ export default function AgentEnquiries() {
 
   return (
     <AgentShell>
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-serif font-bold" style={{ color: '#1E2430' }}>Enquiries</h1>
