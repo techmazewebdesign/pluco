@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, UserPlus, Eye, EyeOff, CheckCircle, Loader2, Upload, Shield, KeyRound } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import PageHero from '@/components/shared/PageHero';
 import { useAuth } from '@/contexts/AuthContext';
@@ -53,11 +53,26 @@ export default function ClientSignIn() {
   });
 
   useEffect(() => {
-    if (!authLoading && user) router.push('/dashboard');
-  }, [user, authLoading, router]);
+    if (!authLoading && user) redirectAfterAuth(user.uid);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading]);
 
   const switchMode = (m: AuthMode) => {
     setMode(m); clearError(); setLocalError(''); setResetDone(false);
+  };
+
+  // ── Determine redirect after auth ────────────────────────────────
+  const redirectAfterAuth = async (uid: string) => {
+    try {
+      const agentSnap = await getDoc(doc(db, 'agents', uid));
+      if (agentSnap.exists() && agentSnap.data().active) {
+        router.push('/agent/dashboard');
+      } else {
+        router.push('/dashboard');
+      }
+    } catch {
+      router.push('/dashboard');
+    }
   };
 
   // ── Sign In ──────────────────────────────────────────────────────
@@ -68,7 +83,9 @@ export default function ClientSignIn() {
     setSubmitting(true);
     try {
       await signIn(siEmail, siPw);
-      router.push('/dashboard');
+      // signIn sets the user in Firebase Auth — get uid from auth directly
+      const { auth } = await import('@/lib/firebase');
+      if (auth.currentUser) await redirectAfterAuth(auth.currentUser.uid);
     } catch { /* error set in context */ }
     finally { setSubmitting(false); }
   };
@@ -84,7 +101,8 @@ export default function ClientSignIn() {
     setSubmitting(true);
     try {
       await signUp(suEmail, suPw, suName);
-      router.push('/dashboard');
+      const { auth } = await import('@/lib/firebase');
+      if (auth.currentUser) await redirectAfterAuth(auth.currentUser.uid);
     } catch { /* error set in context */ }
     finally { setSubmitting(false); }
   };
