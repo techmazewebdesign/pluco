@@ -53,8 +53,8 @@ export default function Header() {
     >
       {/* ── Top bar: language switcher ── */}
       <div
-        className="border-b px-4 sm:px-6 lg:px-8 py-1 flex items-center"
-        style={{ borderColor: '#0B234A', backgroundColor: '#051530' }}
+        className="border-b px-4 sm:px-6 lg:px-8 py-2 flex items-center"
+        style={{ borderColor: '#0B234A', backgroundColor: '#051530', position: 'relative', zIndex: 60 }}
       >
         <div className="max-w-7xl mx-auto w-full flex items-center">
           <LanguageSwitcher />

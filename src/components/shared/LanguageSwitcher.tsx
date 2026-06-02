@@ -1,32 +1,58 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function LanguageSwitcher() {
   const { lang, setLang } = useLanguage();
+  const [mounted, setMounted] = useState(false);
+
+  // Only render interactively after client hydration
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isFa = mounted ? lang === 'fa' : false;
 
   return (
-    <div className="flex items-center gap-0 text-xs font-semibold select-none">
+    <div
+      className="flex items-center rounded-full overflow-hidden text-xs font-semibold"
+      style={{ border: '1px solid #1E3A5F' }}
+    >
       <button
+        type="button"
+        disabled={!mounted}
         onClick={() => setLang('en')}
         aria-label="Switch to English"
-        className="px-2 py-1 transition-colors"
         style={{
-          color: lang === 'en' ? '#C9A35A' : '#94A3B8',
-          fontWeight: lang === 'en' ? 700 : 400,
+          padding: '3px 10px',
+          backgroundColor: !isFa ? '#C9A35A' : 'transparent',
+          color: !isFa ? '#071C3C' : '#64748B',
+          fontWeight: !isFa ? 700 : 400,
+          cursor: mounted ? 'pointer' : 'default',
+          transition: 'background-color 0.2s, color 0.2s',
+          border: 'none',
+          outline: 'none',
+          letterSpacing: '0.05em',
         }}
       >
         EN
       </button>
-      <span style={{ color: '#334155' }}>|</span>
       <button
+        type="button"
+        disabled={!mounted}
         onClick={() => setLang('fa')}
-        aria-label="Switch to Persian"
-        className="px-2 py-1 transition-colors"
+        aria-label="Switch to Persian / فارسی"
         style={{
-          color: lang === 'fa' ? '#C9A35A' : '#94A3B8',
-          fontWeight: lang === 'fa' ? 700 : 400,
+          padding: '3px 10px',
+          backgroundColor: isFa ? '#C9A35A' : 'transparent',
+          color: isFa ? '#071C3C' : '#64748B',
+          fontWeight: isFa ? 700 : 400,
           fontFamily: "'Vazirmatn', 'Tahoma', 'Arial', sans-serif",
+          cursor: mounted ? 'pointer' : 'default',
+          transition: 'background-color 0.2s, color 0.2s',
+          border: 'none',
+          outline: 'none',
         }}
       >
         فارسی
