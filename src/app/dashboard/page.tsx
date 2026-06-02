@@ -164,49 +164,93 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F8F9FA' }}>
+    <div className="flex min-h-screen" style={{ backgroundColor: '#F8F9FA' }}>
 
-      {/* Header */}
-      <div style={{ backgroundColor: '#071C3C', borderBottom: '1px solid #0B234A' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between" dir={isRTL ? 'rtl' : 'ltr'}>
-          <div className="flex items-center gap-4">
-            <Link href="/"><Image src="/images/logo-pluco.png" alt="PLUCO GROUP" width={140} height={36} className="h-9 w-auto object-contain" /></Link>
-            <span className="text-xs font-medium px-2.5 py-1 rounded" style={{ backgroundColor: '#0B234A', color: '#C9A35A' }}>
+      {/* ── Sidebar ── */}
+      <aside className="w-56 flex-shrink-0 flex flex-col fixed inset-y-0 left-0 z-40" style={{ backgroundColor: '#071C3C', borderRight: '1px solid #0B234A' }}>
+        {/* Logo */}
+        <div className="px-5 py-5 border-b" style={{ borderColor: '#0B234A' }}>
+          <Link href="/">
+            <Image src="/images/logo-pluco.png" alt="PLUCO GROUP" width={130} height={34} className="h-8 w-auto object-contain" />
+          </Link>
+          <div className="mt-2">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded" style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>
               {isRTL ? 'پورتال موکل' : 'Client Portal'}
             </span>
           </div>
-          <div className="flex items-center gap-4">
-            {unreadCount > 0 && (
-              <div className="relative">
-                <Bell className="w-5 h-5" style={{ color: '#CBD5E0' }} />
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-xs flex items-center justify-center font-bold" style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>{unreadCount}</span>
-              </div>
-            )}
-            <div className={isRTL ? 'text-left' : 'text-right'}>
-              <p className="text-xs font-medium text-white">{profile?.name || user.email}</p>
-              <p className="text-xs" style={{ color: '#94A3B8' }}>{user.email}</p>
-            </div>
-            <button onClick={handleSignOut} className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg" style={{ backgroundColor: '#0B234A', color: '#C9A35A' }}>
-              <LogOut className="w-3.5 h-3.5" />{isRTL ? 'خروج' : 'Sign Out'}
-            </button>
-          </div>
         </div>
-        {/* Tabs */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" dir={isRTL ? 'rtl' : 'ltr'}>
-          <div className="flex gap-0">
-            {tabs.map(tab => (
-              <button key={tab.key} onClick={() => setActiveTab(tab.key)} className="flex items-center gap-2 px-4 py-3 text-xs font-medium border-b-2 transition-colors relative" style={{ color: activeTab === tab.key ? '#C9A35A' : '#94A3B8', borderColor: activeTab === tab.key ? '#C9A35A' : 'transparent', fontFamily: isRTL ? ff : undefined }}>
-                <tab.Icon className="w-4 h-4" />
-                {isRTL ? tab.labelFa : tab.label}
-                {!!tab.badge && <span className="w-4 h-4 rounded-full text-xs flex items-center justify-center font-bold" style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>{tab.badge}</span>}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir={isRTL ? 'rtl' : 'ltr'}>
+        {/* User info */}
+        <div className="px-5 py-4 border-b" style={{ borderColor: '#0B234A' }}>
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>
+              {(profile?.name || user.email || 'C').charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-white truncate">{profile?.name || user.email?.split('@')[0]}</p>
+              <p className="text-xs truncate" style={{ color: '#64748B' }}>{user.email}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-4 space-y-1">
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors text-left"
+              style={{
+                backgroundColor: activeTab === tab.key ? '#0B234A' : 'transparent',
+                color: activeTab === tab.key ? '#C9A35A' : '#94A3B8',
+                fontFamily: isRTL ? ff : undefined,
+              }}
+            >
+              <tab.Icon className="w-4 h-4 flex-shrink-0" />
+              <span className="flex-1">{isRTL ? tab.labelFa : tab.label}</span>
+              {!!tab.badge && (
+                <span className="w-5 h-5 rounded-full text-xs flex items-center justify-center font-bold flex-shrink-0" style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>
+                  {tab.badge}
+                </span>
+              )}
+            </button>
+          ))}
+        </nav>
+
+        {/* Bottom */}
+        <div className="px-3 py-4 border-t space-y-1" style={{ borderColor: '#0B234A' }}>
+          <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium w-full" style={{ color: '#64748B' }}>
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+            {isRTL ? 'وب‌سایت' : 'Website'}
+          </Link>
+          <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium" style={{ color: '#64748B' }}>
+            <LogOut className="w-4 h-4 flex-shrink-0" />
+            {isRTL ? 'خروج' : 'Sign Out'}
+          </button>
+        </div>
+      </aside>
+
+      {/* ── Main content area (offset by sidebar width) ── */}
+      <div className="flex-1 ml-56 min-h-screen" style={{ backgroundColor: '#F8F9FA' }}>
+        {/* Top bar */}
+        <div className="px-8 py-4 border-b flex items-center justify-between" style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' }} dir={isRTL ? 'rtl' : 'ltr'}>
+          <div>
+            <h1 className="text-base font-serif font-bold" style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}>
+              {tabs.find(t => t.key === activeTab)?.[isRTL ? 'labelFa' : 'label']}
+            </h1>
+          </div>
+          <div className="flex items-center gap-3">
+            {unreadCount > 0 && (
+              <button onClick={() => setActiveTab('messages')} className="relative p-1.5 rounded-lg hover:bg-gray-100">
+                <Bell className="w-4 h-4" style={{ color: '#C9A35A' }} />
+                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full text-xs flex items-center justify-center font-bold" style={{ backgroundColor: '#C9A35A', color: '#071C3C', fontSize: 9 }}>{unreadCount}</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Page content */}
+        <div className="p-8" dir={isRTL ? 'rtl' : 'ltr'}>
         {dataLoading ? (
           <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin" style={{ color: '#C9A35A' }} /></div>
         ) : (
@@ -478,6 +522,7 @@ export default function Dashboard() {
             )}
           </>
         )}
+        </div>
       </div>
     </div>
   );

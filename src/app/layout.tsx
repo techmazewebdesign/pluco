@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AgentProvider } from "@/contexts/AgentContext";
 import RTLWrapper from "@/components/shared/RTLWrapper";
+import SiteShell from "@/components/layout/SiteShell";
 
 export const metadata: Metadata = {
   title: {
@@ -26,33 +25,27 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "PLUCO GROUP – European Immigration Law & Private Client Advisory",
-    description: "Discreet legal and strategic advisory for internationally mobile individuals and families seeking European residency, second citizenship, property, banking and cross-border legal support.",
+    description: "Discreet legal and strategic advisory for internationally mobile individuals and families.",
     type: "website",
     locale: "en_US",
     siteName: "PLUCO GROUP",
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <body className="min-h-full">
         <AuthProvider>
-        <AgentProvider>
-        <LanguageProvider>
-          <RTLWrapper>
-            <Header />
-            <main className="flex-grow">
-              {children}
-            </main>
-            <Footer />
-          </RTLWrapper>
-        </LanguageProvider>
-        </AgentProvider>
+          <AgentProvider>
+            <LanguageProvider>
+              <RTLWrapper>
+                <SiteShell>
+                  {children}
+                </SiteShell>
+              </RTLWrapper>
+            </LanguageProvider>
+          </AgentProvider>
         </AuthProvider>
       </body>
     </html>
