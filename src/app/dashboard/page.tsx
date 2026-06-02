@@ -91,7 +91,15 @@ export default function Dashboard() {
       const newRef = await addDoc(collection(db, 'documents', user.uid, 'files'), docData);
       setDocuments(prev => [{ id: newRef.id, ...docData }, ...prev]);
       setPendingFile(null); setPendingDescription(''); setPendingCategory('other');
-    } catch { setUploadError(isRTL ? 'خطا در بارگذاری' : 'Upload failed'); }
+    } catch (e: unknown) {
+      const code = (e as { code?: string })?.code || '';
+      if (code === 'storage/unauthorized') {
+        setUploadError(isRTL ? 'قوانین Firebase Storage اجازه بارگذاری نمی‌دهد.' : 'Upload blocked by Firebase Storage rules.');
+      } else {
+        setUploadError(isRTL ? `خطا: ${code || String(e)}` : `Upload failed: ${code || String(e)}`);
+      }
+      console.error('Storage upload error:', e);
+    }
     finally { setUploading(false); setUploadProgress(0); }
   };
 

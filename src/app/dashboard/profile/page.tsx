@@ -131,32 +131,50 @@ function PhotoUploader({
 }) {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [uploadErr, setUploadErr] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const ff = "'Vazirmatn', Tahoma, Arial, sans-serif";
   const dim = size === 'lg' ? 'w-24 h-24' : 'w-16 h-16';
 
   const handleFile = async (file: File) => {
-    if (!file.type.startsWith('image/')) return;
-    if (file.size > 5 * 1024 * 1024) { alert('Max 5MB'); return; }
-    setUploading(true);
+    if (!file.type.startsWith('image/')) { setUploadErr('Please select an image file.'); return; }
+    if (file.size > 5 * 1024 * 1024) { setUploadErr('Max file size is 5MB.'); return; }
+    setUploading(true); setUploadErr('');
     try {
-      const ext = file.name.split('.').pop();
+      const ext = file.name.split('.').pop() || 'jpg';
       const path = `${storagePath}.${ext}`;
       const storageRef = ref(storage, path);
       const task = uploadBytesResumable(storageRef, file);
-      await new Promise<void>((res, rej) => task.on('state_changed', s => setProgress(Math.round(s.bytesTransferred / s.totalBytes * 100)), rej, res));
+      await new Promise<void>((res, rej) => task.on(
+        'state_changed',
+        s => setProgress(Math.round(s.bytesTransferred / s.totalBytes * 100)),
+        (err) => { rej(err); },
+        res,
+      ));
       const url = await getDownloadURL(storageRef);
       onUploaded(url, path);
-    } catch (e) { console.error(e); }
-    finally { setUploading(false); setProgress(0); }
+      setProgress(0);
+    } catch (e: unknown) {
+      const code = (e as { code?: string })?.code || '';
+      if (code === 'storage/unauthorized') {
+        setUploadErr('Upload blocked by storage rules. Please check Firebase Storage rules.');
+      } else if (code === 'storage/canceled') {
+        setUploadErr('Upload cancelled.');
+      } else {
+        setUploadErr(`Upload failed: ${code || String(e)}`);
+      }
+      console.error('Storage upload error:', e);
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
     <div className="flex flex-col items-center gap-2">
       <div
         className={`${dim} rounded-full overflow-hidden relative cursor-pointer border-2 flex items-center justify-center`}
-        style={{ borderColor: '#C9A35A', backgroundColor: '#F1F5F9' }}
-        onClick={() => inputRef.current?.click()}
+        style={{ borderColor: uploadErr ? '#DC2626' : '#C9A35A', backgroundColor: '#F1F5F9' }}
+        onClick={() => { setUploadErr(''); inputRef.current?.click(); }}
       >
         {currentUrl ? (
           <Image src={currentUrl} alt="Profile" fill className="object-cover" />
@@ -172,6 +190,11 @@ function PhotoUploader({
           </div>
         )}
       </div>
+      {uploadErr && (
+        <p className="text-xs text-center max-w-[140px]" style={{ color: '#DC2626', fontFamily: isRTL ? ff : undefined }}>
+          {uploadErr}
+        </p>
+      )}
       {label && <p className="text-xs text-center" style={{ color: '#94A3B8', fontFamily: isRTL ? ff : undefined }}>{label}</p>}
       <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
     </div>
