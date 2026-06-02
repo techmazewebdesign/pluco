@@ -22,26 +22,22 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // Read persisted preference on mount
   useEffect(() => {
-    const stored = localStorage.getItem('pluco_lang') as Lang | null;
-    if (stored === 'en' || stored === 'fa') {
-      setLangState(stored);
+    try {
+      const stored = localStorage.getItem('pluco_lang') as Lang | null;
+      if (stored === 'en' || stored === 'fa') {
+        setLangState(stored);
+      }
+    } catch {
+      // localStorage unavailable (private mode etc.)
     }
   }, []);
 
-  // Sync <html> dir/lang attributes whenever lang changes
-  useEffect(() => {
-    const html = document.documentElement;
-    if (lang === 'fa') {
-      html.setAttribute('dir', 'rtl');
-      html.setAttribute('lang', 'fa');
-    } else {
-      html.setAttribute('dir', 'ltr');
-      html.setAttribute('lang', 'en');
-    }
-  }, [lang]);
-
   const setLang = useCallback((next: Lang) => {
-    localStorage.setItem('pluco_lang', next);
+    try {
+      localStorage.setItem('pluco_lang', next);
+    } catch {
+      // ignore
+    }
     setLangState(next);
   }, []);
 

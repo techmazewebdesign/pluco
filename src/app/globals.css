@@ -43,32 +43,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ── Persian / RTL overrides ───────────────────────────────────────── */
-:root[lang="fa"] body,
-[lang="fa"] body {
+/* Scoped to #lang-root to avoid React reconciliation issues with <html> */
+
+#lang-root[lang="fa"] {
   font-family: 'Vazirmatn', 'Tahoma', 'Arial', sans-serif;
 }
 
-:root[lang="fa"] h1,
-:root[lang="fa"] h2,
-:root[lang="fa"] h3,
-:root[lang="fa"] h4,
-:root[lang="fa"] h5,
-:root[lang="fa"] h6,
-[lang="fa"] h1,
-[lang="fa"] h2,
-[lang="fa"] h3,
-[lang="fa"] h4,
-[lang="fa"] h5,
-[lang="fa"] h6 {
+#lang-root[lang="fa"] h1,
+#lang-root[lang="fa"] h2,
+#lang-root[lang="fa"] h3,
+#lang-root[lang="fa"] h4,
+#lang-root[lang="fa"] h5,
+#lang-root[lang="fa"] h6 {
   font-family: 'Vazirmatn', 'Tahoma', 'Arial', sans-serif;
   font-weight: 700;
 }
 
-/* Ensure text aligns right in RTL mode */
-[dir="rtl"] .text-left  { text-align: right; }
-[dir="rtl"] .text-center { text-align: center; }
-[dir="rtl"] .md\:text-left { text-align: right; }
-
-/* Flip flex row directions in RTL for certain layout patterns */
-[dir="rtl"] .flex-row { flex-direction: row-reverse; }
-[dir="rtl"] .sm\:flex-row { flex-direction: row-reverse; }
+/* RTL text alignment */
+#lang-root[dir="rtl"] { text-align: right; }
