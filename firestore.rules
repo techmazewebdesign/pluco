@@ -63,6 +63,17 @@ service cloud.firestore {
       allow read, create, update: if isAgent();
       allow delete: if hasRole('admin');
     }
+    // ── Tickets ───────────────────────────────────────────────────
+    match /tickets/{ticketId} {
+      allow read: if isAgent() || (isSignedIn() && resource.data.clientUid == request.auth.uid);
+      allow create: if isSignedIn();
+      allow update: if isAgent() || (isSignedIn() && resource.data.clientUid == request.auth.uid);
+    }
+    match /tickets/{ticketId}/messages/{msgId} {
+      allow read: if isAgent() || (isSignedIn() && get(/databases/$(database)/documents/tickets/$(ticketId)).data.clientUid == request.auth.uid);
+      allow create: if isAgent() || (isSignedIn() && get(/databases/$(database)/documents/tickets/$(ticketId)).data.clientUid == request.auth.uid);
+    }
+
     match /notifications/{uid}/items/{notifId} {
       allow read, update: if isOwner(uid);
       allow create: if isAgent();

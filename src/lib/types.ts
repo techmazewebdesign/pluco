@@ -187,6 +187,72 @@ export interface Invoice {
   createdBy?: string;  // agentId
 }
 
+// ── Ticket ─────────────────────────────────────────────────────────────
+export type TicketCategory =
+  | 'general' | 'case_update' | 'document' | 'banking'
+  | 'billing' | 'immigration' | 'technical' | 'urgent';
+
+export type TicketStatus = 'open' | 'in_progress' | 'waiting_client' | 'resolved' | 'closed';
+export type TicketPriority = 'low' | 'medium' | 'high' | 'urgent';
+
+export const TICKET_CATEGORY_LABELS: Record<TicketCategory, { en: string; fa: string; icon: string }> = {
+  general:      { en: 'General Enquiry',    fa: 'استعلام عمومی',       icon: '💬' },
+  case_update:  { en: 'Case Update',        fa: 'به‌روزرسانی پرونده',   icon: '📋' },
+  document:     { en: 'Documents',          fa: 'اسناد',               icon: '📄' },
+  banking:      { en: 'Banking',            fa: 'بانکداری',             icon: '🏦' },
+  billing:      { en: 'Billing / Invoice',  fa: 'فاکتور / پرداخت',      icon: '💳' },
+  immigration:  { en: 'Immigration',        fa: 'مهاجرت',               icon: '✈️'  },
+  technical:    { en: 'Technical Issue',    fa: 'مشکل فنی',             icon: '⚙️'  },
+  urgent:       { en: 'Urgent',             fa: 'فوری',                 icon: '🚨' },
+};
+
+export const TICKET_STATUS_LABELS: Record<TicketStatus, { en: string; fa: string; color: string; bg: string }> = {
+  open:           { en: 'Open',            fa: 'باز',           color: '#1E40AF', bg: '#DBEAFE' },
+  in_progress:    { en: 'In Progress',     fa: 'در جریان',      color: '#92400E', bg: '#FEF3C7' },
+  waiting_client: { en: 'Waiting Client',  fa: 'انتظار موکل',   color: '#9333EA', bg: '#F3E8FF' },
+  resolved:       { en: 'Resolved',        fa: 'حل شده',        color: '#15803D', bg: '#DCFCE7' },
+  closed:         { en: 'Closed',          fa: 'بسته شده',      color: '#374151', bg: '#F3F4F6' },
+};
+
+export const TICKET_PRIORITY_LABELS: Record<TicketPriority, { en: string; fa: string; color: string }> = {
+  low:    { en: 'Low',    fa: 'کم',    color: '#374151' },
+  medium: { en: 'Medium', fa: 'متوسط', color: '#1E40AF' },
+  high:   { en: 'High',   fa: 'بالا',  color: '#92400E' },
+  urgent: { en: 'Urgent', fa: 'فوری',  color: '#DC2626' },
+};
+
+export interface Ticket {
+  id: string;
+  ticketNumber: string;
+  subject: string;
+  category: TicketCategory;
+  priority: TicketPriority;
+  status: TicketStatus;
+  clientUid: string;
+  clientName: string;
+  clientEmail: string;
+  assignedTo?: string;
+  assignedToName?: string;
+  description: string;
+  language: 'en' | 'fa';
+  createdAt: string;
+  updatedAt?: string;
+  resolvedAt?: string;
+  unreadAgent?: number;   // unread messages for agent
+  unreadClient?: number;  // unread messages for client
+}
+
+export interface TicketMessage {
+  id: string;
+  from: 'client' | 'agent';
+  senderName: string;
+  senderUid: string;
+  content: string;
+  timestamp: string;
+  readByClient?: boolean;
+  readByAgent?: boolean;
+}
+
 // ── Follow-up ──────────────────────────────────────────────────────────
 export type FollowUpType = 'case' | 'enquiry' | 'document' | 'message' | 'client' | 'custom';
 export type FollowUpPriority = 'low' | 'medium' | 'high' | 'urgent';

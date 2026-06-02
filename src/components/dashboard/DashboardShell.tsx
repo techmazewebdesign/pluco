@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   User, FolderOpen, MessageSquare, CreditCard,
-  LogOut, Menu, X, Home, Bell, CheckCheck,
+  LogOut, Menu, X, Home, Bell, CheckCheck, Ticket as TicketIcon,
 } from 'lucide-react';
 import {
   collection, getDocs, query, orderBy, doc, writeBatch, where,
@@ -22,6 +22,7 @@ const NAV = [
   { href: '/dashboard',         label: 'Documents',  labelFa: 'اسناد',        Icon: FolderOpen,    tab: 'documents' },
   { href: '/dashboard',         label: 'Messages',   labelFa: 'پیام‌ها',       Icon: MessageSquare, tab: 'messages' },
   { href: '/dashboard',         label: 'Invoices',   labelFa: 'فاکتورها',     Icon: CreditCard,    tab: 'invoices' },
+  { href: '/dashboard/tickets', label: 'Tickets',    labelFa: 'تیکت‌ها',       Icon: TicketIcon },
   { href: '/dashboard/profile', label: 'My Profile', labelFa: 'پروفایل من',   Icon: User },
 ];
 

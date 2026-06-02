@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Inbox, Users, FileSearch,
-  FileText, LogOut, ShieldCheck, Menu, X, Flag, User,
+  FileText, LogOut, ShieldCheck, Menu, X, Flag, User, Ticket as TicketIcon,
 } from 'lucide-react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -21,6 +21,7 @@ const NAV = [
   { href: '/agent/clients',    label: 'Clients & Cases',  Icon: Users,           permission: 'clients' },
   { href: '/agent/documents',  label: 'Document Review',  Icon: FileSearch,      permission: 'documents' },
   { href: '/agent/followups',  label: 'Follow-Ups',       Icon: Flag,            permission: null },
+  { href: '/agent/tickets',   label: 'Tickets',          Icon: TicketIcon,      permission: null },
   { href: '/agent/reports',    label: 'Reports',          Icon: FileText,        permission: 'reports' },
 ] as const;
 
