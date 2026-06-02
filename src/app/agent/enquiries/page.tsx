@@ -5,7 +5,8 @@ import { collection, getDocs, query, orderBy, doc, updateDoc } from 'firebase/fi
 import { db } from '@/lib/firebase';
 import { useAgent } from '@/contexts/AgentContext';
 import AgentShell from '@/components/agent/AgentShell';
-import { Loader2, Search, ChevronDown } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
+import FlagButton from '@/components/agent/FlagButton';
 import type { Enquiry, EnquiryStatus } from '@/lib/types';
 import { ENQUIRY_STATUS_LABELS } from '@/lib/types';
 
@@ -110,9 +111,12 @@ export default function AgentEnquiries() {
           {/* Detail */}
           {selected ? (
             <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-start justify-between mb-6 gap-2">
                 <h2 className="text-base font-serif font-bold" style={{ color: '#1E2430' }}>{selected.fullName}</h2>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ backgroundColor: ENQUIRY_STATUS_LABELS[selected.status].bg, color: ENQUIRY_STATUS_LABELS[selected.status].color }}>{ENQUIRY_STATUS_LABELS[selected.status].en}</span>
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: ENQUIRY_STATUS_LABELS[selected.status].bg, color: ENQUIRY_STATUS_LABELS[selected.status].color }}>{ENQUIRY_STATUS_LABELS[selected.status].en}</span>
+                  <FlagButton type="enquiry" relatedLabel={`${selected.fullName} – ${selected.service || 'Enquiry'}`} relatedId={selected.id} />
+                </div>
               </div>
 
               <div className="space-y-3 mb-6">

@@ -1,13 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Inbox, Users, FileSearch,
-  FileText, LogOut, ShieldCheck, Menu, X,
+  FileText, LogOut, ShieldCheck, Menu, X, Flag,
 } from 'lucide-react';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAgent } from '@/contexts/AgentContext';
 import { AGENT_ROLE_LABELS, ROLE_PERMISSIONS } from '@/lib/types';
@@ -18,6 +20,7 @@ const NAV = [
   { href: '/agent/enquiries',  label: 'Enquiries',        Icon: Inbox,           permission: 'enquiries' },
   { href: '/agent/clients',    label: 'Clients & Cases',  Icon: Users,           permission: 'clients' },
   { href: '/agent/documents',  label: 'Document Review',  Icon: FileSearch,      permission: 'documents' },
+  { href: '/agent/followups',  label: 'Follow-Ups',       Icon: Flag,            permission: null },
   { href: '/agent/reports',    label: 'Reports',          Icon: FileText,        permission: 'reports' },
 ] as const;
 
@@ -27,6 +30,21 @@ export default function AgentShell({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [followUpCount, setFollowUpCount] = useState(0);
+
+  useEffect(() => {
+    if (!agent) return;
+    const load = async () => {
+      try {
+        const snap = await getDocs(query(
+          collection(db, 'followups'),
+          where('status', 'in', ['open', 'in_progress'])
+        ));
+        setFollowUpCount(snap.size);
+      } catch { /* ignore */ }
+    };
+    load();
+  }, [agent]);
 
   const handleSignOut = async () => { await signOut(); router.push('/'); };
 
@@ -72,7 +90,12 @@ export default function AgentShell({ children }: { children: React.ReactNode }) 
               style={{ backgroundColor: active ? '#0B234A' : 'transparent', color: active ? '#C9A35A' : '#94A3B8' }}
             >
               <item.Icon className="w-4 h-4 flex-shrink-0" />
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {item.href === '/agent/followups' && followUpCount > 0 && (
+                <span className="w-5 h-5 rounded-full text-xs flex items-center justify-center font-bold flex-shrink-0" style={{ backgroundColor: '#DC2626', color: 'white' }}>
+                  {followUpCount > 9 ? '9+' : followUpCount}
+                </span>
+              )}
             </Link>
           );
         })}

@@ -2,97 +2,70 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── Helper functions ────────────────────────────────────────────
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    function isOwner(uid) {
-      return isSignedIn() && request.auth.uid == uid;
-    }
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
 
     function isAgent() {
       return isSignedIn() &&
         exists(/databases/$(database)/documents/agents/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/agents/$(request.auth.uid)).data.active == true;
     }
-
     function agentRole() {
       return get(/databases/$(database)/documents/agents/$(request.auth.uid)).data.role;
     }
+    function hasRole(role) { return isAgent() && agentRole() == role; }
+    function canManageClients() { return isAgent() && agentRole() in ['admin','case_manager']; }
+    function canReviewDocs() { return isAgent() && agentRole() in ['admin','case_manager','document_reviewer','compliance_officer']; }
+    function canHandleEnquiries() { return isAgent() && agentRole() in ['admin','case_manager','customer_service','compliance_officer','enquiry_handler']; }
 
-    function hasRole(role) {
-      return isAgent() && agentRole() == role;
-    }
-
-    function canManageClients() {
-      return isAgent() && agentRole() in ['admin', 'case_manager'];
-    }
-
-    function canReviewDocs() {
-      return isAgent() && agentRole() in ['admin', 'case_manager', 'document_reviewer', 'compliance_officer'];
-    }
-
-    function canHandleEnquiries() {
-      return isAgent() && agentRole() in ['admin', 'case_manager', 'customer_service', 'compliance_officer', 'enquiry_handler'];
-    }
-
-    // ── Public: enquiry submission (no auth needed) ──────────────────
     match /enquiries/{docId} {
       allow create: if true;
       allow read, update: if canHandleEnquiries();
       allow delete: if hasRole('admin');
     }
-
-    // ── Agents ──────────────────────────────────────────────────────
     match /agents/{uid} {
       allow read: if isOwner(uid) || isAgent();
       allow write: if hasRole('admin');
     }
-
-    // ── Client profiles ──────────────────────────────────────────────
     match /clients/{uid} {
       allow read: if isOwner(uid) || isAgent();
       allow write: if isOwner(uid) || canManageClients();
     }
-
-    // ── Family members ───────────────────────────────────────────────
     match /clients/{uid}/family/{memberId} {
       allow read: if isOwner(uid) || isAgent();
       allow write: if isOwner(uid) || canManageClients();
     }
-
-    // ── Cases ────────────────────────────────────────────────────────
     match /cases/{uid} {
       allow read: if isOwner(uid) || isAgent();
       allow write: if canManageClients();
     }
-
-    // ── Documents ───────────────────────────────────────────────────
     match /documents/{uid}/files/{docId} {
       allow read: if isOwner(uid) || isAgent();
       allow create: if isOwner(uid);
       allow update: if canReviewDocs();
       allow delete: if hasRole('admin');
     }
-
-    // ── Messages ────────────────────────────────────────────────────
     match /messages/{uid}/thread/{msgId} {
       allow read: if isOwner(uid) || isAgent();
       allow create: if isOwner(uid) || isAgent();
       allow update: if isOwner(uid) || isAgent();
     }
-
-    // ── Invoices ────────────────────────────────────────────────────
     match /invoices/{uid}/items/{invId} {
       allow read: if isOwner(uid) || isAgent();
       allow write: if canManageClients();
     }
-
-    // ── Reports ─────────────────────────────────────────────────────
     match /reports/{reportId} {
       allow read, create: if isAgent();
       allow update, delete: if hasRole('admin');
+    }
+    match /followups/{followupId} {
+      allow read, create, update: if isAgent();
+      allow delete: if hasRole('admin');
+    }
+    match /notifications/{uid}/items/{notifId} {
+      allow read, update: if isOwner(uid);
+      allow create: if isAgent();
+      allow delete: if isOwner(uid) || isAgent();
     }
   }
 }

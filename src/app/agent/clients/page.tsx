@@ -6,6 +6,8 @@ import { db } from '@/lib/firebase';
 import { useAgent } from '@/contexts/AgentContext';
 import AgentShell from '@/components/agent/AgentShell';
 import { Loader2, Search, Save, MessageSquare, Eye } from 'lucide-react';
+import FlagButton from '@/components/agent/FlagButton';
+import SendNotificationButton from '@/components/agent/SendNotificationButton';
 import type { ClientProfile, Case, CaseStatus, Message } from '@/lib/types';
 import { CASE_STATUS_LABELS } from '@/lib/types';
 
@@ -141,9 +143,17 @@ export default function AgentClients() {
           {selected && editCase ? (
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               {/* Client header */}
-              <div className="px-6 py-4 border-b border-gray-100" style={{ backgroundColor: '#F8F9FA' }}>
-                <p className="text-base font-serif font-bold" style={{ color: '#1E2430' }}>{selected.profile.name || selected.profile.email}</p>
-                <p className="text-xs mt-0.5" style={{ color: '#5E6470' }}>{selected.profile.email} · UID: {selected.uid.slice(0,12)}…</p>
+              <div className="px-5 py-4 border-b border-gray-100" style={{ backgroundColor: '#F8F9FA' }}>
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="text-base font-serif font-bold" style={{ color: '#1E2430' }}>{selected.profile.name || selected.profile.email}</p>
+                    <p className="text-xs mt-0.5" style={{ color: '#5E6470' }}>{selected.profile.email}</p>
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <FlagButton type="client" relatedLabel={selected.profile.name || selected.profile.email || selected.uid} relatedUid={selected.uid} />
+                    <SendNotificationButton clientUid={selected.uid} clientName={selected.profile.name} />
+                  </div>
+                </div>
               </div>
 
               {/* Tabs */}

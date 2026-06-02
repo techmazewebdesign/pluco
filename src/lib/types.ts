@@ -187,6 +187,77 @@ export interface Invoice {
   createdBy?: string;  // agentId
 }
 
+// ── Follow-up ──────────────────────────────────────────────────────────
+export type FollowUpType = 'case' | 'enquiry' | 'document' | 'message' | 'client' | 'custom';
+export type FollowUpPriority = 'low' | 'medium' | 'high' | 'urgent';
+export type FollowUpStatus = 'open' | 'in_progress' | 'resolved';
+
+export const FOLLOWUP_PRIORITY_LABELS: Record<FollowUpPriority, { en: string; fa: string; color: string; bg: string }> = {
+  low:    { en: 'Low',    fa: 'کم',      color: '#374151', bg: '#F3F4F6' },
+  medium: { en: 'Medium', fa: 'متوسط',  color: '#1E40AF', bg: '#DBEAFE' },
+  high:   { en: 'High',   fa: 'بالا',    color: '#92400E', bg: '#FEF3C7' },
+  urgent: { en: 'Urgent', fa: 'فوری',   color: '#DC2626', bg: '#FEE2E2' },
+};
+
+export const FOLLOWUP_STATUS_LABELS: Record<FollowUpStatus, { en: string; fa: string; color: string; bg: string }> = {
+  open:        { en: 'Open',        fa: 'باز',           color: '#1E40AF', bg: '#DBEAFE' },
+  in_progress: { en: 'In Progress', fa: 'در جریان',     color: '#92400E', bg: '#FEF3C7' },
+  resolved:    { en: 'Resolved',    fa: 'حل شده',        color: '#15803D', bg: '#DCFCE7' },
+};
+
+export interface FollowUp {
+  id: string;
+  type: FollowUpType;
+  title: string;
+  description?: string;
+  priority: FollowUpPriority;
+  status: FollowUpStatus;
+  relatedUid?: string;    // client uid
+  relatedId?: string;     // enquiry id, doc id etc
+  relatedLabel?: string;  // human-readable reference
+  createdBy: string;      // agent uid
+  createdByName: string;
+  assignedTo?: string;    // agent uid
+  assignedToName?: string;
+  dueDate?: string;
+  createdAt: string;
+  updatedAt?: string;
+  resolvedAt?: string;
+  notes?: string;
+}
+
+// ── Client Notification ────────────────────────────────────────────────
+export type NotificationType =
+  | 'case_update'
+  | 'message'
+  | 'document_reviewed'
+  | 'invoice'
+  | 'follow_up'
+  | 'general';
+
+export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, { en: string; fa: string; icon: string }> = {
+  case_update:       { en: 'Case Update',       fa: 'به‌روزرسانی پرونده', icon: '📋' },
+  message:           { en: 'New Message',        fa: 'پیام جدید',          icon: '💬' },
+  document_reviewed: { en: 'Document Reviewed',  fa: 'سند بررسی شد',       icon: '📄' },
+  invoice:           { en: 'Invoice',            fa: 'فاکتور',             icon: '💳' },
+  follow_up:         { en: 'Follow-up',          fa: 'پیگیری',             icon: '🔔' },
+  general:           { en: 'General',            fa: 'عمومی',              icon: '📢' },
+};
+
+export interface ClientNotification {
+  id: string;
+  type: NotificationType;
+  titleEn: string;
+  titleFa: string;
+  bodyEn: string;
+  bodyFa: string;
+  read: boolean;
+  link?: string;
+  createdAt: string;
+  createdBy?: string;
+  createdByName?: string;
+}
+
 // ── Report ─────────────────────────────────────────────────────────────
 export type ReportType =
   | 'weekly_summary'
