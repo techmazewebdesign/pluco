@@ -56,6 +56,12 @@ service cloud.firestore {
       allow write: if isOwner(uid) || canManageClients();
     }
 
+    // ── Family members ───────────────────────────────────────────────
+    match /clients/{uid}/family/{memberId} {
+      allow read: if isOwner(uid) || isAgent();
+      allow write: if isOwner(uid) || canManageClients();
+    }
+
     // ── Cases ────────────────────────────────────────────────────────
     match /cases/{uid} {
       allow read: if isOwner(uid) || isAgent();
