@@ -64,12 +64,22 @@ export default function ClientSignIn() {
   // ── Determine redirect after auth ────────────────────────────────
   const redirectAfterAuth = async (uid: string) => {
     try {
+      // Check Firestore agent doc (source of truth)
       const agentSnap = await getDoc(doc(db, 'agents', uid));
       if (agentSnap.exists() && agentSnap.data().active) {
         router.push('/agent/dashboard');
-      } else {
-        router.push('/dashboard');
+        return;
       }
+      // Fallback: check custom claim (force token refresh to pick up new claims)
+      const { auth } = await import('@/lib/firebase');
+      if (auth.currentUser) {
+        const token = await auth.currentUser.getIdTokenResult(true);
+        if (token.claims.admin) {
+          router.push('/agent/dashboard');
+          return;
+        }
+      }
+      router.push('/dashboard');
     } catch {
       router.push('/dashboard');
     }
