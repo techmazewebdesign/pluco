@@ -10,7 +10,7 @@ import {
   doc, getDoc, setDoc, collection, getDocs,
   addDoc, deleteDoc, updateDoc,
 } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -137,35 +137,44 @@ function PhotoUploader({
   const dim = size === 'lg' ? 'w-24 h-24' : 'w-16 h-16';
 
   const handleFile = async (file: File) => {
-    if (!file.type.startsWith('image/')) { setUploadErr('Please select an image file.'); return; }
-    if (file.size > 5 * 1024 * 1024) { setUploadErr('Max file size is 5MB.'); return; }
-    setUploading(true); setUploadErr('');
+    setUploadErr('');
+    if (!file.type.startsWith('image/')) {
+      setUploadErr('Please select an image file (JPG, PNG, WEBP).');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadErr('File is too large. Maximum size is 5MB.');
+      return;
+    }
+    setUploading(true);
+    setProgress(10); // show immediate feedback
     try {
-      const ext = file.name.split('.').pop() || 'jpg';
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
       const path = `${storagePath}.${ext}`;
       const storageRef = ref(storage, path);
-      const task = uploadBytesResumable(storageRef, file);
-      await new Promise<void>((res, rej) => task.on(
-        'state_changed',
-        s => setProgress(Math.round(s.bytesTransferred / s.totalBytes * 100)),
-        (err) => { rej(err); },
-        res,
-      ));
-      const url = await getDownloadURL(storageRef);
+      setProgress(30);
+      const snapshot = await uploadBytes(storageRef, file, { contentType: file.type });
+      setProgress(80);
+      const url = await getDownloadURL(snapshot.ref);
+      setProgress(100);
       onUploaded(url, path);
-      setProgress(0);
     } catch (e: unknown) {
-      const code = (e as { code?: string })?.code || '';
+      const err = e as { code?: string; message?: string };
+      const code = err?.code || '';
+      const msg = err?.message || String(e);
+      console.error('Storage upload error:', code, msg);
       if (code === 'storage/unauthorized') {
-        setUploadErr('Upload blocked by storage rules. Please check Firebase Storage rules.');
-      } else if (code === 'storage/canceled') {
-        setUploadErr('Upload cancelled.');
+        setUploadErr('Permission denied. Check Firebase Storage rules.');
+      } else if (code === 'storage/object-not-found') {
+        setUploadErr('Storage path error. Please try again.');
+      } else if (code.includes('cors') || msg.includes('CORS')) {
+        setUploadErr('CORS error. Check Firebase Storage CORS config.');
       } else {
-        setUploadErr(`Upload failed: ${code || String(e)}`);
+        setUploadErr(`Upload failed: ${code || msg}`);
       }
-      console.error('Storage upload error:', e);
     } finally {
       setUploading(false);
+      setTimeout(() => setProgress(0), 500);
     }
   };
 

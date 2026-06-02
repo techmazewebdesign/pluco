@@ -17,6 +17,5 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-// Explicitly pass bucket URL to avoid any bucket resolution issues
-export const storage = getStorage(app, 'gs://pluco-group.firebasestorage.app');
+export const storage = getStorage(app);
 export default app;

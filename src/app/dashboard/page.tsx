@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { doc, getDoc, collection, getDocs, orderBy, query, addDoc } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -80,27 +80,31 @@ export default function Dashboard() {
 
   const handleUpload = async () => {
     if (!pendingFile || !user) return;
-    setUploading(true); setUploadProgress(0); setUploadError(null);
+    setUploading(true); setUploadProgress(20); setUploadError(null);
     try {
       const path = `documents/${user.uid}/${Date.now()}-${pendingFile.name}`;
       const storageRef = ref(storage, path);
-      const task = uploadBytesResumable(storageRef, pendingFile);
-      await new Promise<void>((res, rej) => task.on('state_changed', s => setUploadProgress(Math.round(s.bytesTransferred / s.totalBytes * 100)), rej, res));
-      const url = await getDownloadURL(storageRef);
+      setUploadProgress(40);
+      const snapshot = await uploadBytes(storageRef, pendingFile, { contentType: pendingFile.type });
+      setUploadProgress(80);
+      const url = await getDownloadURL(snapshot.ref);
       const docData = { clientUid: user.uid, name: pendingFile.name, category: pendingCategory, description: pendingDescription || '', url, storagePath: path, size: pendingFile.size, mimeType: pendingFile.type, status: 'pending' as DocumentStatus, uploadedAt: new Date().toISOString() };
       const newRef = await addDoc(collection(db, 'documents', user.uid, 'files'), docData);
       setDocuments(prev => [{ id: newRef.id, ...docData }, ...prev]);
       setPendingFile(null); setPendingDescription(''); setPendingCategory('other');
+      setUploadProgress(100);
     } catch (e: unknown) {
-      const code = (e as { code?: string })?.code || '';
+      const err = e as { code?: string; message?: string };
+      const code = err?.code || '';
+      const msg = err?.message || String(e);
+      console.error('Storage upload error:', code, msg);
       if (code === 'storage/unauthorized') {
-        setUploadError(isRTL ? 'قوانین Firebase Storage اجازه بارگذاری نمی‌دهد.' : 'Upload blocked by Firebase Storage rules.');
+        setUploadError(isRTL ? 'دسترسی رد شد. قوانین Storage را بررسی کنید.' : 'Permission denied. Check Firebase Storage rules.');
       } else {
-        setUploadError(isRTL ? `خطا: ${code || String(e)}` : `Upload failed: ${code || String(e)}`);
+        setUploadError(isRTL ? `خطا: ${code || msg}` : `Upload failed: ${code || msg}`);
       }
-      console.error('Storage upload error:', e);
     }
-    finally { setUploading(false); setUploadProgress(0); }
+    finally { setUploading(false); }
   };
 
   if (authLoading || !user) return (
