@@ -4,6 +4,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AgentProvider } from "@/contexts/AgentContext";
 import RTLWrapper from "@/components/shared/RTLWrapper";
 
 export const metadata: Metadata = {
@@ -41,6 +42,7 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <body className="min-h-full">
         <AuthProvider>
+        <AgentProvider>
         <LanguageProvider>
           <RTLWrapper>
             <Header />
@@ -50,6 +52,7 @@ export default function RootLayout({
             <Footer />
           </RTLWrapper>
         </LanguageProvider>
+        </AgentProvider>
         </AuthProvider>
       </body>
     </html>
