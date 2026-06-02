@@ -219,6 +219,13 @@ export default function Dashboard() {
 
         {/* Bottom */}
         <div className="px-3 py-4 border-t space-y-1" style={{ borderColor: '#0B234A' }}>
+          <Link href="/dashboard/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors" style={{ color: '#94A3B8' }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#C9A35A')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#94A3B8')}
+          >
+            <User className="w-4 h-4 flex-shrink-0" />
+            {isRTL ? 'پروفایل من' : 'My Profile'}
+          </Link>
           <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium w-full" style={{ color: '#64748B' }}>
             <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
             {isRTL ? 'وب‌سایت' : 'Website'}
