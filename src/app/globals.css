@@ -61,3 +61,24 @@ h1, h2, h3, h4, h5, h6 {
 
 /* RTL text alignment */
 #lang-root[dir="rtl"] { text-align: right; }
+
+/* RTL form inputs - ensure proper text direction */
+#lang-root[dir="rtl"] input[type="text"],
+#lang-root[dir="rtl"] input[type="email"],
+#lang-root[dir="rtl"] input[type="phone"],
+#lang-root[dir="rtl"] input[type="tel"],
+#lang-root[dir="rtl"] textarea,
+#lang-root[dir="rtl"] select {
+  text-align: right;
+  direction: rtl;
+}
+
+/* RTL checkbox and radio - flex reversal */
+#lang-root[dir="rtl"] .flex {
+  direction: rtl;
+}
+
+/* RTL button arrow rotation */
+#lang-root[dir="rtl"] .rotate-180 {
+  transform: rotate(180deg);
+}

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, AlertCircle } from 'lucide-react';
 import PageHero from '@/components/shared/PageHero';
 import ConsultationCTA from '@/components/shared/ConsultationCTA';
+import LegalDisclaimer from '@/components/shared/LegalDisclaimer';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const feeDisclaimer = {
@@ -203,6 +204,12 @@ export default function NewIdentity() {
           <p className="text-xs leading-relaxed" style={{ color: '#64748B', fontFamily: isRTL ? ff : undefined }}>
             <strong>{isRTL ? 'سلب مسئولیت هزینه‌ها: ' : 'Global Fee Disclaimer: '}</strong>{isRTL ? feeDisclaimer.fa : feeDisclaimer.en}
           </p>
+        </div>
+      </section>
+
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <LegalDisclaimer />
         </div>
       </section>
 

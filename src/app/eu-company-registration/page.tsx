@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Building2, FileText, Users, Landmark, Shield, Globe } from 'lucide-react';
 import PageHero from '@/components/shared/PageHero';
 import ConsultationCTA from '@/components/shared/ConsultationCTA';
+import LegalDisclaimer from '@/components/shared/LegalDisclaimer';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const servicesData = [
@@ -123,6 +124,12 @@ export default function EUCompanyRegistration() {
           <p className="text-xs leading-relaxed" style={{ color: '#64748B', fontFamily: isRTL ? ff : undefined }}>
             {isRTL ? <><strong>سلب مسئولیت هزینه‌ها: </strong>حق‌الوکاله، هزینه‌های دولتی، کارمزد بانک، هزینه‌های مشاوران محلی، هزینه‌های ترجمه، حق دفترخانه، مالیات، هزینه‌های متخصصان شخص ثالث و هزینه‌های جانبی به هزینه‌های استاندارد خدمات PLUCO GROUP اضافه می‌شوند.</> : <><strong>Global Fee Disclaimer: </strong>Legal fees, government fees, bank charges, local counsel fees, translation fees, notary fees, taxes, third-party professional fees and out-of-pocket expenses are added to the standard PLUCO GROUP service fees unless expressly agreed otherwise in writing.</>}
           </p>
+        </div>
+      </section>
+
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <LegalDisclaimer />
         </div>
       </section>
 

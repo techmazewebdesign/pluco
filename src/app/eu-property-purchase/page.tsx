@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import PageHero from '@/components/shared/PageHero';
 import ConsultationCTA from '@/components/shared/ConsultationCTA';
+import LegalDisclaimer from '@/components/shared/LegalDisclaimer';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const content = {
@@ -131,6 +132,12 @@ export default function EUPropertyPurchase() {
           <p className="text-xs leading-relaxed" style={{ color: '#64748B', fontFamily: isRTL ? ff : undefined }}>
             <strong>{c.feeLabel} </strong>{c.globalFee}
           </p>
+        </div>
+      </section>
+
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <LegalDisclaimer />
         </div>
       </section>
 

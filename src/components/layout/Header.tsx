@@ -78,17 +78,23 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-5 xl:gap-6" dir="ltr">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-6" dir={isRTL ? 'rtl' : 'ltr'}>
             {/* Home */}
             <Link href="/" className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
               {t('nav.home')}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300" style={{ backgroundColor: '#C9A35A' }} />
+              <span
+                className={`absolute bottom-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${isRTL ? 'right-0' : 'left-0'}`}
+                style={{ backgroundColor: '#C9A35A' }}
+              />
             </Link>
 
             {/* Our People */}
             <Link href="/our-people" className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
               {t('nav.ourPeople')}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300" style={{ backgroundColor: '#C9A35A' }} />
+              <span
+                className={`absolute bottom-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${isRTL ? 'right-0' : 'left-0'}`}
+                style={{ backgroundColor: '#C9A35A' }}
+              />
             </Link>
 
             {/* Services Dropdown */}
@@ -99,7 +105,10 @@ export default function Header() {
               >
                 {t('nav.services')}
                 <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isServicesOpen ? 'rotate-180' : ''}`} />
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300" style={{ backgroundColor: '#C9A35A' }} />
+                <span
+                  className={`absolute bottom-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${isRTL ? 'right-0' : 'left-0'}`}
+                  style={{ backgroundColor: '#C9A35A' }}
+                />
               </button>
 
               <AnimatePresence>
@@ -109,7 +118,7 @@ export default function Header() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 8 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full left-0 mt-1 w-56 rounded-lg shadow-2xl py-1 z-50"
+                    className={`absolute top-full mt-1 w-56 rounded-lg shadow-2xl py-1 z-50 ${isRTL ? 'right-0' : 'left-0'}`}
                     style={{ backgroundColor: '#071C3C', border: '1px solid #0B234A' }}
                   >
                     {services.map((item) => (
@@ -133,7 +142,10 @@ export default function Header() {
             {/* Publications */}
             <Link href="/publications" className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
               {t('nav.publications')}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300" style={{ backgroundColor: '#C9A35A' }} />
+              <span
+                className={`absolute bottom-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${isRTL ? 'right-0' : 'left-0'}`}
+                style={{ backgroundColor: '#C9A35A' }}
+              />
             </Link>
 
             {/* Client Sign In */}

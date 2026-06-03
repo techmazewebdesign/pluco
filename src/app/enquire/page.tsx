@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle, Lock } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 type FormData = {
   name: string;
@@ -11,35 +12,88 @@ type FormData = {
   company: string;
   service: string;
   message: string;
+  nationality?: string;
+  currentCountry?: string;
+  language?: string;
+  familyMembers?: string;
+  numFamilyMembers?: string;
+  urgency?: string;
+  preferredContact?: string;
+  consent?: boolean;
 };
 
 const inputClass = 'w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A35A] focus:border-[#C9A35A] bg-white';
 
 export default function EnquirePage() {
+  const { isRTL } = useLanguage();
   const [form, setForm] = useState<FormData>({
     name: '', email: '', phone: '', company: '', service: '', message: '',
+    nationality: '', currentCountry: '', language: 'English', familyMembers: '', numFamilyMembers: '', urgency: '', preferredContact: '', consent: false,
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const subject = encodeURIComponent(`Enquiry — ${form.name}${form.company ? ` (${form.company})` : ''}`);
-    const body = encodeURIComponent(
-      `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone || 'N/A'}\nCompany: ${form.company || 'N/A'}\nService of Interest: ${form.service || 'N/A'}\n\nMessage:\n${form.message}`
-    );
-    window.open(`mailto:info@plucogroup.com?subject=${subject}&body=${body}`, '_blank');
-    setSubmitted(true);
+    if (!form.consent) {
+      setError('Please confirm the consent checkbox before submitting.');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/enquiry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName: form.name,
+          email: form.email,
+          phone: form.phone,
+          company: form.company,
+          service: form.service,
+          description: form.message,
+          nationality: form.nationality,
+          country: form.currentCountry,
+          language: form.language,
+          familyMembers: form.familyMembers,
+          numFamilyMembers: form.numFamilyMembers,
+          urgency: form.urgency,
+          preferredContact: form.preferredContact,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit enquiry');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setSubmitted(true);
+      } else {
+        setError(data.error || 'Failed to submit enquiry. Please try again.');
+      }
+    } catch (err) {
+      console.error('Error submitting form:', err);
+      setError('Failed to submit enquiry. Please try again or contact us directly at info@plucogroup.com');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#071C3C' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#071C3C' }} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Dark navy header band */}
       <section className="pt-28 pb-12">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center" dir={isRTL ? 'rtl' : 'ltr'}>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: '#C9A35A' }}>
               CONFIDENTIAL ENQUIRY
@@ -64,13 +118,14 @@ export default function EnquirePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
             className="bg-white rounded-2xl p-8 md:p-10 shadow-2xl"
+            dir={isRTL ? 'rtl' : 'ltr'}
           >
             {submitted ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <CheckCircle className="w-16 h-16 mb-6" style={{ color: '#C9A35A' }} />
-                <h3 className="text-2xl font-serif mb-3" style={{ color: '#1E2430' }}>Enquiry Prepared</h3>
-                <p className="text-sm mb-6" style={{ color: '#5E6470' }}>
-                  Your email client has opened with your enquiry addressed to info@plucogroup.com. Please send it from there and we will respond within 24 hours.
+                <h3 className="text-2xl font-serif mb-3" style={{ color: '#1E2430' }}>Thank You</h3>
+                <p className="text-sm mb-6 leading-relaxed max-w-md" style={{ color: '#5E6470' }}>
+                  Your enquiry has been received. PLUCO GROUP will review your information confidentially and contact you regarding the next appropriate step.
                 </p>
                 <button
                   onClick={() => setSubmitted(false)}
@@ -110,16 +165,78 @@ export default function EnquirePage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium mb-1.5" style={{ color: '#1E2430' }}>Area of Interest</label>
-                    <select name="service" value={form.service} onChange={handleChange} className={inputClass}>
-                      <option value="">Select an area</option>
+                    <label className="block text-xs font-medium mb-1.5" style={{ color: '#1E2430' }}>Service of Interest *</label>
+                    <select name="service" required value={form.service} onChange={handleChange} className={inputClass}>
+                      <option value="">Select a service</option>
+                      <option>New Identity / Second Citizenship</option>
+                      <option>EU Residency</option>
+                      <option>EU Property Purchase</option>
+                      <option>US Green Card / EB-5</option>
+                      <option>Banking & Compliance</option>
+                      <option>Dispute Resolution</option>
                       <option>International Contracts</option>
-                      <option>Dispute Resolution & Settlements</option>
-                      <option>Banking Compliance</option>
-                      <option>Financial Discrimination</option>
-                      <option>High-Tech Industrial Contracts</option>
-                      <option>General Enquiry</option>
+                      <option>Business Solutions</option>
+                      <option>EU Company Registration</option>
+                      <option>Private Client Advisory</option>
+                      <option>Other</option>
                     </select>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#1E2430' }}>Nationality</label>
+                      <input type="text" name="nationality" value={form.nationality || ''} onChange={handleChange} placeholder="Your nationality" className={inputClass} />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#1E2430' }}>Current Country of Residence</label>
+                      <input type="text" name="currentCountry" value={form.currentCountry || ''} onChange={handleChange} placeholder="Current country" className={inputClass} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#1E2430' }}>Preferred Language</label>
+                      <select name="language" value={form.language || 'English'} onChange={handleChange} className={inputClass}>
+                        <option value="English">English</option>
+                        <option value="Farsi / Persian">Farsi / Persian</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#1E2430' }}>Family Members Included</label>
+                      <select name="familyMembers" value={form.familyMembers || ''} onChange={handleChange} className={inputClass}>
+                        <option value="">Select...</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {form.familyMembers === 'Yes' && (
+                    <div>
+                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#1E2430' }}>Number of Family Members</label>
+                      <input type="number" name="numFamilyMembers" value={form.numFamilyMembers || ''} onChange={handleChange} placeholder="e.g., 2, 3, 4..." min="1" className={inputClass} />
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#1E2430' }}>Urgency</label>
+                      <select name="urgency" value={form.urgency || ''} onChange={handleChange} className={inputClass}>
+                        <option value="">Select...</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Urgent">Urgent</option>
+                        <option value="Very Urgent">Very Urgent</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium mb-1.5" style={{ color: '#1E2430' }}>Preferred Contact Method</label>
+                      <select name="preferredContact" value={form.preferredContact || ''} onChange={handleChange} className={inputClass}>
+                        <option value="">Select...</option>
+                        <option value="Email">Email</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="Phone">Phone</option>
+                      </select>
+                    </div>
                   </div>
 
                   <div>
@@ -135,18 +252,41 @@ export default function EnquirePage() {
                     />
                   </div>
 
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 rounded-lg border"
+                      style={{ backgroundColor: '#FEF2F2', borderColor: '#FCA5A5', color: '#991B1B' }}
+                    >
+                      <p className="text-xs font-medium">{error}</p>
+                    </motion.div>
+                  )}
+
+                  <div className="flex items-start gap-3 p-4 rounded-lg" style={{ backgroundColor: '#F8F9FA' }}>
+                    <input
+                      type="checkbox"
+                      name="consent"
+                      checked={form.consent || false}
+                      onChange={(e) => setForm(prev => ({ ...prev, consent: e.target.checked }))}
+                      className="mt-1 w-4 h-4 rounded"
+                      style={{ accentColor: '#C9A35A' }}
+                      disabled={isLoading}
+                    />
+                    <label className="text-xs leading-relaxed" style={{ color: '#5E6470' }}>
+                      I understand that submitting this form does not create a lawyer-client relationship and does not guarantee any result. By submitting, I consent to being contacted by PLUCO GROUP regarding my enquiry.
+                    </label>
+                  </div>
+
                   <button
                     type="submit"
-                    className="w-full inline-flex items-center justify-center gap-2 py-4 text-sm font-semibold rounded-lg transition-all hover:brightness-110"
+                    disabled={!form.consent || isLoading}
+                    className="w-full inline-flex items-center justify-center gap-2 py-4 text-sm font-semibold rounded-lg transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
                   >
-                    Send Enquiry
-                    <ArrowRight className="w-4 h-4" />
+                    {isLoading ? 'Submitting...' : 'Send Enquiry'}
+                    <ArrowRight className={`w-4 h-4 ${isLoading ? 'opacity-50' : ''}`} />
                   </button>
-
-                  <p className="text-center text-xs" style={{ color: '#5E6470' }}>
-                    By submitting this form you consent to being contacted by Pluco Group Sp. z o.o. regarding your enquiry.
-                  </p>
                 </form>
               </>
             )}

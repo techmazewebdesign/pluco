@@ -47,6 +47,8 @@ export default function ClientTickets() {
   const [priority, setPriority] = useState<TicketPriority>('medium');
   const [description, setDescription] = useState('');
   const [creating, setCreating] = useState(false);
+  const [error, setError] = useState('');
+  const [replyError, setReplyError] = useState('');
 
   // Load ticket list
   useEffect(() => {
@@ -88,7 +90,7 @@ export default function ClientTickets() {
 
   const handleCreate = async () => {
     if (!user || !subject.trim() || !description.trim()) return;
-    setCreating(true);
+    setCreating(true); setError('');
     try {
       const snap = await getDoc(doc(db, 'clients', user.uid));
       const profile = snap.exists() ? snap.data() : {};
@@ -101,7 +103,6 @@ export default function ClientTickets() {
         createdAt: new Date().toISOString(), unreadAgent: 1, unreadClient: 0,
       };
       const ref = await addDoc(collection(db, 'tickets'), ticket);
-      // Add first message
       await addDoc(collection(db, 'tickets', ref.id, 'messages'), {
         from: 'client', senderName: profile.name || user.email || 'Client',
         senderUid: user.uid, content: description.trim(),
@@ -111,13 +112,18 @@ export default function ClientTickets() {
       setTickets(prev => [newTicket, ...prev]);
       setSubject(''); setDescription(''); setCategory('general'); setPriority('medium');
       await openTicket(newTicket);
-    } catch (e) { console.error(e); }
+    } catch (e: unknown) {
+      const code = (e as { code?: string })?.code || String(e);
+      const msg = code === 'permission-denied' ? 'Permission denied. Check Firestore security rules.' : `Failed: ${code}`;
+      setError(msg);
+      console.error('Ticket creation error:', e);
+    }
     finally { setCreating(false); }
   };
 
   const handleReply = async () => {
     if (!reply.trim() || !selected || !user) return;
-    setSending(true);
+    setSending(true); setReplyError('');
     try {
       const snap = await getDoc(doc(db, 'clients', user.uid));
       const profile = snap.exists() ? snap.data() : {};
@@ -133,7 +139,12 @@ export default function ClientTickets() {
       });
       setMessages(prev => [...prev, { id: ref.id, ...msg }]);
       setReply('');
-    } catch (e) { console.error(e); }
+    } catch (e: unknown) {
+      const code = (e as { code?: string })?.code || String(e);
+      const msg = code === 'permission-denied' ? 'Permission denied. Check Firestore rules.' : `Failed: ${code}`;
+      setReplyError(msg);
+      console.error('Reply error:', e);
+    }
     finally { setSending(false); }
   };
 
@@ -217,6 +228,11 @@ export default function ClientTickets() {
       <h1 className="text-xl font-serif font-bold mb-6" style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}>
         {isRTL ? 'تیکت جدید' : 'New Support Ticket'}
       </h1>
+      {error && (
+        <div className="mb-4 p-3 rounded-lg text-xs" style={{ backgroundColor: '#FEE2E2', color: '#DC2626', fontFamily: isRTL ? ff : undefined }}>
+          ⚠ {error}
+        </div>
+      )}
       <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
         <div>
           <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined, letterSpacing: isRTL ? 'normal' : undefined }}>
@@ -337,6 +353,11 @@ export default function ClientTickets() {
         {/* Reply box */}
         {selected.status !== 'closed' && (
           <div className="px-4 sm:px-6 py-4 border-t bg-white" style={{ borderColor: '#E5E7EB' }}>
+            {replyError && (
+              <div className="mb-3 p-2 rounded text-xs" style={{ backgroundColor: '#FEE2E2', color: '#DC2626', fontFamily: isRTL ? ff : undefined }}>
+                ⚠ {replyError}
+              </div>
+            )}
             <div className="flex gap-3 items-end">
               <textarea
                 rows={3} value={reply} onChange={e => setReply(e.target.value)}

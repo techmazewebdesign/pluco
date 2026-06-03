@@ -261,6 +261,24 @@ export default function ProfilePage() {
     load();
   }, [user]);
 
+  // Auto-save profile when photo is uploaded
+  useEffect(() => {
+    if (!user || !profile.photo) return;
+    const autoSave = async () => {
+      try {
+        await setDoc(doc(db, 'clients', user.uid), {
+          ...profile,
+          uid: user.uid,
+          email: user.email,
+          updatedAt: new Date().toISOString(),
+        }, { merge: true });
+      } catch (e) {
+        console.error('Auto-save photo error:', e);
+      }
+    };
+    autoSave();
+  }, [profile.photo, user]);
+
   const handleSave = async () => {
     if (!user) return;
     setSaving(true); setSaveError(''); setSaved(false);

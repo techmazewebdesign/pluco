@@ -1,0 +1,25 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow authenticated users to read/write their own profile photos
+    match /profiles/{uid}/photo.{extension=jpg|jpeg|png|webp} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == uid &&
+                      request.resource.size < 5 * 1024 * 1024 &&
+                      request.resource.contentType.matches('image/.*');
+    }
+
+    // Allow authenticated users to upload and manage family member photos
+    match /profiles/{uid}/family/{memberId}/photo.{extension=jpg|jpeg|png|webp} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == uid &&
+                      request.resource.size < 5 * 1024 * 1024 &&
+                      request.resource.contentType.matches('image/.*');
+    }
+
+    // Allow only authenticated users
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
