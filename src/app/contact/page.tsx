@@ -1,5 +1,4 @@
 'use client';
-// Force rebuild: 2024-06-03-v2-new-contact-form
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -9,71 +8,59 @@ import DiscreetFirstContact from '@/components/sections/DiscreetFirstContact';
 import LegalDisclaimer from '@/components/shared/LegalDisclaimer';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-const inputClass = 'w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A35A] focus:border-[#C9A35A]';
+const inputStyle = 'w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A35A] focus:border-[#C9A35A]';
 
-export default function Contact() {
+export default function ContactPage() {
   const { isRTL } = useLanguage();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [company, setCompany] = useState('');
-  const [service, setService] = useState('');
-  const [message, setMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [fName, setFName] = useState('');
+  const [lName, setLName] = useState('');
+  const [mail, setMail] = useState('');
+  const [tel, setTel] = useState('');
+  const [corp, setCorp] = useState('');
+  const [svc, setSvc] = useState('');
+  const [msg, setMsg] = useState('');
+  const [sending, setSending] = useState(false);
+  const [done, setDone] = useState(false);
+  const [err, setErr] = useState('');
 
-  const submitForm = async (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: any) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setErrorMsg('');
+    setSending(true);
+    setErr('');
 
     try {
-      console.log('Form submission started');
-
-      const payload = {
-        fullName: `${firstName} ${lastName}`,
-        email: email,
-        phone: phone,
-        currentCountry: company,
-        preferredLanguage: 'English',
-        serviceNeeded: service,
-        shortCaseDescription: message,
-      };
-
-      console.log('Sending payload to /api/leads:', payload);
-
-      const response = await fetch('/api/leads', {
+      const result = await fetch('/api/leads', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: `${fName} ${lName}`,
+          email: mail,
+          phone: tel,
+          currentCountry: corp,
+          preferredLanguage: 'English',
+          serviceNeeded: svc,
+          shortCaseDescription: msg,
+        }),
       });
 
-      console.log('Response status:', response.status);
-      const result = await response.json();
-      console.log('Response data:', result);
+      const data = await result.json();
 
-      if (response.ok && result.success) {
-        console.log('Form submitted successfully');
-        setSuccessMessage(true);
-        setFirstName('');
-        setLastName('');
-        setEmail('');
-        setPhone('');
-        setCompany('');
-        setService('');
-        setMessage('');
+      if (result.ok && data.success) {
+        setDone(true);
+        setFName('');
+        setLName('');
+        setMail('');
+        setTel('');
+        setCorp('');
+        setSvc('');
+        setMsg('');
       } else {
-        throw new Error(result.error || 'Failed to submit');
+        setErr('Something went wrong. Please try again.');
       }
-    } catch (error) {
-      console.error('Form error:', error);
-      setErrorMsg('Something went wrong. Please try again.');
+    } catch (e) {
+      setErr('Something went wrong. Please try again.');
     } finally {
-      setIsSubmitting(false);
+      setSending(false);
     }
   };
 
@@ -116,33 +103,29 @@ export default function Contact() {
             </motion.div>
 
             <motion.div className="lg:col-span-3" initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
-              {successMessage ? (
+              {done ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
                   <CheckCircle className="w-16 h-16 mb-6" style={{ color: '#C9A35A' }} />
                   <h3 className="text-2xl font-serif mb-3" style={{ color: '#1E2430' }}>Thank You</h3>
                   <p className="text-sm mb-6" style={{ color: '#5E6470' }}>Your enquiry has been received. Our private client team will contact you shortly.</p>
-                  <button onClick={() => setSuccessMessage(false)} className="text-xs font-semibold underline" style={{ color: '#C9A35A' }}>Send another message</button>
+                  <button onClick={() => setDone(false)} className="text-xs font-semibold underline" style={{ color: '#C9A35A' }}>Send another message</button>
                 </div>
               ) : (
                 <div className="bg-gray-50 rounded-2xl p-8">
                   <h2 className="text-2xl font-serif mb-2" style={{ color: '#1E2430' }}>Request a Consultation</h2>
                   <p className="text-xs mb-8" style={{ color: '#5E6470' }}>Fill in the form and we will be in touch within 24 hours.</p>
 
-                  {/* NEW FORM - v2.0 */}
-                  <form onSubmit={submitForm} className="space-y-5">
+                  <form onSubmit={handleFormSubmit} className="space-y-5">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <input type="text" placeholder="First Name *" required value={firstName} onChange={(e) => setFirstName(e.target.value)} className={inputClass} />
-                      <input type="text" placeholder="Last Name *" required value={lastName} onChange={(e) => setLastName(e.target.value)} className={inputClass} />
+                      <input type="text" placeholder="First Name *" required value={fName} onChange={e => setFName(e.target.value)} className={inputStyle} />
+                      <input type="text" placeholder="Last Name *" required value={lName} onChange={e => setLName(e.target.value)} className={inputStyle} />
                     </div>
-
-                    <input type="email" placeholder="Email Address *" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
-
+                    <input type="email" placeholder="Email Address *" required value={mail} onChange={e => setMail(e.target.value)} className={inputStyle} />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <input type="tel" placeholder="Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} />
-                      <input type="text" placeholder="Company / Organisation" value={company} onChange={(e) => setCompany(e.target.value)} className={inputClass} />
+                      <input type="tel" placeholder="Phone Number" value={tel} onChange={e => setTel(e.target.value)} className={inputStyle} />
+                      <input type="text" placeholder="Company / Organisation" value={corp} onChange={e => setCorp(e.target.value)} className={inputStyle} />
                     </div>
-
-                    <select required value={service} onChange={(e) => setService(e.target.value)} className={inputClass}>
+                    <select required value={svc} onChange={e => setSvc(e.target.value)} className={inputStyle}>
                       <option value="">Select a service *</option>
                       <option>International Contracts</option>
                       <option>Dispute Resolution & Settlements</option>
@@ -151,17 +134,10 @@ export default function Contact() {
                       <option>High-Tech Industrial Contracts</option>
                       <option>General Consultation</option>
                     </select>
-
-                    <textarea placeholder="Please describe your legal or commercial needs..." required value={message} onChange={(e) => setMessage(e.target.value)} rows={5} className={inputClass} />
-
-                    {errorMsg && (
-                      <div className="p-4 rounded-lg" style={{ backgroundColor: '#FEF2F2', color: '#991B1B', borderColor: '#FCA5A5', border: '1px solid' }}>
-                        <p className="text-xs font-medium">{errorMsg}</p>
-                      </div>
-                    )}
-
-                    <button type="submit" disabled={isSubmitting} className="w-full inline-flex items-center justify-center gap-2 py-3.5 text-sm font-semibold rounded-lg transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: '#071C3C', color: '#FFFFFF' }}>
-                      {isSubmitting ? 'Sending...' : 'Send Message'}
+                    <textarea placeholder="Please describe your legal or commercial needs..." required value={msg} onChange={e => setMsg(e.target.value)} rows={5} className={inputStyle} />
+                    {err && <div className="p-4 rounded-lg" style={{ backgroundColor: '#FEF2F2', color: '#991B1B', border: '1px solid #FCA5A5' }}><p className="text-xs font-medium">{err}</p></div>}
+                    <button type="submit" disabled={sending} className="w-full inline-flex items-center justify-center gap-2 py-3.5 text-sm font-semibold rounded-lg transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: '#071C3C', color: '#FFFFFF' }}>
+                      {sending ? 'Sending...' : 'Send Message'}
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </form>
@@ -173,7 +149,6 @@ export default function Contact() {
       </section>
 
       <DiscreetFirstContact />
-
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <LegalDisclaimer />
