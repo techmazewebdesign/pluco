@@ -8,67 +8,71 @@ import DiscreetFirstContact from '@/components/sections/DiscreetFirstContact';
 import LegalDisclaimer from '@/components/shared/LegalDisclaimer';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-type FormData = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  company: string;
-  service: string;
-  message: string;
-};
-
 const inputClass = 'w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A35A] focus:border-[#C9A35A]';
 
 export default function Contact() {
   const { isRTL } = useLanguage();
-  const [form, setForm] = useState<FormData>({
-    firstName: '', lastName: '', email: '', phone: '', company: '', service: '', message: '',
-  });
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [company, setCompany] = useState('');
+  const [service, setService] = useState('');
+  const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const submitForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('loading');
-    setErrorMessage('');
+    setIsSubmitting(true);
+    setErrorMsg('');
 
     try {
+      console.log('Form submission started');
+
+      const payload = {
+        fullName: `${firstName} ${lastName}`,
+        email: email,
+        phone: phone,
+        currentCountry: company,
+        preferredLanguage: 'English',
+        serviceNeeded: service,
+        shortCaseDescription: message,
+      };
+
+      console.log('Sending payload to /api/leads:', payload);
+
       const response = await fetch('/api/leads', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fullName: `${form.firstName} ${form.lastName}`.trim(),
-          email: form.email,
-          phone: form.phone,
-          currentCountry: form.company,
-          preferredLanguage: 'English',
-          serviceNeeded: form.service,
-          shortCaseDescription: form.message,
-        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       });
 
-      const data = await response.json() as { success?: boolean; error?: string };
+      console.log('Response status:', response.status);
+      const result = await response.json();
+      console.log('Response data:', result);
 
-      if (!response.ok) {
-        throw new Error(data.error || `Server error: ${response.status}`);
+      if (response.ok && result.success) {
+        console.log('Form submitted successfully');
+        setSuccessMessage(true);
+        setFirstName('');
+        setLastName('');
+        setEmail('');
+        setPhone('');
+        setCompany('');
+        setService('');
+        setMessage('');
+      } else {
+        throw new Error(result.error || 'Failed to submit');
       }
-
-      if (!data.success) {
-        throw new Error(data.error || 'Submission failed');
-      }
-
-      setStatus('success');
-      setForm({ firstName: '', lastName: '', email: '', phone: '', company: '', service: '', message: '' });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error occurred';
-      setErrorMessage(message);
-      setStatus('error');
-      console.error('Form error:', err);
+    } catch (error) {
+      console.error('Form error:', error);
+      setErrorMsg('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -111,28 +115,32 @@ export default function Contact() {
             </motion.div>
 
             <motion.div className="lg:col-span-3" initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
-              {status === 'success' ? (
+              {successMessage ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
                   <CheckCircle className="w-16 h-16 mb-6" style={{ color: '#C9A35A' }} />
                   <h3 className="text-2xl font-serif mb-3" style={{ color: '#1E2430' }}>Thank You</h3>
                   <p className="text-sm mb-6" style={{ color: '#5E6470' }}>Your enquiry has been received. Our private client team will contact you shortly.</p>
-                  <button onClick={() => setStatus('idle')} className="text-xs font-semibold underline" style={{ color: '#C9A35A' }}>Send another message</button>
+                  <button onClick={() => setSuccessMessage(false)} className="text-xs font-semibold underline" style={{ color: '#C9A35A' }}>Send another message</button>
                 </div>
               ) : (
                 <div className="bg-gray-50 rounded-2xl p-8">
                   <h2 className="text-2xl font-serif mb-2" style={{ color: '#1E2430' }}>Request a Consultation</h2>
                   <p className="text-xs mb-8" style={{ color: '#5E6470' }}>Fill in the form and we will be in touch within 24 hours.</p>
-                  <form onSubmit={handleSubmit} className="space-y-5">
+
+                  <form onSubmit={submitForm} className="space-y-5">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <input name="firstName" required value={form.firstName} onChange={handleChange} placeholder="First Name *" className={inputClass} />
-                      <input name="lastName" required value={form.lastName} onChange={handleChange} placeholder="Last Name *" className={inputClass} />
+                      <input type="text" placeholder="First Name *" required value={firstName} onChange={(e) => setFirstName(e.target.value)} className={inputClass} />
+                      <input type="text" placeholder="Last Name *" required value={lastName} onChange={(e) => setLastName(e.target.value)} className={inputClass} />
                     </div>
-                    <input type="email" name="email" required value={form.email} onChange={handleChange} placeholder="Email Address *" className={inputClass} />
+
+                    <input type="email" placeholder="Email Address *" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <input type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="Phone Number" className={inputClass} />
-                      <input name="company" value={form.company} onChange={handleChange} placeholder="Company / Organisation" className={inputClass} />
+                      <input type="tel" placeholder="Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} />
+                      <input type="text" placeholder="Company / Organisation" value={company} onChange={(e) => setCompany(e.target.value)} className={inputClass} />
                     </div>
-                    <select name="service" required value={form.service} onChange={handleChange} className={inputClass}>
+
+                    <select required value={service} onChange={(e) => setService(e.target.value)} className={inputClass}>
                       <option value="">Select a service *</option>
                       <option>International Contracts</option>
                       <option>Dispute Resolution & Settlements</option>
@@ -141,14 +149,17 @@ export default function Contact() {
                       <option>High-Tech Industrial Contracts</option>
                       <option>General Consultation</option>
                     </select>
-                    <textarea name="message" required rows={5} value={form.message} onChange={handleChange} placeholder="Please describe your legal or commercial needs..." className={inputClass} />
-                    {status === 'error' && (
-                      <div className="p-4 rounded-lg border" style={{ backgroundColor: '#FEF2F2', borderColor: '#FCA5A5', color: '#991B1B' }}>
-                        <p className="text-xs font-medium">{errorMessage}</p>
+
+                    <textarea placeholder="Please describe your legal or commercial needs..." required value={message} onChange={(e) => setMessage(e.target.value)} rows={5} className={inputClass} />
+
+                    {errorMsg && (
+                      <div className="p-4 rounded-lg" style={{ backgroundColor: '#FEF2F2', color: '#991B1B', borderColor: '#FCA5A5', border: '1px solid' }}>
+                        <p className="text-xs font-medium">{errorMsg}</p>
                       </div>
                     )}
-                    <button type="submit" disabled={status === 'loading'} className="w-full inline-flex items-center justify-center gap-2 py-3.5 text-sm font-semibold rounded-lg transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: '#071C3C', color: '#FFFFFF' }}>
-                      {status === 'loading' ? 'Sending...' : 'Send Message'}
+
+                    <button type="submit" disabled={isSubmitting} className="w-full inline-flex items-center justify-center gap-2 py-3.5 text-sm font-semibold rounded-lg transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: '#071C3C', color: '#FFFFFF' }}>
+                      {isSubmitting ? 'Sending...' : 'Send Message'}
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </form>
@@ -160,6 +171,7 @@ export default function Contact() {
       </section>
 
       <DiscreetFirstContact />
+
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <LegalDisclaimer />
