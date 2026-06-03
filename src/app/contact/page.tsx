@@ -128,6 +128,7 @@ export default function Contact() {
                   <h2 className="text-2xl font-serif mb-2" style={{ color: '#1E2430' }}>Request a Consultation</h2>
                   <p className="text-xs mb-8" style={{ color: '#5E6470' }}>Fill in the form and we will be in touch within 24 hours.</p>
 
+                  {/* NEW FORM - v2.0 */}
                   <form onSubmit={submitForm} className="space-y-5">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <input type="text" placeholder="First Name *" required value={firstName} onChange={(e) => setFirstName(e.target.value)} className={inputClass} />
