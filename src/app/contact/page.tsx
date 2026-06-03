@@ -8,67 +8,70 @@ import DiscreetFirstContact from '@/components/sections/DiscreetFirstContact';
 import LegalDisclaimer from '@/components/shared/LegalDisclaimer';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-const inputStyle = 'w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A35A] focus:border-[#C9A35A]';
-
 export default function ContactPage() {
   const { isRTL } = useLanguage();
-  const [fName, setFName] = useState('');
-  const [lName, setLName] = useState('');
-  const [mail, setMail] = useState('');
-  const [tel, setTel] = useState('');
-  const [corp, setCorp] = useState('');
-  const [svc, setSvc] = useState('');
-  const [msg, setMsg] = useState('');
-  const [sending, setSending] = useState(false);
-  const [done, setDone] = useState(false);
-  const [err, setErr] = useState('');
 
-  const handleFormSubmit = async (e: any) => {
-    e.preventDefault();
-    console.log('[FORM] Form submission started');
-    setSending(true);
-    setErr('');
+  // Form state
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [emailAddr, setEmailAddr] = useState('');
+  const [phoneNum, setPhoneNum] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [serviceType, setServiceType] = useState('');
+  const [messageText, setMessageText] = useState('');
+
+  // UI state
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  const [errorText, setErrorText] = useState('');
+
+  // Handle form submission
+  const onFormSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    setIsSubmitting(true);
+    setErrorText('');
 
     try {
-      console.log('[FORM] Sending to /api/contact');
-      const result = await fetch('/api/contact', {
+      const payload = {
+        fullName: `${firstName} ${lastName}`,
+        email: emailAddr,
+        phone: phoneNum,
+        currentCountry: companyName,
+        preferredLanguage: 'English',
+        serviceNeeded: serviceType,
+        shortCaseDescription: messageText,
+      };
+
+      const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fullName: `${fName} ${lName}`,
-          email: mail,
-          phone: tel,
-          currentCountry: corp,
-          preferredLanguage: 'English',
-          serviceNeeded: svc,
-          shortCaseDescription: msg,
-        }),
+        body: JSON.stringify(payload),
       });
 
-      const data = await result.json();
-      console.log('[FORM] Response received:', { status: result.status, data });
+      const json = await res.json();
 
-      if (result.ok && data.success) {
-        console.log('[FORM] Success! Showing thank you message');
-        setDone(true);
-        setFName('');
-        setLName('');
-        setMail('');
-        setTel('');
-        setCorp('');
-        setSvc('');
-        setMsg('');
+      if (res.ok && json.success) {
+        setIsComplete(true);
+        setFirstName('');
+        setLastName('');
+        setEmailAddr('');
+        setPhoneNum('');
+        setCompanyName('');
+        setServiceType('');
+        setMessageText('');
       } else {
-        console.error('[FORM] Submission failed');
-        setErr(data.error || 'Something went wrong. Please try again.');
+        setErrorText(json.error || 'Something went wrong. Please try again.');
       }
     } catch (e) {
-      console.error('[FORM] Error:', e);
-      setErr('Something went wrong. Please try again.');
+      setErrorText('Something went wrong. Please try again.');
     } finally {
-      setSending(false);
+      setIsSubmitting(false);
     }
   };
+
+  const inputClass = 'w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A35A] focus:border-[#C9A35A]';
 
   return (
     <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -109,29 +112,83 @@ export default function ContactPage() {
             </motion.div>
 
             <motion.div className="lg:col-span-3" initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
-              {done ? (
+              {isComplete ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
                   <CheckCircle className="w-16 h-16 mb-6" style={{ color: '#C9A35A' }} />
                   <h3 className="text-2xl font-serif mb-3" style={{ color: '#1E2430' }}>Thank You</h3>
                   <p className="text-sm mb-6" style={{ color: '#5E6470' }}>Your enquiry has been received. Our team will contact you shortly.</p>
-                  <button onClick={() => setDone(false)} className="text-xs font-semibold underline" style={{ color: '#C9A35A' }}>Send another message</button>
+                  <button
+                    type="button"
+                    onClick={() => setIsComplete(false)}
+                    className="text-xs font-semibold underline"
+                    style={{ color: '#C9A35A' }}
+                  >
+                    Send another message
+                  </button>
                 </div>
               ) : (
                 <div className="bg-gray-50 rounded-2xl p-8">
                   <h2 className="text-2xl font-serif mb-2" style={{ color: '#1E2430' }}>Request a Consultation</h2>
                   <p className="text-xs mb-8" style={{ color: '#5E6470' }}>Fill in the form and we will be in touch within 24 hours.</p>
 
-                  <form onSubmit={handleFormSubmit} className="space-y-5">
+                  <form onSubmit={onFormSubmit} className="space-y-5">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <input type="text" placeholder="First Name *" required value={fName} onChange={e => setFName(e.target.value)} className={inputStyle} />
-                      <input type="text" placeholder="Last Name *" required value={lName} onChange={e => setLName(e.target.value)} className={inputStyle} />
+                      <input
+                        type="text"
+                        placeholder="First Name *"
+                        required
+                        value={firstName}
+                        onChange={e => setFirstName(e.target.value)}
+                        className={inputClass}
+                        disabled={isSubmitting}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Last Name *"
+                        required
+                        value={lastName}
+                        onChange={e => setLastName(e.target.value)}
+                        className={inputClass}
+                        disabled={isSubmitting}
+                      />
                     </div>
-                    <input type="email" placeholder="Email Address *" required value={mail} onChange={e => setMail(e.target.value)} className={inputStyle} />
+
+                    <input
+                      type="email"
+                      placeholder="Email Address *"
+                      required
+                      value={emailAddr}
+                      onChange={e => setEmailAddr(e.target.value)}
+                      className={inputClass}
+                      disabled={isSubmitting}
+                    />
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <input type="tel" placeholder="Phone Number" value={tel} onChange={e => setTel(e.target.value)} className={inputStyle} />
-                      <input type="text" placeholder="Company / Organisation" value={corp} onChange={e => setCorp(e.target.value)} className={inputStyle} />
+                      <input
+                        type="tel"
+                        placeholder="Phone Number"
+                        value={phoneNum}
+                        onChange={e => setPhoneNum(e.target.value)}
+                        className={inputClass}
+                        disabled={isSubmitting}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Company / Organisation"
+                        value={companyName}
+                        onChange={e => setCompanyName(e.target.value)}
+                        className={inputClass}
+                        disabled={isSubmitting}
+                      />
                     </div>
-                    <select required value={svc} onChange={e => setSvc(e.target.value)} className={inputStyle}>
+
+                    <select
+                      required
+                      value={serviceType}
+                      onChange={e => setServiceType(e.target.value)}
+                      className={inputClass}
+                      disabled={isSubmitting}
+                    >
                       <option value="">Select a service *</option>
                       <option>International Contracts</option>
                       <option>Dispute Resolution & Settlements</option>
@@ -140,10 +197,30 @@ export default function ContactPage() {
                       <option>High-Tech Industrial Contracts</option>
                       <option>General Consultation</option>
                     </select>
-                    <textarea placeholder="Please describe your legal or commercial needs..." required value={msg} onChange={e => setMsg(e.target.value)} rows={5} className={inputStyle} />
-                    {err && <div className="p-4 rounded-lg" style={{ backgroundColor: '#FEF2F2', color: '#991B1B', border: '1px solid #FCA5A5' }}><p className="text-xs font-medium">{err}</p></div>}
-                    <button type="submit" disabled={sending} className="w-full inline-flex items-center justify-center gap-2 py-3.5 text-sm font-semibold rounded-lg transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: '#071C3C', color: '#FFFFFF' }}>
-                      {sending ? 'Sending...' : 'Send Message'}
+
+                    <textarea
+                      placeholder="Please describe your legal or commercial needs..."
+                      required
+                      value={messageText}
+                      onChange={e => setMessageText(e.target.value)}
+                      rows={5}
+                      className={inputClass}
+                      disabled={isSubmitting}
+                    />
+
+                    {errorText && (
+                      <div className="p-4 rounded-lg" style={{ backgroundColor: '#FEF2F2', color: '#991B1B', border: '1px solid #FCA5A5' }}>
+                        <p className="text-xs font-medium">{errorText}</p>
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full inline-flex items-center justify-center gap-2 py-3.5 text-sm font-semibold rounded-lg transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ backgroundColor: '#071C3C', color: '#FFFFFF' }}
+                    >
+                      {isSubmitting ? 'Sending...' : 'Send Message'}
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </form>
