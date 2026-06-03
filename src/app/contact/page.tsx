@@ -25,11 +25,13 @@ export default function ContactPage() {
 
   const handleFormSubmit = async (e: any) => {
     e.preventDefault();
+    console.log('[FORM] Form submission started');
     setSending(true);
     setErr('');
 
     try {
-      const result = await fetch('/api/leads', {
+      console.log('[FORM] Sending to /api/contact');
+      const result = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -44,8 +46,10 @@ export default function ContactPage() {
       });
 
       const data = await result.json();
+      console.log('[FORM] Response received:', { status: result.status, data });
 
       if (result.ok && data.success) {
+        console.log('[FORM] Success! Showing thank you message');
         setDone(true);
         setFName('');
         setLName('');
@@ -55,9 +59,11 @@ export default function ContactPage() {
         setSvc('');
         setMsg('');
       } else {
-        setErr('Something went wrong. Please try again.');
+        console.error('[FORM] Submission failed');
+        setErr(data.error || 'Something went wrong. Please try again.');
       }
     } catch (e) {
+      console.error('[FORM] Error:', e);
       setErr('Something went wrong. Please try again.');
     } finally {
       setSending(false);
@@ -107,7 +113,7 @@ export default function ContactPage() {
                 <div className="flex flex-col items-center justify-center py-20 text-center">
                   <CheckCircle className="w-16 h-16 mb-6" style={{ color: '#C9A35A' }} />
                   <h3 className="text-2xl font-serif mb-3" style={{ color: '#1E2430' }}>Thank You</h3>
-                  <p className="text-sm mb-6" style={{ color: '#5E6470' }}>Your enquiry has been received. Our private client team will contact you shortly.</p>
+                  <p className="text-sm mb-6" style={{ color: '#5E6470' }}>Your enquiry has been received. Our team will contact you shortly.</p>
                   <button onClick={() => setDone(false)} className="text-xs font-semibold underline" style={{ color: '#C9A35A' }}>Send another message</button>
                 </div>
               ) : (
