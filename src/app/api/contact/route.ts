@@ -5,6 +5,15 @@ export async function POST(req: NextRequest) {
     console.log('=== [CONTACT API REACHED] ===');
     const body = await req.json();
 
+    console.log('[CONTACT API] Received payload keys:', Object.keys(body));
+    console.log('[CONTACT API] Received values:', {
+      fullName: body.fullName,
+      email: body.email,
+      phone: body.phone,
+      currentCountry: body.currentCountry,
+      serviceNeeded: body.serviceNeeded,
+    });
+
     // Validate required fields
     if (!body.fullName?.trim() || !body.email?.trim()) {
       console.error('[CONTACT API] Missing required fields');
@@ -29,24 +38,32 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Map form fields according to specification
-    const fullName = body.fullName || body.name || `${body.firstName || ''} ${body.lastName || ''}`.trim();
-    const email = body.email;
-    const phone = body.phone || body.phoneWhatsapp || body.phoneNumber || body.whatsapp || '';
-    const currentCountry = body.currentCountry || body.country || body.currentCountryOfResidence || '';
-    const preferredLanguage = body.preferredLanguage || body.language || '';
-    const serviceNeeded = body.serviceNeeded || body.service || body.areaOfInterest || '';
-    const urgency = body.urgency || 'Normal';
-    const familyMembersNames = body.familyMembersNames || body.familyMembers || body.familyMemberNames || '';
-    const familyMembersNumber = body.familyMembersNumber || body.familyCount || body.familyMembersCount || '';
-    const preferredContactMethod = body.preferredContactMethod || body.contactMethod || '';
-    const message = body.message || body.shortCaseDescription || body.description || '';
+    // Extract fields directly as sent by form - with fallback options per spec
+    const fullName = body.fullName?.trim() || body.name?.trim() || `${body.firstName || ''} ${body.lastName || ''}`.trim();
+    const email = body.email?.trim();
+    const phone = (body.phone?.trim() || body.phoneWhatsapp?.trim() || body.phoneNumber?.trim() || body.whatsapp?.trim() || '').trim();
+    const currentCountry = (body.currentCountry?.trim() || body.country?.trim() || body.currentCountryOfResidence?.trim() || '').trim();
+    const preferredLanguage = body.preferredLanguage?.trim() || body.language?.trim() || '';
+    const serviceNeeded = body.serviceNeeded?.trim() || body.service?.trim() || body.areaOfInterest?.trim() || '';
+    const urgency = body.urgency?.trim() || 'Normal';
+    const familyMembersNames = (body.familyMembersNames?.trim() || body.familyMembers?.trim() || body.familyMemberNames?.trim() || '').trim();
+    const familyMembersNumber = (body.familyMembersNumber?.trim() || body.familyCount?.trim() || body.familyMembersCount?.trim() || '').trim();
+    const preferredContactMethod = (body.preferredContactMethod?.trim() || body.contactMethod?.trim() || '').trim();
+    const message = (body.message?.trim() || body.shortCaseDescription?.trim() || body.description?.trim() || '').trim();
+
+    console.log('[CONTACT API] Extracted fields:', {
+      fullName,
+      email,
+      phone: phone || '(empty)',
+      currentCountry: currentCountry || '(empty)',
+      serviceNeeded,
+    });
 
     // Generate Lead ID and Date
-    const date = new Date().toLocaleDateString('en-US'); // MM/DD/YYYY format
+    const date = new Date().toLocaleDateString('en-US');
     const leadId = `LEAD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-    // Create row array in exact Google Sheet order:
+    // Create row array in exact Google Sheet column order (A-Q):
     // A: Date, B: Lead ID, C: Full Name, D: Email, E: Phone, F: Country, G: Language,
     // H: Service, I: Urgency, J: Family Names, K: Family Count, L: Contact Method, M: Message,
     // N: Status, O: Assigned To, P: Follow-Up, Q: Notes
@@ -69,6 +86,8 @@ export async function POST(req: NextRequest) {
       '',                     // P: Next Follow-Up Date (empty)
       ''                      // Q: Notes (empty)
     ];
+
+    console.log('[CONTACT API] Row data for Google Sheet:', rowData);
 
     // Step 1: Send to Google Sheets via Apps Script
     console.log('[CONTACT API] Sending to Google Sheet...');
@@ -104,7 +123,7 @@ export async function POST(req: NextRequest) {
 
     console.log('[CONTACT API] Google Sheet submission succeeded');
 
-    // Step 2: Send Email Notification (async, after Google Sheets succeeds)
+    // Step 2: Send Email Notification (after Google Sheets succeeds)
     console.log('[CONTACT API] Sending email...');
     if (resendApiKey) {
       try {
@@ -122,13 +141,13 @@ export async function POST(req: NextRequest) {
               <h2>New Contact Form Submission</h2>
               <p><strong>Name:</strong> ${fullName}</p>
               <p><strong>Email:</strong> ${email}</p>
-              <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
-              <p><strong>Country:</strong> ${currentCountry || 'Not provided'}</p>
-              <p><strong>Language:</strong> ${preferredLanguage || 'Not provided'}</p>
-              <p><strong>Service:</strong> ${serviceNeeded || 'Not specified'}</p>
+              <p><strong>Phone:</strong> ${phone ? phone : 'Not provided'}</p>
+              <p><strong>Country:</strong> ${currentCountry ? currentCountry : 'Not provided'}</p>
+              <p><strong>Language:</strong> ${preferredLanguage ? preferredLanguage : 'Not provided'}</p>
+              <p><strong>Service:</strong> ${serviceNeeded ? serviceNeeded : 'Not specified'}</p>
               <p><strong>Urgency:</strong> ${urgency}</p>
               <p><strong>Message:</strong></p>
-              <p>${message || 'No message provided'}</p>
+              <p>${message ? message : 'No message provided'}</p>
               <hr>
               <p>Lead ID: ${leadId}</p>
               <p>Submitted at: ${new Date().toISOString()}</p>
@@ -139,7 +158,6 @@ export async function POST(req: NextRequest) {
         console.log('[CONTACT API] Email sent');
       } catch (emailError) {
         console.error('[CONTACT API] Email sending error:', emailError);
-        // Don't fail - email is secondary to Google Sheets
       }
     }
 
