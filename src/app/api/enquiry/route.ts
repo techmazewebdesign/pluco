@@ -1,5 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { google } from 'googleapis';
+
+async function sendToGoogleSheets(data: any) {
+  try {
+    // Only proceed if Google Sheets credentials are configured
+    if (!process.env.GOOGLE_SHEETS_ID || !process.env.GOOGLE_PROJECT_ID) {
+      console.log('Google Sheets not configured, skipping');
+      return;
+    }
+
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        type: 'service_account',
+        project_id: process.env.GOOGLE_PROJECT_ID,
+        private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID,
+        private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        client_email: process.env.GOOGLE_CLIENT_EMAIL,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+      } as any,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    const values = [
+      [
+        new Date().toLocaleString('en-GB', { timeZone: 'Europe/Warsaw' }),
+        data.fullName || '',
+        data.email || '',
+        data.phone || '',
+        data.nationality || '',
+        data.country || '',
+        data.language || '',
+        data.service || '',
+        data.familyMembers || '',
+        data.numFamilyMembers || '',
+        data.urgency || '',
+        data.preferredContact || '',
+        data.description || '',
+      ],
+    ];
+
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+      range: 'Sheet1!A:M',
+      valueInputOption: 'USER_ENTERED',
+      requestBody: { values },
+    });
+
+    console.log('Successfully appended to Google Sheets');
+  } catch (error) {
+    console.error('Error sending to Google Sheets:', error);
+    // Don't fail the entire request if Google Sheets fails
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -7,12 +62,18 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       fullName, email, phone, nationality, country,
-      familyMembers, service, language, description,
+      familyMembers, numFamilyMembers, service, language, description, urgency, preferredContact,
     } = body;
 
     const isFarsi = language === 'Farsi / Persian' || language === 'فارسی';
     const timestamp = new Date().toLocaleString('en-GB', { timeZone: 'Europe/Warsaw' });
     const fromAddress = process.env.RESEND_FROM || 'PLUCO GROUP <noreply@plucogroup.com>';
+
+    // ── 0. Send to Google Sheets ────────────────────────────────────
+    await sendToGoogleSheets({
+      fullName, email, phone, nationality, country, familyMembers, numFamilyMembers,
+      service, language, description, urgency, preferredContact,
+    });
 
     // ── 1. Notification to PLUCO GROUP ──────────────────────────────
     await resend.emails.send({

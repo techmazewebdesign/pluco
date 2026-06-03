@@ -3,6 +3,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Clock, ArrowRight, CheckCircle } from 'lucide-react';
+import ConsultationProcess from '@/components/sections/ConsultationProcess';
+import DiscreetFirstContact from '@/components/sections/DiscreetFirstContact';
+import LegalDisclaimer from '@/components/shared/LegalDisclaimer';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 type FormData = {
   firstName: string;
@@ -17,30 +21,60 @@ type FormData = {
 const inputClass = 'w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A35A] focus:border-[#C9A35A]';
 
 export default function Contact() {
+  const { isRTL } = useLanguage();
   const [form, setForm] = useState<FormData>({
     firstName: '', lastName: '', email: '', phone: '', company: '', service: '', message: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const subject = encodeURIComponent(`Contact Us — ${form.firstName} ${form.lastName}${form.company ? ` (${form.company})` : ''}`);
-    const body = encodeURIComponent(
-      `Name: ${form.firstName} ${form.lastName}\nEmail: ${form.email}\nPhone: ${form.phone || 'N/A'}\nCompany: ${form.company || 'N/A'}\nService of Interest: ${form.service || 'N/A'}\n\nMessage:\n${form.message}`
-    );
-    window.open(`mailto:info@plucogroup.com?subject=${subject}&body=${body}`, '_blank');
-    setSubmitted(true);
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName: `${form.firstName} ${form.lastName}`.trim(),
+          email: form.email,
+          phone: form.phone,
+          currentCountry: form.company, // Using company field for country
+          preferredLanguage: 'English',
+          serviceNeeded: form.service,
+          shortCaseDescription: form.message,
+        }),
+      });
+
+      const data = await response.json() as { success: boolean; error?: string };
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to submit form');
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Form submission error:', err);
+      setError('Something went wrong. Please try again or contact us directly.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Page header */}
       <section className="pt-28 pb-14" style={{ backgroundColor: '#071C3C' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" dir={isRTL ? 'rtl' : 'ltr'}>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#C9A35A' }}>
               GET IN TOUCH
@@ -53,9 +87,12 @@ export default function Contact() {
         </div>
       </section>
 
+      {/* Consultation Process */}
+      <ConsultationProcess />
+
       {/* Main content */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-16">
 
             {/* Left: contact info */}
@@ -97,9 +134,9 @@ export default function Contact() {
               {submitted ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
                   <CheckCircle className="w-16 h-16 mb-6" style={{ color: '#C9A35A' }} />
-                  <h3 className="text-2xl font-serif mb-3" style={{ color: '#1E2430' }}>Message Prepared</h3>
-                  <p className="text-sm mb-6" style={{ color: '#5E6470' }}>Your email client has opened with your message addressed to info@plucogroup.com. Please send it from there.</p>
-                  <button onClick={() => setSubmitted(false)} className="text-xs font-semibold underline" style={{ color: '#C9A35A' }}>Send another message</button>
+                  <h3 className="text-2xl font-serif mb-3" style={{ color: '#1E2430' }}>Thank You</h3>
+                  <p className="text-sm mb-6" style={{ color: '#5E6470' }}>Your enquiry has been received. Our private client team will contact you shortly.</p>
+                  <button onClick={() => { setSubmitted(false); setError(null); }} className="text-xs font-semibold underline" style={{ color: '#C9A35A' }}>Send another message</button>
                 </div>
               ) : (
                 <div className="bg-gray-50 rounded-2xl p-8">
@@ -146,13 +183,24 @@ export default function Contact() {
                       <label className="block text-xs font-medium mb-1.5" style={{ color: '#1E2430' }}>Message *</label>
                       <textarea name="message" required rows={5} value={form.message} onChange={handleChange} placeholder="Please describe your legal or commercial needs..." className={inputClass} />
                     </div>
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-4 rounded-lg border"
+                        style={{ backgroundColor: '#FEF2F2', borderColor: '#FCA5A5', color: '#991B1B' }}
+                      >
+                        <p className="text-xs font-medium">{error}</p>
+                      </motion.div>
+                    )}
                     <button
                       type="submit"
-                      className="w-full inline-flex items-center justify-center gap-2 py-3.5 text-sm font-semibold rounded-lg transition-all hover:brightness-110"
+                      disabled={isLoading}
+                      className="w-full inline-flex items-center justify-center gap-2 py-3.5 text-sm font-semibold rounded-lg transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{ backgroundColor: '#071C3C', color: '#FFFFFF' }}
                     >
-                      Send Message
-                      <ArrowRight className="w-4 h-4" />
+                      {isLoading ? 'Sending...' : 'Send Message'}
+                      <ArrowRight className={`w-4 h-4 ${isLoading ? 'opacity-50' : ''}`} />
                     </button>
                   </form>
                 </div>
@@ -160,6 +208,16 @@ export default function Contact() {
             </motion.div>
 
           </div>
+        </div>
+      </section>
+
+      {/* Discreet First Contact Section */}
+      <DiscreetFirstContact />
+
+      {/* Legal Disclaimer Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <LegalDisclaimer />
         </div>
       </section>
     </div>
