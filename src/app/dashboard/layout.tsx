@@ -42,11 +42,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const load = async () => {
       try {
         const snap = await getDoc(doc(db, 'clients', user.uid));
-        if (snap.exists()) setProfile(snap.data() as { name?: string; photo?: string });
+        if (snap.exists()) {
+          const data = snap.data() as { name?: string; photo?: string; emailVerified?: boolean };
+          setProfile(data);
+
+          // If email not verified, redirect to verification page
+          if (!data.emailVerified) {
+            router.push(`/verify-email?email=${encodeURIComponent(user.email || '')}`);
+            return;
+          }
+        }
       } catch { /* ignore */ }
     };
     load();
-  }, [user]);
+  }, [user, router]);
 
   if (loading || !user) {
     return (

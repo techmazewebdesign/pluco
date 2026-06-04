@@ -12,9 +12,9 @@ export async function POST(req: NextRequest) {
   try {
     const { email, userId } = await req.json();
 
-    if (!email || !userId) {
+    if (!email) {
       return NextResponse.json(
-        { error: 'Email and userId are required' },
+        { error: 'Email is required' },
         { status: 400 }
       );
     }
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     const verificationRef = doc(db, 'email_verifications', email);
     await setDoc(verificationRef, {
       email,
-      userId,
+      userId: userId || null,
       code,
       expiresAt: expiresAt.toISOString(),
       createdAt: new Date().toISOString(),

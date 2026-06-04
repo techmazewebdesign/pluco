@@ -106,6 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           uid: cred.user.uid,
           name: name.trim(),
           email: email.trim(),
+          emailVerified: false,
           preferredLanguage: 'en',
           createdAt: new Date().toISOString(),
         });

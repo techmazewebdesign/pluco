@@ -10,7 +10,7 @@ import { Lock, Mail, User, ArrowRight, AlertCircle } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
-  const { user, loading, signUp, error, clearError } = useAuth();
+  const { user, loading, signUp, signOut, error, clearError } = useAuth();
   const { isRTL } = useLanguage();
 
   const [formData, setFormData] = useState({
@@ -77,13 +77,15 @@ export default function SignupPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
-          userId: user?.uid || '',
         }),
       });
 
       if (!verificationResponse.ok) {
         throw new Error('Failed to send verification email');
       }
+
+      // Sign out user so they must verify email first
+      await signOut();
 
       // Redirect to email verification page
       router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);

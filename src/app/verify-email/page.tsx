@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { Mail, CheckCircle, AlertCircle, RefreshCw, Clock } from 'lucide-react';
-import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, deleteDoc, query, where, collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 function VerifyEmailContent() {
@@ -83,8 +83,24 @@ function VerifyEmailContent() {
         return;
       }
 
+      // Get userId from Firestore if not already stored
+      let userId = data.userId;
+      if (!userId) {
+        // Query clients collection by email to find the user
+        const clientsRef = collection(db, 'clients');
+        const q = query(clientsRef, where('email', '==', email));
+        const snapshot = await getDocs(q);
+        if (snapshot.docs.length > 0) {
+          userId = snapshot.docs[0].id;
+        }
+      }
+
+      if (!userId) {
+        throw new Error('User not found');
+      }
+
       // Mark user as verified in Firestore
-      const userRef = doc(db, 'clients', data.userId);
+      const userRef = doc(db, 'clients', userId);
       await updateDoc(userRef, { emailVerified: true });
 
       // Delete verification record
