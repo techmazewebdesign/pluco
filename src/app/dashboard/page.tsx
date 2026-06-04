@@ -43,6 +43,8 @@ export default function Dashboard() {
   const [pendingCategory, setPendingCategory] = useState<DocumentCategory>('other');
   const [pendingDescription, setPendingDescription] = useState('');
   const [dragOver, setDragOver] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/client-sign-in');
@@ -316,7 +318,15 @@ export default function Dashboard() {
                               <p className="text-xs" style={{ color: '#94A3B8', fontFamily: isRTL ? ff : undefined }}>{isRTL?cat.fa:cat.en} · {(d.size/1024/1024).toFixed(2)}MB</p>
                             </div>
                             <span className="text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0" style={{ backgroundColor: st.bg, color: st.color, fontFamily: isRTL ? ff : undefined }}>{isRTL?st.fa:st.en}</span>
-                            <a href={d.url} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded hover:bg-gray-100 flex-shrink-0"><Eye className="w-3.5 h-3.5" style={{ color: '#5E6470' }} /></a>
+                            {d.url ? (
+                              <a href={d.url} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded hover:bg-gray-100 flex-shrink-0 cursor-pointer transition-colors" title="Download document">
+                                <Eye className="w-3.5 h-3.5" style={{ color: '#5E6470' }} />
+                              </a>
+                            ) : (
+                              <div className="p-1.5 rounded opacity-50" title="URL not available">
+                                <Eye className="w-3.5 h-3.5" style={{ color: '#CBD5E0' }} />
+                              </div>
+                            )}
                           </div>
                         );
                       })}
@@ -334,7 +344,7 @@ export default function Dashboard() {
                   {messages.length > 0 ? (
                     <div className="divide-y divide-gray-100">
                       {messages.map(msg=>(
-                        <div key={msg.id} className="flex items-start gap-3 p-4" style={{ backgroundColor: !msg.read&&msg.from==='pluco'?'#FFFBEB':'white' }}>
+                        <div key={msg.id} className="flex items-start gap-3 p-4 cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => setSelectedMessage(msg)} style={{ backgroundColor: !msg.read&&msg.from==='pluco'?'#FFFBEB':'white' }}>
                           <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ backgroundColor: msg.from==='pluco'?'#071C3C':'#E5E7EB', color: msg.from==='pluco'?'#C9A35A':'#374151' }}>{msg.from==='pluco'?'P':'C'}</div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -342,8 +352,9 @@ export default function Dashboard() {
                               <span className="text-xs" style={{ color: '#94A3B8' }}>{msg.timestamp?.split('T')[0]}</span>
                               {!msg.read&&msg.from==='pluco'&&<span className="text-xs px-1.5 py-0.5 rounded font-semibold" style={{ backgroundColor: '#FEF3C7', color: '#92400E', fontFamily: isRTL ? ff : undefined }}>{isRTL?'جدید':'New'}</span>}
                             </div>
-                            <p className="text-sm leading-relaxed" style={{ color: '#374151', fontFamily: isRTL ? ff : undefined }}>{msg.content}</p>
+                            <p className="text-sm leading-relaxed truncate" style={{ color: '#374151', fontFamily: isRTL ? ff : undefined }}>{msg.content}</p>
                           </div>
+                          <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: '#C9A35A' }} />
                         </div>
                       ))}
                     </div>
@@ -355,6 +366,28 @@ export default function Dashboard() {
               </motion.div>
             )}
 
+            {/* Message Detail Modal */}
+            {selectedMessage && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setSelectedMessage(null)}>
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-xl max-w-lg w-full max-h-96 overflow-y-auto" onClick={e => e.stopPropagation()}>
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                    <h2 className="text-sm font-bold" style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}>{isRTL?'پیام':'Message'}</h2>
+                    <button onClick={() => setSelectedMessage(null)} className="p-1 hover:bg-gray-100 rounded"><X className="w-4 h-4" style={{ color: '#94A3B8' }} /></button>
+                  </div>
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ backgroundColor: selectedMessage.from==='pluco'?'#071C3C':'#E5E7EB', color: selectedMessage.from==='pluco'?'#C9A35A':'#374151' }}>{selectedMessage.from==='pluco'?'P':'C'}</div>
+                      <div>
+                        <p className="text-xs font-semibold" style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}>{selectedMessage.from==='pluco'?(selectedMessage.senderName||'PLUCO GROUP'):(isRTL?'شما':'You')}</p>
+                        <p className="text-xs" style={{ color: '#94A3B8' }}>{selectedMessage.timestamp}</p>
+                      </div>
+                    </div>
+                    <p className="text-sm leading-relaxed" style={{ color: '#374151', fontFamily: isRTL ? ff : undefined }}>{selectedMessage.content}</p>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+
             {/* ── Invoices ── */}
             {activeTab === 'invoices' && (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
@@ -364,14 +397,15 @@ export default function Dashboard() {
                     <div className="overflow-x-auto">
                       <table className="w-full min-w-[480px]">
                         <thead><tr style={{ backgroundColor: '#F8F9FA', borderBottom: '1px solid #E5E7EB' }}>
-                          {[isRTL?'شرح':'Description',isRTL?'مبلغ':'Amount',isRTL?'سررسید':'Due',isRTL?'وضعیت':'Status'].map(h=><th key={h} className="px-4 py-3 text-xs font-semibold uppercase text-left" style={{ color: '#5E6470', fontFamily: isRTL ? ff : undefined, letterSpacing: isRTL?'normal':'0.05em' }}>{h}</th>)}
+                          {[isRTL?'شرح':'Description',isRTL?'مبلغ':'Amount',isRTL?'سررسید':'Due',isRTL?'وضعیت':'Status',isRTL?'عملیات':'Action'].map(h=><th key={h} className="px-4 py-3 text-xs font-semibold uppercase text-left" style={{ color: '#5E6470', fontFamily: isRTL ? ff : undefined, letterSpacing: isRTL?'normal':'0.05em' }}>{h}</th>)}
                         </tr></thead>
                         <tbody className="divide-y divide-gray-100">
                           {invoices.map(inv=><tr key={inv.id} className="hover:bg-gray-50">
-                            <td className="px-4 py-3 text-sm" style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}>{inv.description}</td>
+                            <td className="px-4 py-3 text-sm cursor-pointer hover:text-yellow-600 transition-colors" onClick={() => setSelectedInvoice(inv)} style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}>{inv.description}</td>
                             <td className="px-4 py-3 text-sm font-semibold" style={{ color: '#1E2430' }}>{inv.amount} {inv.currency}</td>
                             <td className="px-4 py-3 text-xs" style={{ color: inv.status==='pending'?'#DC2626':'#5E6470' }}>{inv.dueDate||'—'}</td>
                             <td className="px-4 py-3"><span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: inv.status==='paid'?'#DCFCE7':'#FEF3C7', color: inv.status==='paid'?'#15803D':'#92400E', fontFamily: isRTL ? ff : undefined }}>{inv.status==='paid'?(isRTL?'پرداخت شده':'Paid'):(isRTL?'در انتظار':'Pending')}</span></td>
+                            <td className="px-4 py-3"><button onClick={() => setSelectedInvoice(inv)} className="text-xs font-semibold px-2 py-1 rounded hover:bg-yellow-100 transition-colors" style={{ color: '#C9A35A', fontFamily: isRTL ? ff : undefined }}>{isRTL?'مشاهده':'View'}</button></td>
                           </tr>)}
                         </tbody>
                       </table>
@@ -381,6 +415,55 @@ export default function Dashboard() {
                   )}
                 </div>
               </motion.div>
+            )}
+
+            {/* Invoice Detail Modal */}
+            {selectedInvoice && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setSelectedInvoice(null)}>
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-xl max-w-lg w-full max-h-96 overflow-y-auto" onClick={e => e.stopPropagation()}>
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                    <h2 className="text-sm font-bold" style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}>{isRTL?'جزئیات فاکتور':'Invoice Details'}</h2>
+                    <button onClick={() => setSelectedInvoice(null)} className="p-1 hover:bg-gray-100 rounded"><X className="w-4 h-4" style={{ color: '#94A3B8' }} /></button>
+                  </div>
+                  <div className="p-5 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium" style={{ color: '#5E6470', fontFamily: isRTL ? ff : undefined }}>{isRTL?'شرح':'Description'}</span>
+                      <span className="text-sm font-semibold" style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}>{selectedInvoice.description}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium" style={{ color: '#5E6470', fontFamily: isRTL ? ff : undefined }}>{isRTL?'مبلغ':'Amount'}</span>
+                      <span className="text-sm font-semibold" style={{ color: '#1E2430' }}>{selectedInvoice.amount} {selectedInvoice.currency}</span>
+                    </div>
+                    {selectedInvoice.dueDate && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium" style={{ color: '#5E6470', fontFamily: isRTL ? ff : undefined }}>{isRTL?'سررسید':'Due Date'}</span>
+                        <span className="text-sm font-semibold" style={{ color: '#1E2430' }}>{selectedInvoice.dueDate}</span>
+                      </div>
+                    )}
+                    {selectedInvoice.issuedAt && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium" style={{ color: '#5E6470', fontFamily: isRTL ? ff : undefined }}>{isRTL?'تاریخ صدور':'Issued Date'}</span>
+                        <span className="text-sm font-semibold" style={{ color: '#1E2430' }}>{selectedInvoice.issuedAt}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between border-t border-gray-100 pt-3">
+                      <span className="text-xs font-medium" style={{ color: '#5E6470', fontFamily: isRTL ? ff : undefined }}>{isRTL?'وضعیت':'Status'}</span>
+                      <span className="text-xs font-semibold px-2 py-1 rounded-full" style={{ backgroundColor: selectedInvoice.status==='paid'?'#DCFCE7':'#FEF3C7', color: selectedInvoice.status==='paid'?'#15803D':'#92400E', fontFamily: isRTL ? ff : undefined }}>{selectedInvoice.status==='paid'?(isRTL?'پرداخت شده':'Paid'):(isRTL?'در انتظار':'Pending')}</span>
+                    </div>
+                    <div className="pt-3 border-t border-gray-100 space-y-3">
+                      {selectedInvoice.url && (
+                        <a href={selectedInvoice.url} target="_blank" rel="noopener noreferrer" className="w-full block py-2 text-xs font-semibold text-center rounded hover:brightness-110 transition-all" style={{ backgroundColor: '#C9A35A', color: '#071C3C', fontFamily: isRTL ? ff : undefined }}>
+                          {isRTL?'دانلود PDF':'Download PDF'}
+                        </a>
+                      )}
+                      <div>
+                        <p className="text-xs" style={{ color: '#94A3B8', fontFamily: isRTL ? ff : undefined }}>{isRTL?'برای پرسش‌ها یا پرداخت تماس بگیرید:':'For questions or payment, contact:'}</p>
+                        <a href="mailto:info@plucogroup.com" className="text-xs font-semibold" style={{ color: '#C9A35A' }}>info@plucogroup.com</a>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
             )}
           </>
         )}

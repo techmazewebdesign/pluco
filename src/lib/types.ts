@@ -184,6 +184,8 @@ export interface Invoice {
   dueDate?: string;
   issuedAt?: string;
   paidAt?: string;
+  url?: string;  // Download URL for PDF
+  storagePath?: string;
   createdBy?: string;  // agentId
 }
 

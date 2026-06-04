@@ -22,7 +22,7 @@ const contactMethods = [
     descEn: 'Instant messaging. Discreet and secure. Perfect for first contact.',
     descFa: 'پیام فوری. محرمانه و امن. ایده‌آل برای تماس اول.',
     Icon: MessageCircle,
-    href: 'https://wa.me/48605550750?text=Hello%20PLUCO%20GROUP%2C%20I%20would%20like%20to%20discuss%20a%20confidential%20matter',
+    href: 'https://wa.me/989199091944?text=Hello%20PLUCO%20GROUP%2C%20I%20would%20like%20to%20discuss%20a%20confidential%20matter',
     buttonEn: 'WhatsApp Us',
     buttonFa: 'واتس اپ بزنید',
   },

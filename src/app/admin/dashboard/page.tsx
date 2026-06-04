@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
-import { LogOut, Users, FileText, MessageSquare, Settings, BarChart3, AlertCircle, Clock } from 'lucide-react';
+import { LogOut, Users, FileText, MessageSquare, Settings, BarChart3, AlertCircle, Clock, Bot } from 'lucide-react';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
@@ -94,11 +94,12 @@ export default function AdminDashboard() {
       color: '#0F766E',
     },
     {
-      titleEn: 'Messages',
-      titleFa: 'پیام‌ها',
-      value: 0,
-      Icon: AlertCircle,
+      titleEn: 'AI Agents',
+      titleFa: 'AI عوامل',
+      value: 1,
+      Icon: Bot,
       color: '#C9A35A',
+      badge: '🟢 Active',
     },
   ];
 
@@ -106,6 +107,7 @@ export default function AdminDashboard() {
     { titleEn: 'View Clients', titleFa: 'مشاهده موکلین', href: '/agent/clients', Icon: Users },
     { titleEn: 'View Cases', titleFa: 'مشاهده پرونده‌ها', href: '/agent/clients', Icon: FileText },
     { titleEn: 'Messages', titleFa: 'پیام‌ها', href: '/agent/enquiries', Icon: MessageSquare },
+    { titleEn: 'AI Agents', titleFa: 'AI عوامل', href: '/admin/dashboard/ai-agents', Icon: Bot },
     { titleEn: 'Reports', titleFa: 'گزارش‌ها', href: '/agent/reports', Icon: BarChart3 },
     { titleEn: 'Settings', titleFa: 'تنظیمات', href: '/agent/profile', Icon: Settings },
   ];
@@ -143,7 +145,7 @@ export default function AdminDashboard() {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
         >
           {stats.map((stat, index) => {
-            const { Icon, color, value, titleEn, titleFa } = stat;
+            const { Icon, color, value, titleEn, titleFa, badge } = stat;
             return (
               <motion.div
                 key={titleEn}
@@ -156,9 +158,16 @@ export default function AdminDashboard() {
                   <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
                     <Icon className="w-6 h-6" style={{ color }} />
                   </div>
-                  <span className="text-3xl font-bold" style={{ color: '#1E2430' }}>
-                    {value}
-                  </span>
+                  <div className="text-right">
+                    <span className="text-3xl font-bold block" style={{ color: '#1E2430' }}>
+                      {value}
+                    </span>
+                    {badge && (
+                      <span className="text-xs font-semibold" style={{ color: '#15803D' }}>
+                        {badge}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <p className="text-sm" style={{ color: '#5E6470' }}>
                   {isRTL ? titleFa : titleEn}

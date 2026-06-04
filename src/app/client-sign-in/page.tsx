@@ -75,8 +75,8 @@ export default function ClientSignIn() {
               style={{ color: '#5E6470', fontFamily: isRTL ? ff : undefined }}
             >
               {isRTL
-                ? 'PLUCO GROUP درگاه موکل امن را برای موکلین فعلی آماده می‌کند. درگاه از به‌روزرسانی‌های وضعیت پرونده، تبادل اسناد، دسترسی به فاکتورها، اطلاعات قرارملاقات و ارتباط محرمانه با تیم پرونده پشتیبانی می‌کند.'
-                : 'PLUCO GROUP is preparing a secure client portal for existing clients. The portal will support case status updates, document exchange, invoice access, appointment information, and confidential communication with the case team.'}
+                ? 'درگاه موکل امن PLUCO GROUP اکنون برای موکلین فعلی در دسترس است. درگاه از به‌روزرسانی‌های وضعیت پرونده، تبادل اسناد، دسترسی به فاکتورها، اطلاعات قرارملاقات و ارتباط محرمانه با تیم پرونده پشتیبانی می‌کند.'
+                : 'PLUCO GROUP\'s secure client portal is now available for existing clients. The portal supports case status updates, document exchange, invoice access, appointment information, and confidential communication with your case team.'}
             </p>
 
             {/* Buttons */}
@@ -110,7 +110,7 @@ export default function ClientSignIn() {
         </div>
       </section>
 
-      {/* Coming Soon Features */}
+      {/* Active Features */}
       <section className="py-20" style={{ backgroundColor: '#F8F9FA' }} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -130,7 +130,7 @@ export default function ClientSignIn() {
               className="text-3xl md:text-4xl font-serif font-bold tracking-wide"
               style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}
             >
-              {isRTL ? 'به زودی در دسترس' : 'Coming Soon'}
+              {isRTL ? 'اکنون در دسترس' : 'Now Active'}
             </h2>
             <motion.div
               initial={{ width: 0 }}
@@ -153,8 +153,16 @@ export default function ClientSignIn() {
                 whileInView="visible"
                 viewport={{ once: true, margin: '-50px' }}
                 whileHover={{ y: -8, transition: { type: 'spring' as const, stiffness: 300, damping: 20 } }}
-                className="flex flex-col p-6 rounded-lg border border-gray-200 bg-white hover:shadow-lg transition-shadow duration-300"
+                className="relative flex flex-col p-6 rounded-lg border-2 bg-white hover:shadow-lg transition-shadow duration-300"
+                style={{ borderColor: '#C9A35A' }}
               >
+                {/* Active Badge */}
+                <div className="absolute top-0 right-0 transform translate-y-[-50%] translate-x-[50%]">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full" style={{ backgroundColor: '#16A34A', color: '#FFFFFF' }}>
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#FFFFFF' }}></span>
+                    {isRTL ? 'فعال' : 'LIVE'}
+                  </span>
+                </div>
                 <motion.div
                   whileHover={{ rotate: 10, scale: 1.1 }}
                   transition={{ duration: 0.4 }}
@@ -223,15 +231,15 @@ export default function ClientSignIn() {
               className="text-2xl font-serif font-bold mb-4"
               style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}
             >
-              {isRTL ? 'برای دسترسی درگاه درخواست کنید' : 'Ready for Portal Access?'}
+              {isRTL ? 'درگاه خود را فعال کنید' : 'Activate Your Portal'}
             </h3>
             <p
               className="text-sm mb-6"
               style={{ color: '#5E6470', fontFamily: isRTL ? ff : undefined }}
             >
               {isRTL
-                ? 'اگر موکل فعلی PLUCO GROUP هستید، برای فعال‌سازی دسترسی درگاه خود درخواست کنید.'
-                : 'If you are a current PLUCO GROUP client, request access to activate your secure portal.'}
+                ? 'اگر موکل فعلی PLUCO GROUP هستید، برای دسترسی به درگاه امن و تمام ویژگی‌های آن درخواست کنید.'
+                : 'If you are a current PLUCO GROUP client, request access now to start using your secure portal with case updates, document exchange, invoices, and confidential messaging.'}
             </p>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
