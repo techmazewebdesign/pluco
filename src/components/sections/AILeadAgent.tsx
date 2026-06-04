@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import {
   Target, Flame, Mail, Calendar, CheckCircle, Zap, TrendingUp,
   AlertCircle, Filter, Search, X, Phone, MapPin, Briefcase,
-  DollarSign, Star, Clock, ArrowRight, AlertTriangle
+  DollarSign, Star, Clock, ArrowRight, AlertTriangle, Plus, Download, RefreshCw, Upload
 } from 'lucide-react';
 import { Lead, AgentTask, AgentActivityLog, AgentNotification, PriorityLevel } from '@/lib/types';
 import {
@@ -16,6 +16,9 @@ import {
   generateDemoLeads,
   generateDemoTasks
 } from '@/lib/services/aiLeadAgentService';
+import AddLeadModal from '@/components/admin/AddLeadModal';
+import ImportCSVModal from '@/components/admin/ImportCSVModal';
+import { useLeadOperations } from '@/lib/hooks/useLeadOperations';
 
 interface PipelineStep {
   id: string;
@@ -46,12 +49,17 @@ interface HotAlert {
 }
 
 export default function AILeadAgent() {
+  const { recalculateAllScores, downloadCSV } = useLeadOperations();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [tasks, setTasks] = useState<AgentTask[]>([]);
   const [activities, setActivities] = useState<AgentActivityLog[]>([]);
   const [notifications, setNotifications] = useState<AgentNotification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isRecalculating, setIsRecalculating] = useState(false);
+
+  const [showAddLeadModal, setShowAddLeadModal] = useState(false);
+  const [showImportCSVModal, setShowImportCSVModal] = useState(false);
 
   const [filterService, setFilterService] = useState('All');
   const [filterPriority, setFilterPriority] = useState('All');
@@ -61,36 +69,59 @@ export default function AILeadAgent() {
   const [searchTerm, setSearchTerm] = useState('');
 
   // Load data from Firebase
+  const loadData = async () => {
+    try {
+      setIsLoading(true);
+      const [leadsData, tasksData, activitiesData, notificationsData] = await Promise.all([
+        getLeads(),
+        getAgentTasks(),
+        getActivityLogs(20),
+        getNotifications(),
+      ]);
+
+      // Use demo data if no real data exists
+      setLeads(leadsData.length > 0 ? leadsData : generateDemoLeads());
+      setTasks(tasksData.length > 0 ? tasksData : generateDemoTasks());
+      setActivities(activitiesData);
+      setNotifications(notificationsData);
+      setError(null);
+    } catch (err) {
+      console.error('Error loading data:', err);
+      // Fallback to demo data on error
+      setLeads(generateDemoLeads());
+      setTasks(generateDemoTasks());
+      setError('Using demo data - could not load from database');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setIsLoading(true);
-        const [leadsData, tasksData, activitiesData, notificationsData] = await Promise.all([
-          getLeads(),
-          getAgentTasks(),
-          getActivityLogs(20),
-          getNotifications(),
-        ]);
-
-        // Use demo data if no real data exists
-        setLeads(leadsData.length > 0 ? leadsData : generateDemoLeads());
-        setTasks(tasksData.length > 0 ? tasksData : generateDemoTasks());
-        setActivities(activitiesData);
-        setNotifications(notificationsData);
-        setError(null);
-      } catch (err) {
-        console.error('Error loading data:', err);
-        // Fallback to demo data on error
-        setLeads(generateDemoLeads());
-        setTasks(generateDemoTasks());
-        setError('Using demo data - could not load from database');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadData();
   }, []);
+
+  const handleRecalculateScores = async () => {
+    try {
+      setIsRecalculating(true);
+      const result = await recalculateAllScores();
+      alert(`✅ Recalculation complete!\nUpdated: ${result.updated} leads`);
+      await loadData(); // Reload data after recalculation
+    } catch (error) {
+      console.error('Error:', error);
+      alert('❌ Error recalculating scores');
+    } finally {
+      setIsRecalculating(false);
+    }
+  };
+
+  const handleDownloadCSV = async () => {
+    try {
+      await downloadCSV();
+    } catch (error) {
+      console.error('Error:', error);
+      alert('❌ Error downloading CSV');
+    }
+  };
 
   // Compute stats
   const stats = [
@@ -237,6 +268,43 @@ export default function AILeadAgent() {
           <p className="text-sm mt-1" style={{ color: '#5E6470' }}>
             Real-time lead generation and qualification automation • {leads.length} leads in database
           </p>
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-3 mt-6">
+            <button
+              onClick={() => setShowAddLeadModal(true)}
+              className="px-4 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 transition-colors hover:brightness-110"
+              style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
+            >
+              <Plus className="w-4 h-4" />
+              Add Lead
+            </button>
+            <button
+              onClick={() => setShowImportCSVModal(true)}
+              className="px-4 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 transition-colors"
+              style={{ backgroundColor: '#F3F4F6', color: '#5E6470' }}
+            >
+              <Upload className="w-4 h-4" />
+              Import CSV
+            </button>
+            <button
+              onClick={handleRecalculateScores}
+              disabled={isRecalculating}
+              className="px-4 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 transition-colors"
+              style={{ backgroundColor: '#F3F4F6', color: '#5E6470', opacity: isRecalculating ? 0.6 : 1 }}
+            >
+              <RefreshCw className={`w-4 h-4 ${isRecalculating ? 'animate-spin' : ''}`} />
+              {isRecalculating ? 'Recalculating...' : 'Recalculate Scores'}
+            </button>
+            <button
+              onClick={handleDownloadCSV}
+              className="px-4 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 transition-colors"
+              style={{ backgroundColor: '#F3F4F6', color: '#5E6470' }}
+            >
+              <Download className="w-4 h-4" />
+              Export CSV
+            </button>
+          </div>
         </div>
       </div>
 
@@ -504,6 +572,18 @@ export default function AILeadAgent() {
           </div>
         </motion.div>
       </div>
+
+      {/* Modals */}
+      <AddLeadModal
+        isOpen={showAddLeadModal}
+        onClose={() => setShowAddLeadModal(false)}
+        onLeadAdded={loadData}
+      />
+      <ImportCSVModal
+        isOpen={showImportCSVModal}
+        onClose={() => setShowImportCSVModal(false)}
+        onImportComplete={loadData}
+      />
     </div>
   );
 }
