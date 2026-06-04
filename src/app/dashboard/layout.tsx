@@ -11,12 +11,31 @@ import DashboardShell from '@/components/dashboard/DashboardShell';
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [profile, setProfile] = useState<{ name?: string; photo?: string } | null>(null);
+  const [profile, setProfile] = useState<{ name?: string; photo?: string; role?: string } | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) router.push('/client-sign-in');
   }, [user, loading, router]);
+
+  // Check if user is admin and redirect
+  useEffect(() => {
+    if (!user) return;
+    const checkAdmin = async () => {
+      try {
+        const snap = await getDoc(doc(db, 'agents', user.uid));
+        if (snap.exists() && snap.data()?.role === 'admin') {
+          setIsAdmin(true);
+          router.push('/admin/dashboard');
+          return;
+        }
+      } catch (e) {
+        console.error('Admin check error:', e);
+      }
+    };
+    checkAdmin();
+  }, [user, router]);
 
   useEffect(() => {
     if (!user) return;

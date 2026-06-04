@@ -131,11 +131,19 @@ export default function Dashboard() {
       <div className="border-b overflow-x-auto" style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' }} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="flex min-w-max px-2">
           {tabs.map(tab => (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-              className="flex items-center gap-2 px-4 py-3.5 text-xs font-medium border-b-2 transition-colors whitespace-nowrap"
-              style={{ borderColor: activeTab === tab.key ? '#C9A35A' : 'transparent', color: activeTab === tab.key ? '#C9A35A' : '#94A3B8', fontFamily: isRTL ? ff : undefined }}
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              type="button"
+              className="flex items-center gap-2 px-4 py-3.5 text-xs font-medium border-b-2 transition-all whitespace-nowrap hover:bg-gray-50 active:bg-gray-100 cursor-pointer"
+              style={{
+                borderColor: activeTab === tab.key ? '#C9A35A' : 'transparent',
+                color: activeTab === tab.key ? '#C9A35A' : '#94A3B8',
+                fontFamily: isRTL ? ff : undefined,
+                userSelect: 'none',
+              }}
             >
-              <tab.Icon className="w-4 h-4" />
+              <tab.Icon className="w-4 h-4" strokeWidth={1.5} />
               {isRTL ? tab.labelFa : tab.label}
               {!!tab.badge && <span className="w-4 h-4 rounded-full text-xs flex items-center justify-center font-bold flex-shrink-0" style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>{tab.badge}</span>}
             </button>
@@ -213,7 +221,14 @@ export default function Dashboard() {
                   <div className="bg-white rounded-xl border border-gray-200 p-5">
                     <div className="flex items-center justify-between mb-4">
                       <h2 className="text-sm font-serif font-bold" style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}>{isRTL?'پیام‌های اخیر':'Recent Messages'}</h2>
-                      <button onClick={() => setActiveTab('messages')} className="text-xs flex items-center gap-1" style={{ color: '#C9A35A' }}>{isRTL?'همه':'All'}<ChevronRight className="w-3 h-3" /></button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('messages')}
+                        className="text-xs flex items-center gap-1 hover:opacity-70 transition-opacity cursor-pointer"
+                        style={{ color: '#C9A35A', userSelect: 'none' }}
+                      >
+                        {isRTL?'همه':'All'}<ChevronRight className="w-3 h-3" />
+                      </button>
                     </div>
                     {messages.length > 0 ? (
                       <div className="space-y-2">
