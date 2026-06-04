@@ -75,8 +75,8 @@ export default function AIAgentsPage() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showMonitorModal, setShowMonitorModal] = useState(false);
   const [settingsData, setSettingsData] = useState({
-    processingSpeed: 'normal' as const,
-    notificationFrequency: 'normal' as const,
+    processingSpeed: 'normal',
+    notificationFrequency: 'normal',
     accuracyThreshold: 95,
     autoEscalation: true,
     maxConcurrentTasks: 15,
@@ -296,10 +296,10 @@ export default function AIAgentsPage() {
     if (selectedAgent) {
       setAgents(agents.map(a =>
         a.id === selectedAgent.id
-          ? { ...a, settings: settingsData }
+          ? { ...a, settings: settingsData as any }
           : a
       ));
-      setSelectedAgent({ ...selectedAgent, settings: settingsData });
+      setSelectedAgent({ ...selectedAgent, settings: settingsData as any });
     }
     setShowSettingsModal(false);
 
@@ -538,7 +538,7 @@ export default function AIAgentsPage() {
                                 {taskPriority.label}
                               </span>
                             </div>
-                            <p className="text-xs" style={{ color: '#5E6470' }} className="mb-2">{task.details}</p>
+                            <p className="text-xs mb-2" style={{ color: '#5E6470' }}>{task.details}</p>
                             <div className="flex items-center gap-4 text-xs" style={{ color: '#94A3B8' }}>
                               <span>{taskStatus.label}</span>
                               {(task.status === 'in_progress' || task.status === 'completed') && (
@@ -929,8 +929,8 @@ export default function AIAgentsPage() {
               </div>
             </div>
           </motion.div>
+        </motion.div>
         )}
-      </div>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
-import { LogOut, Users, FileText, MessageSquare, Settings, BarChart3, AlertCircle, Clock, Bot } from 'lucide-react';
+import { LogOut, Users, FileText, MessageSquare, Settings, BarChart3, AlertCircle, Clock, Bot, Zap } from 'lucide-react';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
@@ -107,9 +107,9 @@ export default function AdminDashboard() {
     { titleEn: 'View Clients', titleFa: 'مشاهده موکلین', href: '/agent/clients', Icon: Users },
     { titleEn: 'View Cases', titleFa: 'مشاهده پرونده‌ها', href: '/agent/clients', Icon: FileText },
     { titleEn: 'Messages', titleFa: 'پیام‌ها', href: '/agent/enquiries', Icon: MessageSquare },
+    { titleEn: 'AI Leads', titleFa: 'AI سرنخ‌ها', href: '/admin/dashboard/leads', Icon: Zap },
     { titleEn: 'AI Agents', titleFa: 'AI عوامل', href: '/admin/dashboard/ai-agents', Icon: Bot },
     { titleEn: 'Reports', titleFa: 'گزارش‌ها', href: '/agent/reports', Icon: BarChart3 },
-    { titleEn: 'Settings', titleFa: 'تنظیمات', href: '/agent/profile', Icon: Settings },
   ];
 
   return (
