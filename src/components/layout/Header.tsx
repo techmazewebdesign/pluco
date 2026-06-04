@@ -2,17 +2,26 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, LogOut, User } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function Header() {
   const { t, isRTL } = useLanguage();
+  const { user, signOut, loading } = useAuth();
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleLogout = async () => {
+    await signOut();
+    router.push('/');
+  };
 
   const services = [
     { key: 'nav.newIdentity' as const,             href: '/new-identity' },
@@ -26,13 +35,14 @@ export default function Header() {
     { key: 'nav.euCompanyRegistration' as const,   href: '/eu-company-registration' },
   ];
 
-  const mobileAll = [
+  const mobileBase = [
     { key: 'nav.home' as const,                    href: '/' },
     { key: 'nav.ourPeople' as const,               href: '/our-people' },
     ...services,
     { key: 'nav.publications' as const,            href: '/publications' },
-    { key: 'nav.clientSignIn' as const,            href: '/client-sign-in' },
   ];
+
+  const mobileAll = [...mobileBase];
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -148,14 +158,44 @@ export default function Header() {
               />
             </Link>
 
-            {/* Client Sign In */}
-            <Link
-              href="/client-sign-in"
-              className="px-5 py-1.5 text-xs font-semibold rounded border transition-colors whitespace-nowrap"
-              style={{ borderColor: '#C9A35A', color: '#C9A35A' }}
-            >
-              {t('nav.clientSignIn')}
-            </Link>
+            {/* Auth Links */}
+            {!loading && !user ? (
+              <>
+                <Link
+                  href="/login"
+                  className="px-5 py-1.5 text-xs font-semibold rounded border transition-colors whitespace-nowrap"
+                  style={{ borderColor: '#C9A35A', color: '#C9A35A' }}
+                >
+                  {isRTL ? 'ورود' : 'Login'}
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-5 py-1.5 text-xs font-semibold rounded transition-colors whitespace-nowrap text-white"
+                  style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
+                >
+                  {isRTL ? 'ثبت نام' : 'Sign up'}
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-2 px-5 py-1.5 text-xs font-semibold rounded border transition-colors whitespace-nowrap"
+                  style={{ borderColor: '#C9A35A', color: '#C9A35A' }}
+                >
+                  <User className="w-4 h-4" />
+                  {isRTL ? 'پنل' : 'Dashboard'}
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-5 py-1.5 text-xs font-semibold rounded transition-colors whitespace-nowrap text-white hover:opacity-80"
+                  style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
+                >
+                  <LogOut className="w-4 h-4" />
+                  {isRTL ? 'خروج' : 'Logout'}
+                </button>
+              </>
+            )}
           </nav>
 
           {/* Mobile menu button */}
@@ -196,6 +236,21 @@ export default function Header() {
                   {t(item.key)}
                 </Link>
               ))}
+              {!loading && user && (
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMenuOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2.5 text-sm font-medium rounded transition-colors flex items-center gap-2"
+                  style={{ color: '#CBD5E0' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A35A')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#CBD5E0')}
+                >
+                  <LogOut className="w-4 h-4" />
+                  {isRTL ? 'خروج' : 'Logout'}
+                </button>
+              )}
             </nav>
           </motion.div>
         )}
