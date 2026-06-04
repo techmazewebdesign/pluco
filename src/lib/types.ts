@@ -373,3 +373,136 @@ export const ROLE_PERMISSIONS: Record<AgentRole, {
   compliance_officer: { enquiries: true,  clients: true,  cases: true,  documents: true,  messages: false, invoices: false, reports: true,  agents: false },
   enquiry_handler:    { enquiries: true,  clients: false, cases: false, documents: false, messages: true,  invoices: false, reports: true,  agents: false },
 };
+
+// ── AI Lead Agent ──────────────────────────────────────────────────────
+export type LeadStatus = 'New' | 'Reviewed' | 'Message Prepared' | 'Contacted' | 'Follow-up Needed' | 'Consultation Ready' | 'Converted' | 'Not Relevant';
+export type PriorityLevel = 'High' | 'Medium' | 'Low';
+export type SourceChannel = 'LinkedIn' | 'Google' | 'Email' | 'Referral' | 'Website' | 'Other';
+
+export const LEAD_STATUS_LABELS: Record<LeadStatus, { en: string; fa: string; color: string; bg: string }> = {
+  'New':                  { en: 'New',                  fa: 'جدید',                 color: '#1E40AF', bg: '#DBEAFE' },
+  'Reviewed':             { en: 'Reviewed',             fa: 'بررسی شده',             color: '#92400E', bg: '#FEF3C7' },
+  'Message Prepared':     { en: 'Message Prepared',     fa: 'پیام آماده',            color: '#6B21A8', bg: '#E9D5FF' },
+  'Contacted':            { en: 'Contacted',            fa: 'تماس برقرار شد',       color: '#15803D', bg: '#DCFCE7' },
+  'Follow-up Needed':     { en: 'Follow-up Needed',     fa: 'پیگیری مورد نیاز',      color: '#B45309', bg: '#FED7AA' },
+  'Consultation Ready':   { en: 'Consultation Ready',   fa: 'مشاوره آماده',          color: '#1E40AF', bg: '#DBEAFE' },
+  'Converted':            { en: 'Converted',            fa: 'تبدیل شده',             color: '#15803D', bg: '#DCFCE7' },
+  'Not Relevant':         { en: 'Not Relevant',         fa: 'نامربوط',               color: '#6B7280', bg: '#F3F4F6' },
+};
+
+export const PRIORITY_LEVEL_LABELS: Record<PriorityLevel, { en: string; fa: string; color: string; bg: string; badge: string }> = {
+  'High':   { en: 'High',   fa: 'بالا',    color: '#DC2626', bg: '#FEE2E2', badge: '🔴' },
+  'Medium': { en: 'Medium', fa: 'متوسط',  color: '#92400E', bg: '#FEF3C7', badge: '🟠' },
+  'Low':    { en: 'Low',    fa: 'کم',      color: '#15803D', bg: '#DCFCE7', badge: '🟢' },
+};
+
+export interface Lead {
+  id: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  whatsapp?: string;
+  country: string;
+  currentResidence?: string;
+  nationality?: string;
+  serviceInterest: string;
+  sourceChannel: SourceChannel;
+  sourceUrl?: string;
+  companyName?: string;
+  estimatedBudget: string;
+  urgency: 'High' | 'Medium' | 'Low';
+  priorityScore: number;  // 0-100
+  priorityLevel: PriorityLevel;
+  status: LeadStatus;
+  assignedTo?: string;  // agent uid
+  assignedToName?: string;
+  notes?: string;
+  aiSummary?: string;
+  aiRecommendedAction?: string;
+  lastContactAt?: string;
+  nextFollowUpAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type AgentTaskType = 'target_selection' | 'channel_search' | 'lead_collection' | 'lead_scoring' | 'message_preparation' | 'follow_up_check' | 'crm_sync';
+export type AgentTaskStatus = 'pending' | 'running' | 'completed' | 'failed' | 'needs_review';
+
+export const AGENT_TASK_TYPE_LABELS: Record<AgentTaskType, { en: string; fa: string; icon: string }> = {
+  'target_selection':     { en: 'Target Selection',      fa: 'انتخاب هدف',           icon: '🎯' },
+  'channel_search':       { en: 'Channel Search',        fa: 'جستجوی کانال',         icon: '🔍' },
+  'lead_collection':      { en: 'Lead Collection',       fa: 'جمع‌آوری سرنخ',       icon: '📊' },
+  'lead_scoring':         { en: 'Lead Scoring',          fa: 'امتیازدهی سرنخ',      icon: '⭐' },
+  'message_preparation':  { en: 'Message Preparation',   fa: 'آماده‌سازی پیام',      icon: '✉️' },
+  'follow_up_check':      { en: 'Follow-up Check',       fa: 'بررسی پیگیری',        icon: '📞' },
+  'crm_sync':             { en: 'CRM Sync',              fa: 'همگام‌سازی CRM',       icon: '🔄' },
+};
+
+export const AGENT_TASK_STATUS_LABELS: Record<AgentTaskStatus, { en: string; fa: string; color: string; bg: string }> = {
+  'pending':       { en: 'Pending',       fa: 'در انتظار',      color: '#1E40AF', bg: '#DBEAFE' },
+  'running':       { en: 'Running',       fa: 'در حال اجرا',   color: '#92400E', bg: '#FEF3C7' },
+  'completed':     { en: 'Completed',     fa: 'تکمیل شده',    color: '#15803D', bg: '#DCFCE7' },
+  'failed':        { en: 'Failed',        fa: 'ناموفق',        color: '#DC2626', bg: '#FEE2E2' },
+  'needs_review':  { en: 'Needs Review',  fa: 'نیاز به بررسی',  color: '#9333EA', bg: '#F3E8FF' },
+};
+
+export interface AgentTask {
+  id: string;
+  taskType: AgentTaskType;
+  title: string;
+  description: string;
+  status: AgentTaskStatus;
+  startedAt: string;
+  completedAt?: string;
+  resultCount: number;
+  errorMessage?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export type ActivityActionType = 'lead_found' | 'lead_scored' | 'message_prepared' | 'contact_made' | 'follow_up_scheduled' | 'consultation_booked' | 'lead_converted' | 'task_completed' | 'task_failed';
+
+export const ACTIVITY_ACTION_LABELS: Record<ActivityActionType, { en: string; fa: string; icon: string }> = {
+  'lead_found':             { en: 'Lead Found',             fa: 'سرنخ یافت شد',         icon: '🎯' },
+  'lead_scored':            { en: 'Lead Scored',            fa: 'سرنخ امتیازدهی شد',   icon: '⭐' },
+  'message_prepared':       { en: 'Message Prepared',       fa: 'پیام آماده شد',       icon: '✉️' },
+  'contact_made':           { en: 'Contact Made',           fa: 'تماس برقرار شد',     icon: '📞' },
+  'follow_up_scheduled':    { en: 'Follow-up Scheduled',    fa: 'پیگیری برنامه‌ریزی شد',  icon: '📅' },
+  'consultation_booked':    { en: 'Consultation Booked',    fa: 'مشاوره رزرو شد',      icon: '✅' },
+  'lead_converted':         { en: 'Lead Converted',         fa: 'سرنخ تبدیل شد',      icon: '🎉' },
+  'task_completed':         { en: 'Task Completed',         fa: 'تکلیف تکمیل شد',      icon: '✔️' },
+  'task_failed':            { en: 'Task Failed',            fa: 'تکلیف ناموفق بود',   icon: '❌' },
+};
+
+export interface AgentActivityLog {
+  id: string;
+  actionType: ActivityActionType;
+  title: string;
+  description: string;
+  relatedLeadId?: string;
+  priority: PriorityLevel;
+  createdAt: string;
+}
+
+export type NotificationSeverity = 'info' | 'success' | 'warning' | 'urgent';
+
+export const NOTIFICATION_SEVERITY_LABELS: Record<NotificationSeverity, { en: string; fa: string; color: string; bg: string; icon: string }> = {
+  'info':    { en: 'Info',    fa: 'اطلاعات',    color: '#1E40AF', bg: '#DBEAFE',   icon: 'ℹ️' },
+  'success': { en: 'Success', fa: 'موفق',      color: '#15803D', bg: '#DCFCE7',   icon: '✓' },
+  'warning': { en: 'Warning', fa: 'هشدار',     color: '#92400E', bg: '#FEF3C7',   icon: '⚠️' },
+  'urgent':  { en: 'Urgent',  fa: 'فوری',      color: '#DC2626', bg: '#FEE2E2',   icon: '🔴' },
+};
+
+export interface AgentNotification {
+  id: string;
+  type: 'lead_found' | 'lead_hot' | 'task_failed' | 'follow_up_due' | 'consultation_ready' | 'message' | 'system';
+  title: string;
+  message: string;
+  relatedLeadId?: string;
+  relatedTaskId?: string;
+  severity: NotificationSeverity;
+  isRead: boolean;
+  actionUrl?: string;
+  createdAt: string;
+  readAt?: string;
+}

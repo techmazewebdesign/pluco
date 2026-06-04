@@ -1,27 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Target, Flame, Mail, Calendar, CheckCircle, Zap, TrendingUp,
   AlertCircle, Filter, Search, X, Phone, MapPin, Briefcase,
-  DollarSign, Star, Clock, ArrowRight, ChevronDown
+  DollarSign, Star, Clock, ArrowRight, AlertTriangle
 } from 'lucide-react';
-
-interface Lead {
-  id: string;
-  name: string;
-  country: string;
-  service: string;
-  source: string;
-  budget: string;
-  priority: 'High' | 'Medium' | 'Low';
-  status: 'New' | 'Reviewed' | 'Message Prepared' | 'Contacted' | 'Follow-up Needed' | 'Consultation Ready' | 'Converted' | 'Not Relevant';
-  assignedTo: string;
-  lastContact: string;
-  nextAction: string;
-  company?: string;
-}
+import { Lead, AgentTask, AgentActivityLog, AgentNotification, PriorityLevel } from '@/lib/types';
+import {
+  getLeads,
+  getAgentTasks,
+  getActivityLogs,
+  getNotifications,
+  generateDemoLeads,
+  generateDemoTasks
+} from '@/lib/services/aiLeadAgentService';
 
 interface PipelineStep {
   id: string;
@@ -52,6 +46,13 @@ interface HotAlert {
 }
 
 export default function AILeadAgent() {
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [tasks, setTasks] = useState<AgentTask[]>([]);
+  const [activities, setActivities] = useState<AgentActivityLog[]>([]);
+  const [notifications, setNotifications] = useState<AgentNotification[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [filterService, setFilterService] = useState('All');
   const [filterPriority, setFilterPriority] = useState('All');
   const [filterStatus, setFilterStatus] = useState('All');
@@ -59,57 +60,118 @@ export default function AILeadAgent() {
   const [filterCountry, setFilterCountry] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Mock data
-  const statCards = [
-    { title: 'New Leads Found', value: 24, icon: Target, color: '#1E40AF', description: 'Today' },
-    { title: 'Hot Leads', value: 8, icon: Flame, color: '#DC2626', description: 'Need action' },
-    { title: 'Messages Prepared', value: 15, icon: Mail, color: '#0F766E', description: 'Ready to send' },
-    { title: 'Follow-ups Due', value: 12, icon: Calendar, color: '#9333EA', description: 'Today' },
-    { title: 'Consultations Ready', value: 5, icon: CheckCircle, color: '#15803D', description: 'Can book' },
-    { title: 'Tasks Completed', value: 47, icon: Zap, color: '#C9A35A', description: 'Today' },
+  // Load data from Firebase
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const [leadsData, tasksData, activitiesData, notificationsData] = await Promise.all([
+          getLeads(),
+          getAgentTasks(),
+          getActivityLogs(20),
+          getNotifications(),
+        ]);
+
+        // Use demo data if no real data exists
+        setLeads(leadsData.length > 0 ? leadsData : generateDemoLeads());
+        setTasks(tasksData.length > 0 ? tasksData : generateDemoTasks());
+        setActivities(activitiesData);
+        setNotifications(notificationsData);
+        setError(null);
+      } catch (err) {
+        console.error('Error loading data:', err);
+        // Fallback to demo data on error
+        setLeads(generateDemoLeads());
+        setTasks(generateDemoTasks());
+        setError('Using demo data - could not load from database');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // Compute stats
+  const stats = [
+    {
+      title: 'New Leads Found',
+      value: leads.filter(l => l.status === 'New').length,
+      icon: Target,
+      color: '#1E40AF',
+      description: 'Today'
+    },
+    {
+      title: 'Hot Leads',
+      value: leads.filter(l => l.priorityLevel === 'High').length,
+      icon: Flame,
+      color: '#DC2626',
+      description: 'Need action'
+    },
+    {
+      title: 'Messages Prepared',
+      value: leads.filter(l => l.status === 'Message Prepared').length,
+      icon: Mail,
+      color: '#0F766E',
+      description: 'Ready to send'
+    },
+    {
+      title: 'Follow-ups Due',
+      value: leads.filter(l => {
+        if (!l.nextFollowUpAt) return false;
+        const followUpDate = new Date(l.nextFollowUpAt);
+        const today = new Date();
+        return followUpDate.toDateString() === today.toDateString();
+      }).length,
+      icon: Calendar,
+      color: '#9333EA',
+      description: 'Today'
+    },
+    {
+      title: 'Consultations Ready',
+      value: leads.filter(l => l.status === 'Consultation Ready').length,
+      icon: CheckCircle,
+      color: '#15803D',
+      description: 'Can book'
+    },
+    {
+      title: 'Tasks Completed',
+      value: tasks.filter(t => t.status === 'completed').length,
+      icon: Zap,
+      color: '#C9A35A',
+      description: 'Today'
+    },
   ];
 
   const pipelineSteps: PipelineStep[] = [
-    { id: '1', title: 'Target Client', description: 'Identify ideal clients', status: 'Done', count: 150 },
-    { id: '2', title: 'Search Channels', description: 'Find leads online', status: 'Running', count: 85 },
-    { id: '3', title: 'Collect Leads', description: 'Gather contact data', status: 'Running', count: 120 },
-    { id: '4', title: 'Score Leads', description: 'Qualify leads', status: 'Done', count: 98 },
-    { id: '5', title: 'Prepare Message', description: 'Create outreach', status: 'Running', count: 65 },
-    { id: '6', title: 'Team Action', description: 'Manual follow-up', status: 'Pending', count: 32 },
-    { id: '7', title: 'Consultation Booked', description: 'Meeting scheduled', status: 'Done', count: 18 },
+    { id: '1', title: 'Target Client', description: 'Identify ideal clients', status: 'Done', count: leads.length },
+    { id: '2', title: 'Search Channels', description: 'Find leads online', status: 'Running', count: leads.filter(l => l.status === 'New').length },
+    { id: '3', title: 'Collect Leads', description: 'Gather contact data', status: 'Running', count: leads.filter(l => l.status === 'Reviewed').length },
+    { id: '4', title: 'Score Leads', description: 'Qualify leads', status: 'Done', count: leads.filter(l => l.priorityScore >= 70).length },
+    { id: '5', title: 'Prepare Message', description: 'Create outreach', status: 'Running', count: leads.filter(l => l.status === 'Message Prepared').length },
+    { id: '6', title: 'Team Action', description: 'Manual follow-up', status: 'Running', count: leads.filter(l => l.status === 'Contacted').length },
+    { id: '7', title: 'Consultation Booked', description: 'Meeting scheduled', status: 'Done', count: leads.filter(l => l.status === 'Consultation Ready').length },
   ];
 
-  const recentActivities: Activity[] = [
-    { id: '1', time: '02:15 PM', action: 'New Lead Found', lead: 'Sarah Johnson', service: 'EU Residency', priority: 'High', status: 'New', nextStep: 'Send introduction email' },
-    { id: '2', time: '02:08 PM', action: 'Message Prepared', lead: 'Acme Corp', service: 'Business Setup', priority: 'Medium', status: 'Message Prepared', nextStep: 'Team review' },
-    { id: '3', time: '01:45 PM', action: 'Lead Qualified', lead: 'Michael Chen', service: 'Investment', priority: 'High', status: 'Reviewed', nextStep: 'Prepare proposal' },
-    { id: '4', time: '01:32 PM', action: 'Follow-up Scheduled', lead: 'Global Tech Ltd', service: 'Visa Sponsorship', priority: 'Medium', status: 'Follow-up Needed', nextStep: 'Call tomorrow 10 AM' },
-    { id: '5', time: '01:15 PM', action: 'Consultation Booked', lead: 'Emma Wilson', service: 'Residency', priority: 'High', status: 'Consultation Ready', nextStep: 'Meeting at 3 PM' },
-  ];
-
-  const hotAlerts: HotAlert[] = [
-    { id: '1', lead: 'John Patel', company: 'TechStart India', reason: 'High budget + urgent timeline', action: 'Call immediately', priority: 'Critical' },
-    { id: '2', lead: 'Lisa Mueller', company: 'EU Consulting', reason: 'Decision maker available now', action: 'Send proposal today', priority: 'High' },
-    { id: '3', lead: 'David Park', company: 'Asia Holdings', reason: 'Perfect fit + high engagement', action: 'Schedule consultation', priority: 'High' },
-  ];
-
-  const leads: Lead[] = [
-    { id: '1', name: 'John Patel', country: 'India', service: 'Investment', source: 'LinkedIn', budget: '$500K+', priority: 'High', status: 'Reviewed', assignedTo: 'Ahmed', lastContact: '2h ago', nextAction: 'Send proposal', company: 'TechStart India' },
-    { id: '2', name: 'Sarah Johnson', country: 'USA', service: 'EU Residency', source: 'Referral', budget: '$200K', priority: 'High', status: 'New', assignedTo: 'Unassigned', lastContact: '5m ago', nextAction: 'Send intro email', company: 'Self-employed' },
-    { id: '3', name: 'Lisa Mueller', country: 'Germany', service: 'Business Setup', source: 'Google', budget: '$100K', priority: 'Medium', status: 'Message Prepared', assignedTo: 'Sofia', lastContact: '1d ago', nextAction: 'Call tomorrow', company: 'EU Consulting' },
-    { id: '4', name: 'Michael Chen', country: 'Singapore', service: 'Investment', source: 'Email', budget: '$1M+', priority: 'High', status: 'Consultation Ready', assignedTo: 'Ahmed', lastContact: '3h ago', nextAction: 'Meeting booked', company: 'Asia Holdings' },
-    { id: '5', name: 'Emma Wilson', country: 'UK', service: 'Visa Sponsorship', source: 'Website', budget: '$50K', priority: 'Medium', status: 'Contacted', assignedTo: 'Sofia', lastContact: 'Now', nextAction: 'Follow-up', company: 'Global Tech Ltd' },
-    { id: '6', name: 'David Park', country: 'South Korea', service: 'Residency', source: 'LinkedIn', budget: '$300K', priority: 'High', status: 'Follow-up Needed', assignedTo: 'Ahmed', lastContact: '12h ago', nextAction: 'Schedule call', company: 'Park Industries' },
-    { id: '7', name: 'Anna Rossi', country: 'Italy', service: 'Business Setup', source: 'Referral', budget: '$150K', priority: 'Low', status: 'Not Relevant', assignedTo: 'Unassigned', lastContact: '2d ago', nextAction: 'Archive', company: 'Rossi & Co' },
-    { id: '8', name: 'Tom Anderson', country: 'Canada', service: 'Investment', source: 'Google', budget: '$250K', priority: 'Medium', status: 'Message Prepared', assignedTo: 'Sofia', lastContact: '6h ago', nextAction: 'Send documents', company: 'Anderson Ventures' },
-  ];
+  const hotLeads: HotAlert[] = leads
+    .filter(l => l.priorityLevel === 'High')
+    .slice(0, 3)
+    .map(lead => ({
+      id: lead.id,
+      lead: lead.fullName,
+      company: lead.companyName || 'Self-employed',
+      reason: `Budget: ${lead.estimatedBudget} | Priority: ${lead.priorityScore}%`,
+      action: lead.status === 'Consultation Ready' ? 'Send consultation link' : 'Call immediately',
+      priority: lead.priorityScore > 90 ? 'Critical' : 'High'
+    }));
 
   const filteredLeads = leads.filter(lead => {
-    if (searchTerm && !lead.name.toLowerCase().includes(searchTerm.toLowerCase()) && !lead.company?.toLowerCase().includes(searchTerm.toLowerCase())) return false;
-    if (filterService !== 'All' && lead.service !== filterService) return false;
-    if (filterPriority !== 'All' && lead.priority !== filterPriority) return false;
+    const services = ['EU Residency', 'Business Setup', 'Investment', 'Visa Sponsorship', 'Residency'];
+    if (searchTerm && !lead.fullName.toLowerCase().includes(searchTerm.toLowerCase()) && !lead.companyName?.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    if (filterService !== 'All' && lead.serviceInterest !== filterService) return false;
+    if (filterPriority !== 'All' && lead.priorityLevel !== filterPriority) return false;
     if (filterStatus !== 'All' && lead.status !== filterStatus) return false;
-    if (filterSource !== 'All' && lead.source !== filterSource) return false;
+    if (filterSource !== 'All' && lead.sourceChannel !== filterSource) return false;
     if (filterCountry !== 'All' && lead.country !== filterCountry) return false;
     return true;
   });
@@ -124,17 +186,17 @@ export default function AILeadAgent() {
   };
 
   const getStatusColor = (status: string) => {
-    switch(status) {
-      case 'New': return { bg: '#DBEAFE', color: '#1E40AF' };
-      case 'Reviewed': return { bg: '#FEF3C7', color: '#92400E' };
-      case 'Message Prepared': return { bg: '#E9D5FF', color: '#6B21A8' };
-      case 'Contacted': return { bg: '#DCFCE7', color: '#15803D' };
-      case 'Follow-up Needed': return { bg: '#FED7AA', color: '#B45309' };
-      case 'Consultation Ready': return { bg: '#DBEAFE', color: '#1E40AF' };
-      case 'Converted': return { bg: '#DCFCE7', color: '#15803D' };
-      case 'Not Relevant': return { bg: '#F3F4F6', color: '#6B7280' };
-      default: return { bg: '#F3F4F6', color: '#6B7280' };
-    }
+    const statusMap: Record<string, { bg: string; color: string }> = {
+      'New': { bg: '#DBEAFE', color: '#1E40AF' },
+      'Reviewed': { bg: '#FEF3C7', color: '#92400E' },
+      'Message Prepared': { bg: '#E9D5FF', color: '#6B21A8' },
+      'Contacted': { bg: '#DCFCE7', color: '#15803D' },
+      'Follow-up Needed': { bg: '#FED7AA', color: '#B45309' },
+      'Consultation Ready': { bg: '#DBEAFE', color: '#1E40AF' },
+      'Converted': { bg: '#DCFCE7', color: '#15803D' },
+      'Not Relevant': { bg: '#F3F4F6', color: '#6B7280' },
+    };
+    return statusMap[status] || { bg: '#F3F4F6', color: '#6B7280' };
   };
 
   const getStatusBadge = (status: string) => {
@@ -147,16 +209,33 @@ export default function AILeadAgent() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#F8F9FA' }}>
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-gray-200 border-t-[#C9A35A] rounded-full animate-spin"></div>
+          <p style={{ color: '#5E6470' }}>Loading AI Lead Agent data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ backgroundColor: '#F8F9FA' }}>
+    <div style={{ backgroundColor: '#F8F9FA', minHeight: '100vh' }}>
       {/* Header */}
       <div className="px-4 sm:px-6 lg:px-8 py-8 border-b border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto">
+          {error && (
+            <div className="mb-4 p-3 rounded-lg flex items-center gap-2" style={{ backgroundColor: '#FEF3C7' }}>
+              <AlertTriangle className="w-5 h-5" style={{ color: '#92400E' }} />
+              <p className="text-sm" style={{ color: '#92400E' }}>{error}</p>
+            </div>
+          )}
           <h2 className="text-3xl font-serif font-bold" style={{ color: '#071C3C' }}>
             🤖 AI Lead Agent Control Center
           </h2>
           <p className="text-sm mt-1" style={{ color: '#5E6470' }}>
-            Real-time lead generation and qualification automation
+            Real-time lead generation and qualification automation • {leads.length} leads in database
           </p>
         </div>
       </div>
@@ -165,7 +244,7 @@ export default function AILeadAgent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stat Cards */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
-          {statCards.map((card, i) => {
+          {stats.map((card, i) => {
             const Icon = card.icon;
             return (
               <motion.div
@@ -230,36 +309,25 @@ export default function AILeadAgent() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="lg:col-span-2 bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
             <h3 className="text-lg font-bold mb-4" style={{ color: '#1E2430' }}>Recent Agent Activity</h3>
             <div className="space-y-3">
-              {recentActivities.map((activity) => {
-                const actColor = getStatusColor(activity.status);
-                return (
-                  <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg" style={{ backgroundColor: '#F8F9FA' }}>
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5" style={{ backgroundColor: actColor.bg, color: actColor.color }}>
-                      ✓
+              {activities.slice(0, 5).map((activity) => (
+                <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg" style={{ backgroundColor: '#F8F9FA' }}>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5" style={{ backgroundColor: '#DCFCE7', color: '#15803D' }}>
+                    ✓
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <p className="text-xs font-bold" style={{ color: '#1E2430' }}>{activity.actionType}</p>
+                      <span className="text-xs" style={{ color: '#94A3B8' }}>{new Date(activity.createdAt).toLocaleTimeString()}</span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <p className="text-xs font-bold" style={{ color: '#1E2430' }}>{activity.action}</p>
-                        <span className="text-xs" style={{ color: '#94A3B8' }}>{activity.time}</span>
-                      </div>
-                      <p className="text-xs" style={{ color: '#5E6470' }}>
-                        <span className="font-semibold">{activity.lead}</span> • {activity.service}
-                      </p>
-                      <div className="flex gap-2 mt-2 flex-wrap">
-                        <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: getPriorityColor(activity.priority).bg, color: getPriorityColor(activity.priority).color }}>
-                          {getPriorityColor(activity.priority).badge} {activity.priority}
-                        </span>
-                        <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: actColor.bg, color: actColor.color }}>
-                          {activity.status}
-                        </span>
-                        <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: '#DBEAFE', color: '#1E40AF' }}>
-                          📋 {activity.nextStep}
-                        </span>
-                      </div>
+                    <p className="text-xs" style={{ color: '#5E6470' }}>{activity.description}</p>
+                    <div className="flex gap-2 mt-2 flex-wrap">
+                      <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: getPriorityColor(activity.priority).bg, color: getPriorityColor(activity.priority).color }}>
+                        {getPriorityColor(activity.priority).badge} {activity.priority}
+                      </span>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </motion.div>
 
@@ -267,39 +335,43 @@ export default function AILeadAgent() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: '#1E2430' }}>
               <Flame className="w-5 h-5" style={{ color: '#DC2626' }} />
-              Hot Lead Alerts
+              Hot Lead Alerts ({hotLeads.length})
             </h3>
             <div className="space-y-3">
-              {hotAlerts.map((alert) => (
-                <div key={alert.id} className="border border-amber-200 rounded-lg p-4" style={{ backgroundColor: '#FFFBEB' }}>
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <div>
-                      <p className="text-sm font-bold" style={{ color: '#1E2430' }}>{alert.lead}</p>
-                      <p className="text-xs mt-0.5" style={{ color: '#5E6470' }}>{alert.company}</p>
+              {hotLeads.length === 0 ? (
+                <p className="text-xs text-center py-4" style={{ color: '#94A3B8' }}>No hot leads at this time</p>
+              ) : (
+                hotLeads.map((alert) => (
+                  <div key={alert.id} className="border border-amber-200 rounded-lg p-4" style={{ backgroundColor: '#FFFBEB' }}>
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div>
+                        <p className="text-sm font-bold" style={{ color: '#1E2430' }}>{alert.lead}</p>
+                        <p className="text-xs mt-0.5" style={{ color: '#5E6470' }}>{alert.company}</p>
+                      </div>
+                      <span className="text-xs font-bold px-2 py-1 rounded whitespace-nowrap" style={{
+                        backgroundColor: alert.priority === 'Critical' ? '#FEE2E2' : '#FEF3C7',
+                        color: alert.priority === 'Critical' ? '#DC2626' : '#92400E'
+                      }}>
+                        {alert.priority === 'Critical' ? '🔴' : '🟠'} {alert.priority}
+                      </span>
                     </div>
-                    <span className="text-xs font-bold px-2 py-1 rounded whitespace-nowrap" style={{
-                      backgroundColor: alert.priority === 'Critical' ? '#FEE2E2' : '#FEF3C7',
-                      color: alert.priority === 'Critical' ? '#DC2626' : '#92400E'
-                    }}>
-                      {alert.priority === 'Critical' ? '🔴' : '🟠'} {alert.priority}
-                    </span>
+                    <p className="text-xs mb-3" style={{ color: '#5E6470' }}>
+                      💡 {alert.reason}
+                    </p>
+                    <p className="text-xs font-semibold mb-3" style={{ color: '#92400E' }}>
+                      → {alert.action}
+                    </p>
+                    <div className="flex gap-2">
+                      <button className="flex-1 text-xs font-semibold px-2 py-2 rounded transition-colors" style={{ backgroundColor: '#DCFCE7', color: '#15803D' }}>
+                        ✓ Mark Contacted
+                      </button>
+                      <button className="flex-1 text-xs font-semibold px-2 py-2 rounded border" style={{ borderColor: '#D1D5DB', color: '#5E6470' }}>
+                        + Follow-up
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-xs mb-3" style={{ color: '#5E6470' }}>
-                    💡 {alert.reason}
-                  </p>
-                  <p className="text-xs font-semibold mb-3" style={{ color: '#92400E' }}>
-                    → {alert.action}
-                  </p>
-                  <div className="flex gap-2">
-                    <button className="flex-1 text-xs font-semibold px-2 py-2 rounded transition-colors" style={{ backgroundColor: '#DCFCE7', color: '#15803D' }}>
-                      ✓ Mark Contacted
-                    </button>
-                    <button className="flex-1 text-xs font-semibold px-2 py-2 rounded border" style={{ borderColor: '#D1D5DB', color: '#5E6470' }}>
-                      + Follow-up
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </motion.div>
         </div>
@@ -341,11 +413,11 @@ export default function AILeadAgent() {
                   className="px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none"
                 >
                   <option value="All">{filterType}</option>
-                  {filterType === 'Service Interest' && ['EU Residency', 'Business Setup', 'Investment', 'Visa Sponsorship', 'Residency'].map(s => <option key={s} value={s}>{s}</option>)}
+                  {filterType === 'Service Interest' && leads.map(l => l.serviceInterest).filter((v, i, a) => a.indexOf(v) === i).map(s => <option key={s} value={s}>{s}</option>)}
                   {filterType === 'Priority' && ['High', 'Medium', 'Low'].map(p => <option key={p} value={p}>{p}</option>)}
-                  {filterType === 'Status' && ['New', 'Reviewed', 'Message Prepared', 'Contacted', 'Follow-up Needed', 'Consultation Ready'].map(st => <option key={st} value={st}>{st}</option>)}
-                  {filterType === 'Source' && ['LinkedIn', 'Referral', 'Google', 'Email', 'Website'].map(src => <option key={src} value={src}>{src}</option>)}
-                  {filterType === 'Country' && ['India', 'USA', 'Germany', 'Singapore', 'UK', 'South Korea', 'Italy', 'Canada'].map(c => <option key={c} value={c}>{c}</option>)}
+                  {filterType === 'Status' && leads.map(l => l.status).filter((v, i, a) => a.indexOf(v) === i).map(st => <option key={st} value={st}>{st}</option>)}
+                  {filterType === 'Source' && leads.map(l => l.sourceChannel).filter((v, i, a) => a.indexOf(v) === i).map(src => <option key={src} value={src}>{src}</option>)}
+                  {filterType === 'Country' && leads.map(l => l.country).filter((v, i, a) => a.indexOf(v) === i).map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
             ))}
@@ -370,13 +442,13 @@ export default function AILeadAgent() {
               </thead>
               <tbody>
                 {filteredLeads.map((lead) => {
-                  const priColor = getPriorityColor(lead.priority);
+                  const priColor = getPriorityColor(lead.priorityLevel);
                   const statColor = getStatusColor(lead.status);
                   return (
                     <tr key={lead.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                       <td className="px-3 py-3">
-                        <p className="font-semibold" style={{ color: '#1E2430' }}>{lead.name}</p>
-                        {lead.company && <p style={{ color: '#5E6470' }}>{lead.company}</p>}
+                        <p className="font-semibold" style={{ color: '#1E2430' }}>{lead.fullName}</p>
+                        {lead.companyName && <p style={{ color: '#5E6470' }}>{lead.companyName}</p>}
                       </td>
                       <td className="px-3 py-3" style={{ color: '#5E6470' }}>
                         <MapPin className="w-3 h-3 inline-block mr-1" />
@@ -384,16 +456,16 @@ export default function AILeadAgent() {
                       </td>
                       <td className="px-3 py-3" style={{ color: '#5E6470' }}>
                         <Briefcase className="w-3 h-3 inline-block mr-1" />
-                        {lead.service}
+                        {lead.serviceInterest}
                       </td>
-                      <td className="px-3 py-3" style={{ color: '#5E6470' }}>{lead.source}</td>
+                      <td className="px-3 py-3" style={{ color: '#5E6470' }}>{lead.sourceChannel}</td>
                       <td className="px-3 py-3">
                         <DollarSign className="w-3 h-3 inline-block mr-1" style={{ color: '#15803D' }} />
-                        <span style={{ color: '#15803D', fontWeight: 'bold' }}>{lead.budget}</span>
+                        <span style={{ color: '#15803D', fontWeight: 'bold' }}>{lead.estimatedBudget}</span>
                       </td>
                       <td className="px-3 py-3">
                         <span className="px-2 py-1 rounded text-xs font-semibold" style={{ backgroundColor: priColor.bg, color: priColor.color }}>
-                          {priColor.badge} {lead.priority}
+                          {priColor.badge} {lead.priorityLevel}
                         </span>
                       </td>
                       <td className="px-3 py-3">
@@ -402,13 +474,13 @@ export default function AILeadAgent() {
                         </span>
                       </td>
                       <td className="px-3 py-3" style={{ color: '#5E6470' }}>
-                        {lead.assignedTo === 'Unassigned' ? <span style={{ color: '#DC2626' }}>⚠️ {lead.assignedTo}</span> : lead.assignedTo}
+                        {lead.assignedToName === 'Unassigned' || !lead.assignedToName ? <span style={{ color: '#DC2626' }}>⚠️ Unassigned</span> : lead.assignedToName}
                       </td>
                       <td className="px-3 py-3" style={{ color: '#5E6470' }}>
                         <Clock className="w-3 h-3 inline-block mr-1" />
-                        {lead.lastContact}
+                        {lead.lastContactAt ? new Date(lead.lastContactAt).toLocaleDateString() : 'Never'}
                       </td>
-                      <td className="px-3 py-3" style={{ color: '#1E40AF', fontWeight: 'bold' }}>→ {lead.nextAction}</td>
+                      <td className="px-3 py-3" style={{ color: '#1E40AF', fontWeight: 'bold' }}>→ {lead.aiRecommendedAction || 'No action'}</td>
                     </tr>
                   );
                 })}
