@@ -7,7 +7,7 @@ import {
   AlertCircle, Filter, Search, X, Phone, MapPin, Briefcase,
   DollarSign, Star, Clock, ArrowRight, AlertTriangle, Plus, Download, RefreshCw, Upload
 } from 'lucide-react';
-import { Lead, AgentTask, AgentActivityLog, AgentNotification, PriorityLevel } from '@/lib/types';
+import { Lead, AgentTask, AgentActivityLog, AgentNotification, PriorityLevel, LEAD_EXPORT_STATUS_LABELS } from '@/lib/types';
 import {
   getLeads,
   getAgentTasks,
@@ -49,7 +49,7 @@ interface HotAlert {
 }
 
 export default function AILeadAgent() {
-  const { recalculateAllScores, downloadCSV } = useLeadOperations();
+  const { recalculateAllScores, downloadCSV, exportLeadsToGoogleSheet } = useLeadOperations();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [tasks, setTasks] = useState<AgentTask[]>([]);
   const [activities, setActivities] = useState<AgentActivityLog[]>([]);
@@ -57,6 +57,7 @@ export default function AILeadAgent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isRecalculating, setIsRecalculating] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const [showAddLeadModal, setShowAddLeadModal] = useState(false);
   const [showImportCSVModal, setShowImportCSVModal] = useState(false);
@@ -120,6 +121,24 @@ export default function AILeadAgent() {
     } catch (error) {
       console.error('Error:', error);
       alert('❌ Error downloading CSV');
+    }
+  };
+
+  const handleExportToGoogleSheet = async () => {
+    try {
+      setIsExporting(true);
+      const result = await exportLeadsToGoogleSheet();
+      if (result.success > 0) {
+        alert(`✅ ${result.message}`);
+        await loadData();
+      } else {
+        alert(`❌ ${result.message}`);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('❌ Error exporting to Google Sheet');
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -303,6 +322,15 @@ export default function AILeadAgent() {
             >
               <Download className="w-4 h-4" />
               Export CSV
+            </button>
+            <button
+              onClick={handleExportToGoogleSheet}
+              disabled={isExporting}
+              className="px-4 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 transition-colors"
+              style={{ backgroundColor: '#F3F4F6', color: '#5E6470', opacity: isExporting ? 0.6 : 1 }}
+            >
+              <Zap className={`w-4 h-4 ${isExporting ? 'animate-spin' : ''}`} />
+              {isExporting ? 'Exporting...' : 'Export to Google Sheet'}
             </button>
           </div>
         </div>
@@ -505,6 +533,7 @@ export default function AILeadAgent() {
                   <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Status</th>
                   <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Assigned</th>
                   <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Last Contact</th>
+                  <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Sheet Export</th>
                   <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Next Action</th>
                 </tr>
               </thead>
@@ -551,6 +580,17 @@ export default function AILeadAgent() {
                       <td className="px-3 py-3" style={{ color: '#5E6470' }}>
                         <Clock className="w-3 h-3 inline-block mr-1" />
                         {lead.lastContactAt ? new Date(lead.lastContactAt).toLocaleDateString() : 'Never'}
+                      </td>
+                      <td className="px-3 py-3">
+                        {lead.exportStatus ? (
+                          <span className="px-2 py-1 rounded text-xs font-semibold" style={{ backgroundColor: LEAD_EXPORT_STATUS_LABELS[lead.exportStatus].bg, color: LEAD_EXPORT_STATUS_LABELS[lead.exportStatus].color }}>
+                            {LEAD_EXPORT_STATUS_LABELS[lead.exportStatus].icon} {lead.exportStatus}
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 rounded text-xs font-semibold" style={{ backgroundColor: '#F3F4F6', color: '#6B7280' }}>
+                            ⭕ Not Exported
+                          </span>
+                        )}
                       </td>
                       <td className="px-3 py-3" style={{ color: '#1E40AF', fontWeight: 'bold' }}>→ {lead.aiRecommendedAction || 'No action'}</td>
                     </tr>

@@ -296,6 +296,106 @@ export function useLeadOperations() {
     }
   };
 
+  /**
+   * Export leads to Google Sheet via webhook
+   */
+  const exportLeadsToGoogleSheet = async (leadIds?: string[]): Promise<{ success: number; failed: number; message: string }> => {
+    try {
+      const allLeads = await getLeads();
+
+      // Filter leads if specific IDs provided
+      const leadsToExport = leadIds
+        ? allLeads.filter(lead => leadIds.includes(lead.id))
+        : allLeads;
+
+      if (leadsToExport.length === 0) {
+        return { success: 0, failed: 1, message: 'No leads to export' };
+      }
+
+      // Prepare lead data
+      const leadsData = leadsToExport.map(lead => ({
+        fullName: lead.fullName,
+        email: lead.email,
+        phone: lead.phone,
+        whatsapp: lead.whatsapp,
+        country: lead.country,
+        nationality: lead.nationality,
+        serviceInterest: lead.serviceInterest,
+        sourceChannel: lead.sourceChannel,
+        estimatedBudget: lead.estimatedBudget,
+        urgency: lead.urgency,
+        priorityScore: lead.priorityScore,
+        priorityLevel: lead.priorityLevel,
+        status: lead.status,
+        aiRecommendedAction: lead.aiRecommendedAction,
+        createdAt: lead.createdAt,
+      }));
+
+      // Call API route
+      const response = await fetch('/api/leads/export', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ leads: leadsData }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Export error:', errorData);
+
+        // Create failure notification
+        for (const lead of leadsToExport) {
+          await createNotification(
+            'lead_hot',
+            `❌ Export Failed: ${lead.fullName}`,
+            `Failed to export lead to Google Sheet: ${errorData.error}`,
+            'warning',
+            lead.id
+          );
+        }
+
+        return {
+          success: 0,
+          failed: leadsToExport.length,
+          message: errorData.message || errorData.error || 'Export failed'
+        };
+      }
+
+      // Create activity logs and notifications for successful exports
+      for (const lead of leadsToExport) {
+        await createActivityLog(
+          'task_completed',
+          'Lead Exported to Google Sheet',
+          `Lead successfully exported: ${lead.fullName}`,
+          lead.id,
+          lead.priorityLevel
+        );
+
+        await createNotification(
+          'message',
+          `✅ Exported: ${lead.fullName}`,
+          `Lead successfully exported to Google Sheet`,
+          'success',
+          lead.id
+        );
+      }
+
+      return {
+        success: leadsToExport.length,
+        failed: 0,
+        message: `Successfully exported ${leadsToExport.length} lead(s) to Google Sheet`
+      };
+    } catch (error) {
+      console.error('Error exporting leads:', error);
+      return {
+        success: 0,
+        failed: 1,
+        message: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  };
+
   return {
     calculateLeadScore,
     addLeadManually,
@@ -303,5 +403,6 @@ export function useLeadOperations() {
     recalculateAllScores,
     exportLeadsToCSV,
     downloadCSV,
+    exportLeadsToGoogleSheet,
   };
 }

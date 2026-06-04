@@ -378,6 +378,7 @@ export const ROLE_PERMISSIONS: Record<AgentRole, {
 export type LeadStatus = 'New' | 'Reviewed' | 'Message Prepared' | 'Contacted' | 'Follow-up Needed' | 'Consultation Ready' | 'Converted' | 'Not Relevant';
 export type PriorityLevel = 'High' | 'Medium' | 'Low';
 export type SourceChannel = 'LinkedIn' | 'Google' | 'Email' | 'Referral' | 'Website' | 'Other';
+export type LeadExportStatus = 'Not Exported' | 'Exported' | 'Export Failed';
 
 export const LEAD_STATUS_LABELS: Record<LeadStatus, { en: string; fa: string; color: string; bg: string }> = {
   'New':                  { en: 'New',                  fa: 'جدید',                 color: '#1E40AF', bg: '#DBEAFE' },
@@ -394,6 +395,12 @@ export const PRIORITY_LEVEL_LABELS: Record<PriorityLevel, { en: string; fa: stri
   'High':   { en: 'High',   fa: 'بالا',    color: '#DC2626', bg: '#FEE2E2', badge: '🔴' },
   'Medium': { en: 'Medium', fa: 'متوسط',  color: '#92400E', bg: '#FEF3C7', badge: '🟠' },
   'Low':    { en: 'Low',    fa: 'کم',      color: '#15803D', bg: '#DCFCE7', badge: '🟢' },
+};
+
+export const LEAD_EXPORT_STATUS_LABELS: Record<LeadExportStatus, { en: string; fa: string; color: string; bg: string; icon: string }> = {
+  'Not Exported':   { en: 'Not Exported',   fa: 'صادر نشده',     color: '#6B7280', bg: '#F3F4F6', icon: '⭕' },
+  'Exported':       { en: 'Exported',       fa: 'صادر شده',      color: '#15803D', bg: '#DCFCE7', icon: '✅' },
+  'Export Failed':  { en: 'Export Failed',  fa: 'صادر نشد',      color: '#DC2626', bg: '#FEE2E2', icon: '❌' },
 };
 
 export interface Lead {
@@ -421,6 +428,8 @@ export interface Lead {
   aiRecommendedAction?: string;
   lastContactAt?: string;
   nextFollowUpAt?: string;
+  exportStatus?: LeadExportStatus;  // Google Sheet export status
+  exportedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
