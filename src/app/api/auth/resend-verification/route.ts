@@ -10,9 +10,14 @@ function generateCode(): string {
 
 export async function POST(req: NextRequest) {
   try {
+    console.log('=== RESEND VERIFICATION EMAIL API ===');
+
     const { email } = await req.json();
 
+    console.log('Email:', email);
+
     if (!email) {
+      console.error('Email is required');
       return NextResponse.json(
         { error: 'Email is required' },
         { status: 400 }
@@ -20,28 +25,39 @@ export async function POST(req: NextRequest) {
     }
 
     if (!RESEND_API_KEY) {
+      console.error('RESEND_API_KEY is not set in environment variables');
+      console.error('Available env keys:', Object.keys(process.env).filter(k => k.includes('RESEND') || k.includes('MAIL')));
       return NextResponse.json(
-        { error: 'Email service not configured' },
+        { error: 'Email service not properly configured. RESEND_API_KEY missing.' },
         { status: 500 }
       );
     }
+
+    console.log('RESEND_API_KEY is set, length:', RESEND_API_KEY.length);
 
     // Get the verification record to get userId
     const verificationRef = doc(db, 'email_verifications', email);
     const verificationDoc = await getDoc(verificationRef);
 
     if (!verificationDoc.exists()) {
+      console.error('Verification record not found for email:', email);
       return NextResponse.json(
         { error: 'Verification record not found' },
         { status: 404 }
       );
     }
 
-    const { userId } = verificationDoc.data();
+    const data = verificationDoc.data();
+    const userId = data.userId;
+
+    console.log('Found verification record for user:', userId);
 
     // Generate new code
     const code = generateCode();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    console.log('Generated new code:', code);
+    console.log('Updating verification code in Firestore...');
 
     // Update verification code
     await setDoc(verificationRef, {
@@ -51,6 +67,9 @@ export async function POST(req: NextRequest) {
       expiresAt: expiresAt.toISOString(),
       createdAt: new Date().toISOString(),
     });
+
+    console.log('Verification code updated successfully');
+    console.log('Sending email via Resend API...');
 
     // Send email
     const response = await fetch('https://api.resend.com/emails', {
@@ -104,21 +123,35 @@ export async function POST(req: NextRequest) {
       }),
     });
 
+    console.log('Resend API response status:', response.status);
+
     if (!response.ok) {
-      const error = await response.json();
-      console.error('Resend API error:', error);
+      let errorMessage = 'Failed to resend verification email';
+      try {
+        const error = await response.json();
+        console.error('Resend API error:', error);
+        errorMessage = error.message || error.error || JSON.stringify(error);
+      } catch (e) {
+        const errorText = await response.text();
+        console.error('Resend API error (text):', errorText);
+        errorMessage = errorText;
+      }
+      console.error('Final error message:', errorMessage);
       return NextResponse.json(
-        { error: 'Failed to resend verification email' },
+        { error: `Failed to send email: ${errorMessage}` },
         { status: 500 }
       );
     }
+
+    console.log('Email sent successfully');
 
     return NextResponse.json({
       success: true,
       message: 'Verification email resent',
     });
   } catch (error) {
-    console.error('Resend verification error:', error);
+    console.error('=== RESEND VERIFICATION ERROR ===');
+    console.error('Error details:', error);
     return NextResponse.json(
       { error: 'Failed to resend verification email' },
       { status: 500 }

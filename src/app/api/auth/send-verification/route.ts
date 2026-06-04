@@ -20,12 +20,15 @@ export async function POST(req: NextRequest) {
     }
 
     if (!RESEND_API_KEY) {
-      console.error('RESEND_API_KEY not configured');
+      console.error('RESEND_API_KEY is not set in environment variables');
+      console.error('Available env keys:', Object.keys(process.env).filter(k => k.includes('RESEND') || k.includes('MAIL')));
       return NextResponse.json(
-        { error: 'Email service not configured' },
+        { error: 'Email service not properly configured. RESEND_API_KEY missing.' },
         { status: 500 }
       );
     }
+
+    console.log('RESEND_API_KEY is set, length:', RESEND_API_KEY.length);
 
     // Generate 6-digit verification code
     const code = generateCode();
@@ -94,10 +97,19 @@ export async function POST(req: NextRequest) {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      console.error('Resend API error:', error);
+      let errorMessage = 'Failed to send verification email';
+      try {
+        const error = await response.json();
+        console.error('Resend API error:', error);
+        errorMessage = error.message || error.error || JSON.stringify(error);
+      } catch (e) {
+        const errorText = await response.text();
+        console.error('Resend API error (text):', errorText);
+        errorMessage = errorText;
+      }
+      console.error('Final error message:', errorMessage);
       return NextResponse.json(
-        { error: 'Failed to send verification email' },
+        { error: `Failed to send email: ${errorMessage}` },
         { status: 500 }
       );
     }

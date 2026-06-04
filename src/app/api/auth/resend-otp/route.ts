@@ -10,9 +10,14 @@ function generateOTP(): string {
 
 export async function POST(req: NextRequest) {
   try {
+    console.log('=== RESEND OTP API ===');
+
     const { email } = await req.json();
 
+    console.log('Email:', email);
+
     if (!email) {
+      console.error('Email is required');
       return NextResponse.json(
         { error: 'Email is required' },
         { status: 400 }
@@ -20,15 +25,22 @@ export async function POST(req: NextRequest) {
     }
 
     if (!RESEND_API_KEY) {
+      console.error('RESEND_API_KEY is not set in environment variables');
+      console.error('Available env keys:', Object.keys(process.env).filter(k => k.includes('RESEND') || k.includes('MAIL')));
       return NextResponse.json(
-        { error: 'Email service not configured' },
+        { error: 'Email service not properly configured. RESEND_API_KEY missing.' },
         { status: 500 }
       );
     }
 
+    console.log('RESEND_API_KEY is set, length:', RESEND_API_KEY.length);
+
     // Generate new OTP
     const otp = generateOTP();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    console.log('Generated OTP:', otp);
+    console.log('Updating OTP in Firestore...');
 
     // Update OTP
     const otpRef = doc(db, 'login_otps', email);
@@ -38,6 +50,9 @@ export async function POST(req: NextRequest) {
       expiresAt: expiresAt.toISOString(),
       createdAt: new Date().toISOString(),
     });
+
+    console.log('OTP updated successfully');
+    console.log('Sending email via Resend API...');
 
     // Send email
     const response = await fetch('https://api.resend.com/emails', {
@@ -93,21 +108,35 @@ export async function POST(req: NextRequest) {
       }),
     });
 
+    console.log('Resend API response status:', response.status);
+
     if (!response.ok) {
-      const error = await response.json();
-      console.error('Resend API error:', error);
+      let errorMessage = 'Failed to resend OTP email';
+      try {
+        const error = await response.json();
+        console.error('Resend API error:', error);
+        errorMessage = error.message || error.error || JSON.stringify(error);
+      } catch (e) {
+        const errorText = await response.text();
+        console.error('Resend API error (text):', errorText);
+        errorMessage = errorText;
+      }
+      console.error('Final error message:', errorMessage);
       return NextResponse.json(
-        { error: 'Failed to resend OTP email' },
+        { error: `Failed to send email: ${errorMessage}` },
         { status: 500 }
       );
     }
+
+    console.log('Email sent successfully');
 
     return NextResponse.json({
       success: true,
       message: 'OTP resent',
     });
   } catch (error) {
-    console.error('Resend OTP error:', error);
+    console.error('=== RESEND OTP ERROR ===');
+    console.error('Error details:', error);
     return NextResponse.json(
       { error: 'Failed to resend OTP email' },
       { status: 500 }
