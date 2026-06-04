@@ -9,6 +9,7 @@ import { LogOut, Users, FileText, MessageSquare, Settings, BarChart3, AlertCircl
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
+import NotificationDropdown from '@/components/admin/NotificationDropdown';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -125,14 +126,17 @@ export default function AdminDashboard() {
               {user?.email}
             </p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all hover:brightness-110"
-            style={{ backgroundColor: '#071C3C', color: '#FFFFFF' }}
-          >
-            <LogOut className="w-4 h-4" />
-            {isRTL ? 'خروج' : 'Logout'}
-          </button>
+          <div className="flex items-center gap-3">
+            <NotificationDropdown />
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all hover:brightness-110"
+              style={{ backgroundColor: '#071C3C', color: '#FFFFFF' }}
+            >
+              <LogOut className="w-4 h-4" />
+              {isRTL ? 'خروج' : 'Logout'}
+            </button>
+          </div>
         </div>
       </header>
 
