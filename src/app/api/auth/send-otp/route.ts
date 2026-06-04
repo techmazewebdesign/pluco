@@ -10,9 +10,15 @@ function generateOTP(): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { email } = await req.json();
+    console.log('=== SEND OTP API ===');
+
+    const body = await req.json();
+    const { email } = body;
+
+    console.log('Email:', email);
 
     if (!email) {
+      console.error('Email is required');
       return NextResponse.json(
         { error: 'Email is required' },
         { status: 400 }
@@ -31,6 +37,9 @@ export async function POST(req: NextRequest) {
     const otp = generateOTP();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
+    console.log('Generated OTP:', otp);
+    console.log('Storing OTP in Firestore...');
+
     // Store OTP in Firestore
     const otpRef = doc(db, 'login_otps', email);
     await setDoc(otpRef, {
@@ -39,6 +48,9 @@ export async function POST(req: NextRequest) {
       expiresAt: expiresAt.toISOString(),
       createdAt: new Date().toISOString(),
     });
+
+    console.log('OTP stored successfully');
+    console.log('Sending email via Resend API...');
 
     // Send email using Resend
     const response = await fetch('https://api.resend.com/emails', {
@@ -94,6 +106,8 @@ export async function POST(req: NextRequest) {
       }),
     });
 
+    console.log('Resend API response status:', response.status);
+
     if (!response.ok) {
       const error = await response.json();
       console.error('Resend API error:', error);
@@ -103,12 +117,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    console.log('Email sent successfully');
+
     return NextResponse.json({
       success: true,
       message: 'OTP sent to email',
     });
   } catch (error) {
-    console.error('Send OTP error:', error);
+    console.error('=== SEND OTP ERROR ===');
+    console.error('Error details:', error);
     return NextResponse.json(
       { error: 'Failed to send OTP email' },
       { status: 500 }
