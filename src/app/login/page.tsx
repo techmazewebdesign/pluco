@@ -37,9 +37,46 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await signIn(formData.email, formData.password);
-      router.push('/dashboard');
+      // Verify credentials first
+      const verifyResponse = await fetch('/api/auth/verify-credentials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      if (!verifyResponse.ok) {
+        const error = await verifyResponse.json();
+        clearError();
+        // Trigger auth context error by attempting sign in (will fail)
+        try {
+          await signIn(formData.email, formData.password);
+        } catch (authErr) {
+          // Expected to fail
+        }
+        setIsSubmitting(false);
+        return;
+      }
+
+      const { email } = await verifyResponse.json();
+
+      // Send OTP email
+      const otpResponse = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!otpResponse.ok) {
+        throw new Error('Failed to send OTP');
+      }
+
+      // Redirect to OTP verification
+      router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
     } catch (err) {
+      console.error('Login error:', err);
       setIsSubmitting(false);
     }
   };

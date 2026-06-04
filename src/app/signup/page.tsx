@@ -68,9 +68,28 @@ export default function SignupPage() {
     setIsSubmitting(true);
 
     try {
+      // Sign up user
       await signUp(formData.email, formData.password, formData.name);
-      router.push('/dashboard');
+
+      // Send verification email
+      const verificationResponse = await fetch('/api/auth/send-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          userId: user?.uid || '',
+        }),
+      });
+
+      if (!verificationResponse.ok) {
+        throw new Error('Failed to send verification email');
+      }
+
+      // Redirect to email verification page
+      router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
     } catch (err) {
+      console.error('Signup error:', err);
+      setValidationError(isRTL ? 'خطا در ثبت نام' : 'Error during signup');
       setIsSubmitting(false);
     }
   };
