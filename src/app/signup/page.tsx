@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Lock, Mail, User, ArrowRight, AlertCircle, Loader } from 'lucide-react';
+import { Lock, Mail, User, ArrowRight, AlertCircle, Loader, CheckCircle } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -69,10 +69,7 @@ export default function SignupPage() {
     setIsSubmitting(true);
 
     try {
-      console.log('Creating account and sending verification email...');
-
-      // Create account on Firebase and Firestore
-      const response = await fetch('/api/auth/signup', {
+      const response = await fetch('/api/auth/signup-with-email-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -90,17 +87,15 @@ export default function SignupPage() {
         return;
       }
 
-      console.log('Account created, verification email sent');
       setSuccessMessage(
         isRTL
-          ? 'حساب کاربری ایجاد شد! لطفا ایمیل خود را بررسی کنید و کد تایید را وارد کنید.'
-          : 'Account created! Please check your email and verify your account.'
+          ? 'حساب کاربری ایجاد شد! ایمیل تایید به آدرس شما ارسال شد. لطفا پوشه spam را بررسی کنید.'
+          : 'Account created! We sent a verification email. Check your inbox and spam folder.'
       );
 
-      // Redirect to verify page after short delay
       setTimeout(() => {
-        router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
-      }, 2000);
+        router.push('/login');
+      }, 3000);
     } catch (err) {
       console.error('Signup error:', err);
       setValidationError(isRTL ? 'خطا در ثبت نام' : 'Error during signup');
@@ -122,11 +117,9 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 pt-20 pb-12 px-4" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Background Elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-[#C9A35A] rounded-full mix-blend-multiply filter blur-3xl opacity-10 -z-10"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#071C3C] rounded-full mix-blend-multiply filter blur-3xl opacity-10 -z-10"></div>
 
-      {/* Main Content */}
       <div className="relative z-10 flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -134,7 +127,6 @@ export default function SignupPage() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md"
         >
-          {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl md:text-4xl font-serif font-bold mb-2" style={{ color: '#071C3C' }}>
               {isRTL ? 'ثبت نام' : 'Create Account'}
@@ -144,10 +136,8 @@ export default function SignupPage() {
             </p>
           </div>
 
-          {/* Form Card */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Name Field */}
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: '#1E2430' }}>
                   {isRTL ? 'نام کامل' : 'Full Name'}
@@ -166,7 +156,6 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              {/* Email Field */}
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: '#1E2430' }}>
                   {isRTL ? 'ایمیل' : 'Email'}
@@ -185,7 +174,6 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              {/* Password Field */}
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: '#1E2430' }}>
                   {isRTL ? 'رمز عبور' : 'Password'}
@@ -204,7 +192,6 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              {/* Confirm Password Field */}
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: '#1E2430' }}>
                   {isRTL ? 'تایید رمز عبور' : 'Confirm Password'}
@@ -223,7 +210,6 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              {/* Validation Error */}
               {validationError && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
@@ -235,19 +221,17 @@ export default function SignupPage() {
                 </motion.div>
               )}
 
-              {/* Success Message */}
               {successMessage && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="flex items-start gap-3 p-4 rounded-lg bg-green-50 border border-green-200"
                 >
-                  <AlertCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-green-600">{successMessage}</p>
                 </motion.div>
               )}
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -268,7 +252,6 @@ export default function SignupPage() {
               </button>
             </form>
 
-            {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200"></div>
@@ -280,7 +263,6 @@ export default function SignupPage() {
               </div>
             </div>
 
-            {/* Sign In Link */}
             <p className="text-center text-sm">
               <span style={{ color: '#5E6470' }}>
                 {isRTL ? 'حساب کاربری دارید؟' : 'Already have an account?'}
@@ -296,7 +278,6 @@ export default function SignupPage() {
             </p>
           </div>
 
-          {/* Help */}
           <p className="text-center text-xs mt-6" style={{ color: '#5E6470' }}>
             {isRTL ? 'سوالی دارید؟' : 'Need help?'}{' '}
             <Link href="/contact" className="font-semibold hover:underline" style={{ color: '#C9A35A' }}>

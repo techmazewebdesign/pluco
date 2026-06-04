@@ -2,42 +2,46 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Lock, Mail, ArrowRight, AlertCircle, Loader } from 'lucide-react';
+import { signInWithEmailAndPassword, sendEmailVerification, signOut, onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, loading, signIn, error, clearError } = useAuth();
   const { isRTL } = useLanguage();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isResendingEmail, setIsResendingEmail] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
 
   useEffect(() => {
-    if (!loading && user) {
-      // User is logged in, check if admin and redirect accordingly
-      checkAdminStatus();
-    }
-  }, [user, loading]);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user && user.emailVerified) {
+        checkAdminAndRedirect(user.uid);
+      } else {
+        setLoading(false);
+      }
+    });
 
-  const checkAdminStatus = async () => {
-    if (!user) return;
+    return () => unsubscribe();
+  }, []);
 
+  const checkAdminAndRedirect = async (uid: string) => {
     try {
-      console.log('Checking if user is admin...');
-      const agentDoc = await getDoc(doc(db, 'agents', user.uid));
+      const agentDoc = await getDoc(doc(db, 'agents', uid));
 
       if (agentDoc.exists() && agentDoc.data()?.role === 'admin') {
-        console.log('User is admin, redirecting to admin dashboard');
         router.push('/admin/dashboard');
       } else {
-        console.log('User is regular client, redirecting to client dashboard');
         router.push('/dashboard');
       }
     } catch (err) {
@@ -48,7 +52,8 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    clearError();
+    setError('');
+    setUnverifiedEmail('');
 
     if (!email.trim() || !password.trim()) {
       return;
@@ -58,16 +63,85 @@ export default function LoginPage() {
 
     try {
       console.log('Attempting to sign in with email:', email);
-      await signIn(email.trim(), password);
-      console.log('Sign in successful');
 
-      // After sign in, check admin status and redirect
-      setTimeout(() => {
-        checkAdminStatus();
-      }, 500);
-    } catch (err) {
+      // Sign in with Firebase
+      const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
+      const user = userCredential.user;
+
+      // Reload user to get latest emailVerified status
+      await user.reload();
+
+      console.log('User signed in, emailVerified:', user.emailVerified);
+
+      if (!user.emailVerified) {
+        console.log('Email not verified, signing out');
+        setUnverifiedEmail(user.email || email);
+        await signOut(auth);
+        setError(
+          isRTL
+            ? 'لطفا ایمیل خود را تایید کنید تا بتوانید وارد شوید'
+            : 'Please verify your email before logging in'
+        );
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Email is verified, check admin status and redirect
+      console.log('Email verified, checking admin status');
+      checkAdminAndRedirect(user.uid);
+    } catch (err: any) {
       console.error('Sign in error:', err);
+
+      let errorMessage = isRTL ? 'ایمیل یا رمز عبور اشتباه است' : 'Invalid email or password';
+
+      if (err.code === 'auth/user-not-found') {
+        errorMessage = isRTL ? 'حساب کاربری پیدا نشد' : 'Account not found';
+      } else if (err.code === 'auth/wrong-password') {
+        errorMessage = isRTL ? 'رمز عبور اشتباه است' : 'Incorrect password';
+      } else if (err.code === 'auth/user-disabled') {
+        errorMessage = isRTL ? 'حساب کاربری غیرفعال است' : 'Account is disabled';
+      } else if (err.code === 'auth/too-many-requests') {
+        errorMessage = isRTL
+          ? 'تلاش‌های بیش‌ازحد زیاد. لطفا بعدا دوباره تلاش کنید'
+          : 'Too many login attempts. Please try again later';
+      }
+
+      setError(errorMessage);
       setIsSubmitting(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!unverifiedEmail) return;
+
+    setIsResendingEmail(true);
+    setError('');
+
+    try {
+      console.log('Temporarily signing in to resend verification email');
+
+      // Sign in temporarily to send verification
+      const userCredential = await signInWithEmailAndPassword(auth, unverifiedEmail, password);
+      const user = userCredential.user;
+
+      console.log('Sending verification email');
+      await sendEmailVerification(user);
+
+      console.log('Signing out after sending verification');
+      await signOut(auth);
+
+      setError(
+        isRTL
+          ? 'ایمیل تایید مجددا ارسال شد. لطفا پوشه spam را بررسی کنید'
+          : 'Verification email resent. Check your inbox and spam folder'
+      );
+      setUnverifiedEmail('');
+      setPassword('');
+    } catch (err: any) {
+      console.error('Resend verification error:', err);
+      setError(isRTL ? 'خطا در ارسال ایمیل' : 'Failed to resend email');
+    } finally {
+      setIsResendingEmail(false);
     }
   };
 
@@ -84,11 +158,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 pt-20 pb-12 px-4" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Background Elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-[#C9A35A] rounded-full mix-blend-multiply filter blur-3xl opacity-10 -z-10"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#071C3C] rounded-full mix-blend-multiply filter blur-3xl opacity-10 -z-10"></div>
 
-      {/* Main Content */}
       <div className="relative z-10 flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -96,7 +168,6 @@ export default function LoginPage() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md"
         >
-          {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl md:text-4xl font-serif font-bold mb-2" style={{ color: '#071C3C' }}>
               {isRTL ? 'ورود' : 'Sign In'}
@@ -106,10 +177,8 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Form Card */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Email Field */}
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: '#1E2430' }}>
                   {isRTL ? 'ایمیل' : 'Email'}
@@ -122,7 +191,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
-                      clearError();
+                      setError('');
                     }}
                     disabled={isSubmitting}
                     className={`w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A35A] focus:border-[#C9A35A] disabled:opacity-50 transition-all ${
@@ -133,7 +202,6 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Password Field */}
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium" style={{ color: '#1E2430' }}>
@@ -155,7 +223,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
-                      clearError();
+                      setError('');
                     }}
                     disabled={isSubmitting}
                     className={`w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A35A] focus:border-[#C9A35A] disabled:opacity-50 transition-all ${
@@ -166,7 +234,6 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Error Message */}
               {error && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
@@ -178,7 +245,30 @@ export default function LoginPage() {
                 </motion.div>
               )}
 
-              {/* Submit Button */}
+              {unverifiedEmail && (
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={isResendingEmail || isSubmitting}
+                  className="w-full py-2 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition-all border"
+                  style={{
+                    borderColor: '#C9A35A',
+                    color: '#C9A35A',
+                    opacity: isResendingEmail ? 0.6 : 1,
+                    cursor: isResendingEmail ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {isResendingEmail ? (
+                    <>
+                      <Loader className="w-4 h-4 animate-spin" />
+                      {isRTL ? 'درحال ارسال...' : 'Sending...'}
+                    </>
+                  ) : (
+                    isRTL ? 'ارسال دوباره ایمیل تایید' : 'Resend verification email'
+                  )}
+                </button>
+              )}
+
               <button
                 type="submit"
                 disabled={isSubmitting || !email.trim() || !password.trim()}
@@ -188,14 +278,6 @@ export default function LoginPage() {
                   opacity: isSubmitting || (!email.trim() || !password.trim()) ? 0.6 : 1,
                   cursor: isSubmitting || (!email.trim() || !password.trim()) ? 'not-allowed' : 'pointer',
                   userSelect: 'none',
-                }}
-                onMouseEnter={(e) => {
-                  if (!isSubmitting && email.trim() && password.trim()) {
-                    (e.target as HTMLButtonElement).style.filter = 'brightness(1.1)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLButtonElement).style.filter = 'brightness(1)';
                 }}
               >
                 {isSubmitting ? (
@@ -212,7 +294,6 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200"></div>
@@ -224,7 +305,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Sign Up Link */}
             <p className="text-center text-sm">
               <span style={{ color: '#5E6470' }}>
                 {isRTL ? 'حساب ندارید؟' : "Don't have an account?"}
@@ -240,7 +320,6 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Help */}
           <p className="text-center text-xs mt-6" style={{ color: '#5E6470' }}>
             {isRTL ? 'سوالی دارید؟' : 'Need help?'}{' '}
             <Link href="/contact" className="font-semibold hover:underline" style={{ color: '#C9A35A' }}>
