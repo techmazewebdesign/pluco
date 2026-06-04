@@ -2,12 +2,15 @@
 
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { ArrowLeft, LogOut, Copy, Edit2, Check, Calendar, MessageSquare, Flag, CheckCircle, AlertCircle, MapPin, Briefcase, DollarSign, TrendingUp, FileText, MessageCircle, Users, Plus } from 'lucide-react';
+import { ArrowLeft, LogOut, Copy, Edit2, Check, Calendar, MessageSquare, Flag, CheckCircle, AlertCircle, MapPin, Briefcase, DollarSign, TrendingUp, FileText, MessageCircle, Users, Plus, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Lead, AgentActivityLog } from '@/lib/types';
 import { getLeadById, getActivityLogs, updateLead, createActivityLog, createNotification } from '@/lib/services/aiLeadAgentService';
 import { motion } from 'framer-motion';
+import { useMessageTemplates, GeneratedMessages } from '@/lib/hooks/useMessageTemplates';
+import { useLeadOperations } from '@/lib/hooks/useLeadOperations';
+import MessageTemplatesModal from '@/components/admin/MessageTemplatesModal';
 
 interface LeadWithActivity extends Lead {
   activities?: AgentActivityLog[];
@@ -18,6 +21,8 @@ export default function LeadDetailPage() {
   const params = useParams();
   const { user, signOut, loading } = useAuth();
   const leadId = params.id as string;
+  const { generateAndSaveMessages } = useMessageTemplates();
+  const { markMessageAsSent } = useLeadOperations();
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [lead, setLead] = useState<LeadWithActivity | null>(null);
@@ -26,6 +31,9 @@ export default function LeadDetailPage() {
   const [newNote, setNewNote] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<'summary' | 'analysis' | 'timeline' | 'messages' | 'notes'>('summary');
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [generatedMessages, setGeneratedMessages] = useState<GeneratedMessages | null>(null);
+  const [isGeneratingMessages, setIsGeneratingMessages] = useState(false);
 
   // Check admin and load lead
   useEffect(() => {
@@ -136,6 +144,45 @@ export default function LeadDetailPage() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
+  };
+
+  const handleGenerateMessages = async () => {
+    if (!lead) return;
+
+    try {
+      setIsGeneratingMessages(true);
+      const messages = await generateAndSaveMessages(lead);
+      if (messages) {
+        setGeneratedMessages(messages);
+        setShowMessageModal(true);
+      } else {
+        alert('❌ Error generating messages');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('❌ Error generating messages');
+    } finally {
+      setIsGeneratingMessages(false);
+    }
+  };
+
+  const handleMarkMessageSent = async () => {
+    if (!lead) return;
+
+    try {
+      const success = await markMessageAsSent(lead.id, lead.fullName, lead.priorityLevel);
+      if (success) {
+        // Reload lead to show updated status
+        const updatedLead = await getLeadById(lead.id);
+        if (updatedLead) {
+          const activities = await getActivityLogs(50);
+          const leadActivities = activities.filter(a => a.relatedLeadId === lead.id);
+          setLead({ ...updatedLead, activities: leadActivities });
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   if (loading) {
@@ -445,43 +492,91 @@ export default function LeadDetailPage() {
             {/* Messages Tab */}
             {activeTab === 'messages' && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                <div>
-                  <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: '#1E2430' }}>
-                    📧 Email Message
-                  </h3>
-                  <div className="p-4 rounded-lg border border-gray-200 bg-gray-50 font-mono text-xs leading-relaxed" style={{ color: '#1E2430' }}>
-                    <p>Dear {lead.fullName},</p>
-                    <p className="mt-3">Thank you for your interest in our {lead.serviceInterest} services. We would like to discuss how we can assist you with your goals.</p>
-                    <p className="mt-3">We believe your background and requirements align well with our expertise. We're prepared to provide a customized solution tailored to your specific needs.</p>
-                    <p className="mt-3">Would you be available for a brief consultation this week?</p>
-                    <p className="mt-3">Best regards,<br/>PLUCO GROUP Team</p>
-                  </div>
+                {/* Generate Messages Button */}
+                <div className="flex gap-3">
                   <button
-                    onClick={() => copyToClipboard(`Dear ${lead.fullName},...`)}
-                    className="mt-3 px-3 py-2 text-xs font-semibold rounded-lg flex items-center gap-2 transition-colors"
-                    style={{ backgroundColor: '#F3F4F6', color: '#5E6470' }}
+                    onClick={handleGenerateMessages}
+                    disabled={isGeneratingMessages}
+                    className="px-4 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 transition-colors"
+                    style={{ backgroundColor: isGeneratingMessages ? '#CBD5E0' : '#C9A35A', color: '#071C3C' }}
                   >
-                    <Copy className="w-4 h-4" />
-                    Copy
+                    <Zap className={`w-4 h-4 ${isGeneratingMessages ? 'animate-spin' : ''}`} />
+                    {isGeneratingMessages ? 'Generating...' : 'Generate Messages'}
                   </button>
                 </div>
 
-                <div>
-                  <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: '#1E2430' }}>
-                    💬 WhatsApp Message
-                  </h3>
-                  <div className="p-4 rounded-lg border border-gray-200 bg-gray-50 text-sm leading-relaxed" style={{ color: '#1E2430' }}>
-                    Hi {lead.fullName}! 👋 Thanks for your interest in our {lead.serviceInterest} services. We're excited to help you achieve your goals. Would you have time for a quick chat? 💼
+                {/* Message Status */}
+                {lead.status === 'Message Prepared' && (
+                  <div className="p-4 rounded-lg" style={{ backgroundColor: '#DCFCE7' }}>
+                    <p className="text-sm font-semibold" style={{ color: '#15803D' }}>
+                      ✅ Messages have been prepared and sent to this lead
+                    </p>
                   </div>
-                  <button
-                    onClick={() => copyToClipboard(`Hi ${lead.fullName}! 👋 Thanks for your interest...`)}
-                    className="mt-3 px-3 py-2 text-xs font-semibold rounded-lg flex items-center gap-2 transition-colors"
-                    style={{ backgroundColor: '#F3F4F6', color: '#5E6470' }}
-                  >
-                    <Copy className="w-4 h-4" />
-                    Copy
-                  </button>
-                </div>
+                )}
+
+                {generatedMessages ? (
+                  <>
+                    {/* Email Template */}
+                    <div>
+                      <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: '#1E2430' }}>
+                        📧 Email Message
+                      </h3>
+                      <div className="p-4 rounded-lg border border-gray-200 bg-gray-50 font-mono text-xs leading-relaxed whitespace-pre-wrap" style={{ color: '#1E2430' }}>
+                        {generatedMessages.email}
+                      </div>
+                      <button
+                        onClick={() => copyToClipboard(generatedMessages.email)}
+                        className="mt-3 px-3 py-2 text-xs font-semibold rounded-lg flex items-center gap-2 transition-colors"
+                        style={{ backgroundColor: '#F3F4F6', color: '#5E6470' }}
+                      >
+                        <Copy className="w-4 h-4" />
+                        Copy Email
+                      </button>
+                    </div>
+
+                    {/* WhatsApp Template */}
+                    <div>
+                      <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: '#1E2430' }}>
+                        💬 WhatsApp Message
+                      </h3>
+                      <div className="p-4 rounded-lg border border-gray-200 bg-gray-50 text-sm leading-relaxed whitespace-pre-wrap" style={{ color: '#1E2430' }}>
+                        {generatedMessages.whatsapp}
+                      </div>
+                      <button
+                        onClick={() => copyToClipboard(generatedMessages.whatsapp)}
+                        className="mt-3 px-3 py-2 text-xs font-semibold rounded-lg flex items-center gap-2 transition-colors"
+                        style={{ backgroundColor: '#F3F4F6', color: '#5E6470' }}
+                      >
+                        <Copy className="w-4 h-4" />
+                        Copy WhatsApp
+                      </button>
+                    </div>
+
+                    {/* LinkedIn Template */}
+                    <div>
+                      <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: '#1E2430' }}>
+                        💼 LinkedIn Message
+                      </h3>
+                      <div className="p-4 rounded-lg border border-gray-200 bg-gray-50 text-sm leading-relaxed whitespace-pre-wrap" style={{ color: '#1E2430' }}>
+                        {generatedMessages.linkedin}
+                      </div>
+                      <button
+                        onClick={() => copyToClipboard(generatedMessages.linkedin)}
+                        className="mt-3 px-3 py-2 text-xs font-semibold rounded-lg flex items-center gap-2 transition-colors"
+                        style={{ backgroundColor: '#F3F4F6', color: '#5E6470' }}
+                      >
+                        <Copy className="w-4 h-4" />
+                        Copy LinkedIn
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="p-4 rounded-lg border border-gray-200" style={{ backgroundColor: '#F3F4F6' }}>
+                    <p style={{ color: '#5E6470' }}>
+                      Click "Generate Messages" to create compliance-safe message templates for this lead based on their service interest and priority level.
+                    </p>
+                  </div>
+                )}
               </motion.div>
             )}
 
@@ -552,6 +647,15 @@ export default function LeadDetailPage() {
             ))}
           </div>
         </motion.div>
+
+        {/* Message Templates Modal */}
+        <MessageTemplatesModal
+          isOpen={showMessageModal}
+          onClose={() => setShowMessageModal(false)}
+          messages={generatedMessages}
+          leadName={lead.fullName}
+          onMarkSent={handleMarkMessageSent}
+        />
       </main>
     </div>
   );

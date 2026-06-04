@@ -1,5 +1,5 @@
 import { Lead, PriorityLevel } from '@/lib/types';
-import { createLead, getLeads, createNotification, createActivityLog } from '@/lib/services/aiLeadAgentService';
+import { createLead, getLeads, createNotification, createActivityLog, updateLead } from '@/lib/services/aiLeadAgentService';
 
 export function useLeadOperations() {
   /**
@@ -396,6 +396,44 @@ export function useLeadOperations() {
     }
   };
 
+  /**
+   * Mark message as sent and update lead status
+   */
+  const markMessageAsSent = async (leadId: string, leadName: string, leadPriority: PriorityLevel): Promise<boolean> => {
+    try {
+      // Update lead status to Message Prepared
+      const success = await updateLead(leadId, {
+        status: 'Message Prepared',
+        lastContactAt: new Date().toISOString(),
+      });
+
+      if (success) {
+        // Create activity log
+        await createActivityLog(
+          'contact_made',
+          'Message Sent',
+          `Message sent to ${leadName}`,
+          leadId,
+          leadPriority
+        );
+
+        // Create notification
+        await createNotification(
+          'message',
+          `📤 Message Sent: ${leadName}`,
+          `Message template has been sent to the lead`,
+          'success',
+          leadId
+        );
+      }
+
+      return success;
+    } catch (error) {
+      console.error('Error marking message as sent:', error);
+      return false;
+    }
+  };
+
   return {
     calculateLeadScore,
     addLeadManually,
@@ -404,5 +442,6 @@ export function useLeadOperations() {
     exportLeadsToCSV,
     downloadCSV,
     exportLeadsToGoogleSheet,
+    markMessageAsSent,
   };
 }
