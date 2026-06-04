@@ -10,14 +10,12 @@ import { Lock, Mail, ArrowRight, AlertCircle, Loader } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading, signIn, error, clearError } = useAuth();
   const { isRTL } = useLanguage();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [statusMessage, setStatusMessage] = useState('');
 
   useEffect(() => {
     if (!loading && user) {
@@ -27,91 +25,22 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('=== LOGIN FORM SUBMITTED ===');
-    console.log('Email:', email);
-    console.log('Password:', password ? '***' : 'empty');
+    clearError();
 
-    // Clear previous errors
-    setError('');
-    setStatusMessage('');
-
-    // Validate inputs
-    if (!email.trim()) {
-      setError(isRTL ? 'لطفا ایمیل را وارد کنید' : 'Please enter your email');
-      return;
-    }
-
-    if (!password.trim()) {
-      setError(isRTL ? 'لطفا رمز عبور را وارد کنید' : 'Please enter your password');
+    if (!email.trim() || !password.trim()) {
       return;
     }
 
     setIsSubmitting(true);
-    setStatusMessage(isRTL ? 'در حال ورود...' : 'Signing in...');
 
     try {
-      console.log('Step 1: Verifying credentials...');
-      setStatusMessage(isRTL ? 'در حال تأیید ایمیل و رمز عبور...' : 'Verifying credentials...');
-
-      const verifyResponse = await fetch('/api/auth/verify-credentials', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), password }),
-      });
-
-      console.log('Verify response status:', verifyResponse.status);
-
-      if (!verifyResponse.ok) {
-        const errorData = await verifyResponse.json();
-        console.error('Credentials verification failed:', errorData);
-        setError(errorData.error || (isRTL ? 'ایمیل یا رمز عبور اشتباه است' : 'Invalid email or password'));
-        setIsSubmitting(false);
-        setStatusMessage('');
-        return;
-      }
-
-      const verifyData = await verifyResponse.json();
-      console.log('Credentials verified successfully');
-      console.log('User email:', verifyData.email);
-
-      console.log('Step 2: Sending OTP...');
-      setStatusMessage(isRTL ? 'در حال ارسال کد OTP...' : 'Sending OTP code...');
-
-      const otpResponse = await fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: verifyData.email }),
-      });
-
-      console.log('OTP response status:', otpResponse.status);
-
-      if (!otpResponse.ok) {
-        const errorData = await otpResponse.json();
-        console.error('OTP send failed:', errorData);
-        setError(errorData.error || (isRTL ? 'خطا در ارسال کد OTP' : 'Failed to send OTP'));
-        setIsSubmitting(false);
-        setStatusMessage('');
-        return;
-      }
-
-      const otpData = await otpResponse.json();
-      console.log('OTP sent successfully');
-
-      console.log('Step 3: Redirecting to OTP verification...');
-      setStatusMessage(isRTL ? 'بازگردایی به صفحه تأیید...' : 'Redirecting to verification...');
-
-      // Redirect to OTP verification page
-      setTimeout(() => {
-        const redirectUrl = `/verify-otp?email=${encodeURIComponent(verifyData.email)}`;
-        console.log('Redirecting to:', redirectUrl);
-        router.push(redirectUrl);
-      }, 500);
+      console.log('Attempting to sign in with email:', email);
+      await signIn(email.trim(), password);
+      console.log('Sign in successful, redirecting to dashboard...');
+      router.push('/dashboard');
     } catch (err) {
-      console.error('=== LOGIN ERROR ===');
-      console.error('Error details:', err);
-      setError(isRTL ? 'خطا در ورود. لطفا دوباره تلاش کنید' : 'Login failed. Please try again.');
+      console.error('Sign in error:', err);
       setIsSubmitting(false);
-      setStatusMessage('');
     }
   };
 
@@ -166,7 +95,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
-                      setError('');
+                      clearError();
                     }}
                     disabled={isSubmitting}
                     className={`w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A35A] focus:border-[#C9A35A] disabled:opacity-50 transition-all ${
@@ -199,7 +128,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
-                      setError('');
+                      clearError();
                     }}
                     disabled={isSubmitting}
                     className={`w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A35A] focus:border-[#C9A35A] disabled:opacity-50 transition-all ${
@@ -219,20 +148,6 @@ export default function LoginPage() {
                 >
                   <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-red-600">{error}</p>
-                </motion.div>
-              )}
-
-              {/* Status Message */}
-              {statusMessage && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200"
-                >
-                  <Loader className="w-4 h-4 animate-spin" style={{ color: '#1E40AF' }} />
-                  <p className="text-sm" style={{ color: '#1E40AF' }}>
-                    {statusMessage}
-                  </p>
                 </motion.div>
               )}
 
