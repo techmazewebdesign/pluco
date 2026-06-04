@@ -10,7 +10,7 @@ import { Lock, Mail, User, ArrowRight, AlertCircle, Loader } from 'lucide-react'
 
 export default function SignupPage() {
   const router = useRouter();
-  const { user, loading, signUp, error, clearError } = useAuth();
+  const { user, loading } = useAuth();
   const { isRTL } = useLanguage();
 
   const [formData, setFormData] = useState({
@@ -22,6 +22,7 @@ export default function SignupPage() {
 
   const [validationError, setValidationError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     if (!loading && user) {
@@ -33,12 +34,12 @@ export default function SignupPage() {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     setValidationError('');
-    clearError();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError('');
+    setSuccessMessage('');
 
     if (!formData.name.trim()) {
       setValidationError(isRTL ? 'لطفا نام خود را وارد کنید' : 'Please enter your name');
@@ -68,13 +69,38 @@ export default function SignupPage() {
     setIsSubmitting(true);
 
     try {
-      console.log('Signing up user:', formData.email);
-      // Sign up user directly
-      await signUp(formData.email, formData.password, formData.name);
+      console.log('Creating account and sending verification email...');
 
-      console.log('Sign up successful, redirecting to dashboard');
-      // Redirect directly to dashboard (no email verification needed)
-      router.push('/dashboard');
+      // Create account on Firebase and Firestore
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setValidationError(data.error || (isRTL ? 'خطا در ثبت نام' : 'Error during signup'));
+        setIsSubmitting(false);
+        return;
+      }
+
+      console.log('Account created, verification email sent');
+      setSuccessMessage(
+        isRTL
+          ? 'حساب کاربری ایجاد شد! لطفا ایمیل خود را بررسی کنید و کد تایید را وارد کنید.'
+          : 'Account created! Please check your email and verify your account.'
+      );
+
+      // Redirect to verify page after short delay
+      setTimeout(() => {
+        router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+      }, 2000);
     } catch (err) {
       console.error('Signup error:', err);
       setValidationError(isRTL ? 'خطا در ثبت نام' : 'Error during signup');
@@ -209,15 +235,15 @@ export default function SignupPage() {
                 </motion.div>
               )}
 
-              {/* Auth Error */}
-              {error && (
+              {/* Success Message */}
+              {successMessage && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex items-start gap-3 p-4 rounded-lg bg-red-50 border border-red-200"
+                  className="flex items-start gap-3 p-4 rounded-lg bg-green-50 border border-green-200"
                 >
-                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-red-600">{error}</p>
+                  <AlertCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-green-600">{successMessage}</p>
                 </motion.div>
               )}
 

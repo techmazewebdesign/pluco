@@ -7,6 +7,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Lock, Mail, ArrowRight, AlertCircle, Loader } from 'lucide-react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,9 +21,30 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!loading && user) {
+      // User is logged in, check if admin and redirect accordingly
+      checkAdminStatus();
+    }
+  }, [user, loading]);
+
+  const checkAdminStatus = async () => {
+    if (!user) return;
+
+    try {
+      console.log('Checking if user is admin...');
+      const agentDoc = await getDoc(doc(db, 'agents', user.uid));
+
+      if (agentDoc.exists() && agentDoc.data()?.role === 'admin') {
+        console.log('User is admin, redirecting to admin dashboard');
+        router.push('/admin/dashboard');
+      } else {
+        console.log('User is regular client, redirecting to client dashboard');
+        router.push('/dashboard');
+      }
+    } catch (err) {
+      console.error('Error checking admin status:', err);
       router.push('/dashboard');
     }
-  }, [user, loading, router]);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,8 +59,12 @@ export default function LoginPage() {
     try {
       console.log('Attempting to sign in with email:', email);
       await signIn(email.trim(), password);
-      console.log('Sign in successful, redirecting to dashboard...');
-      router.push('/dashboard');
+      console.log('Sign in successful');
+
+      // After sign in, check admin status and redirect
+      setTimeout(() => {
+        checkAdminStatus();
+      }, 500);
     } catch (err) {
       console.error('Sign in error:', err);
       setIsSubmitting(false);
