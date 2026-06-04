@@ -34,9 +34,12 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Login form submitted');
     setIsSubmitting(true);
 
     try {
+      console.log('Verifying credentials for:', formData.email);
+
       // Verify credentials first
       const verifyResponse = await fetch('/api/auth/verify-credentials', {
         method: 'POST',
@@ -47,13 +50,17 @@ export default function LoginPage() {
         }),
       });
 
+      console.log('Verify response status:', verifyResponse.status);
+
       if (!verifyResponse.ok) {
-        const error = await verifyResponse.json();
+        const errorData = await verifyResponse.json();
+        console.error('Credentials verification failed:', errorData);
         clearError();
         // Trigger auth context error by attempting sign in (will fail)
         try {
           await signIn(formData.email, formData.password);
         } catch (authErr) {
+          console.error('Auth error:', authErr);
           // Expected to fail
         }
         setIsSubmitting(false);
@@ -61,18 +68,25 @@ export default function LoginPage() {
       }
 
       const { email } = await verifyResponse.json();
+      console.log('Credentials verified for:', email);
 
       // Send OTP email
+      console.log('Sending OTP to:', email);
       const otpResponse = await fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
 
+      console.log('OTP response status:', otpResponse.status);
+
       if (!otpResponse.ok) {
+        const errorData = await otpResponse.json();
+        console.error('OTP send failed:', errorData);
         throw new Error('Failed to send OTP');
       }
 
+      console.log('OTP sent, redirecting to verify-otp');
       // Redirect to OTP verification
       router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
     } catch (err) {
@@ -184,9 +198,9 @@ export default function LoginPage() {
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full py-3 px-4 rounded-lg font-semibold text-white flex items-center justify-center gap-2 transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
-                style={{ backgroundColor: '#071C3C' }}
+                disabled={isSubmitting || !formData.email || !formData.password}
+                className="w-full py-3 px-4 rounded-lg font-semibold text-white flex items-center justify-center gap-2 transition-all hover:brightness-110 active:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed mt-6 cursor-pointer"
+                style={{ backgroundColor: '#071C3C', userSelect: 'none' }}
               >
                 {isSubmitting ? (
                   <>
