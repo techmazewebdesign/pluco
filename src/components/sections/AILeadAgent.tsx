@@ -13,8 +13,6 @@ import {
   getAgentTasks,
   getActivityLogs,
   getNotifications,
-  generateDemoLeads,
-  generateDemoTasks
 } from '@/lib/services/aiLeadAgentService';
 import AddLeadModal from '@/components/admin/AddLeadModal';
 import ImportCSVModal from '@/components/admin/ImportCSVModal';
@@ -61,6 +59,7 @@ export default function AILeadAgent() {
 
   const [showAddLeadModal, setShowAddLeadModal] = useState(false);
   const [showImportCSVModal, setShowImportCSVModal] = useState(false);
+  const [isRunningAgent, setIsRunningAgent] = useState(false);
 
   const [filterService, setFilterService] = useState('All');
   const [filterPriority, setFilterPriority] = useState('All');
@@ -69,7 +68,7 @@ export default function AILeadAgent() {
   const [filterCountry, setFilterCountry] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Load data from Firebase
+  // Load data from Firebase (real data only, no demos)
   const loadData = async () => {
     try {
       setIsLoading(true);
@@ -80,18 +79,16 @@ export default function AILeadAgent() {
         getNotifications(),
       ]);
 
-      // Use demo data if no real data exists
-      setLeads(leadsData.length > 0 ? leadsData : generateDemoLeads());
-      setTasks(tasksData.length > 0 ? tasksData : generateDemoTasks());
+      setLeads(leadsData);
+      setTasks(tasksData);
       setActivities(activitiesData);
       setNotifications(notificationsData);
       setError(null);
     } catch (err) {
       console.error('Error loading data:', err);
-      // Fallback to demo data on error
-      setLeads(generateDemoLeads());
-      setTasks(generateDemoTasks());
-      setError('Using demo data - could not load from database');
+      setError('Could not load data from database. Please try again.');
+      setLeads([]);
+      setTasks([]);
     } finally {
       setIsLoading(false);
     }
@@ -139,6 +136,46 @@ export default function AILeadAgent() {
       alert('❌ Error exporting to Google Sheet');
     } finally {
       setIsExporting(false);
+    }
+  };
+
+  const handleRunAgent = async () => {
+    try {
+      setIsRunningAgent(true);
+
+      // Get auth token from Firebase
+      const { getAuth } = await import('firebase/auth');
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) {
+        alert('❌ Not authenticated');
+        return;
+      }
+
+      const token = await user.getIdToken();
+
+      const response = await fetch('/api/agent/run', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(`❌ ${data.error || 'Agent run failed'}`);
+        return;
+      }
+
+      alert(`✅ ${data.message}\n\nProcessed: ${data.processed}\nUpdated: ${data.updated}`);
+      await loadData();
+    } catch (error) {
+      console.error('Error:', error);
+      alert('❌ Error running agent');
+    } finally {
+      setIsRunningAgent(false);
     }
   };
 
@@ -332,6 +369,15 @@ export default function AILeadAgent() {
               <Zap className={`w-4 h-4 ${isExporting ? 'animate-spin' : ''}`} />
               {isExporting ? 'Exporting...' : 'Export to Google Sheet'}
             </button>
+            <button
+              onClick={handleRunAgent}
+              disabled={isRunningAgent}
+              className="px-4 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 transition-colors"
+              style={{ backgroundColor: isRunningAgent ? '#CBD5E0' : '#C9A35A', color: '#071C3C', opacity: isRunningAgent ? 0.6 : 1 }}
+            >
+              <Zap className={`w-4 h-4 ${isRunningAgent ? 'animate-spin' : ''}`} />
+              {isRunningAgent ? 'Agent Running...' : '🤖 Run Agent Now'}
+            </button>
           </div>
         </div>
       </div>
@@ -519,86 +565,106 @@ export default function AILeadAgent() {
             ))}
           </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr style={{ borderBottom: '2px solid #E5E7EB' }}>
-                  <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Name</th>
-                  <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Country</th>
-                  <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Service</th>
-                  <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Source</th>
-                  <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Budget</th>
-                  <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Priority</th>
-                  <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Status</th>
-                  <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Assigned</th>
-                  <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Last Contact</th>
-                  <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Sheet Export</th>
-                  <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Next Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredLeads.map((lead) => {
-                  const priColor = getPriorityColor(lead.priorityLevel);
-                  const statColor = getStatusColor(lead.status);
-                  return (
-                    <tr
-                      key={lead.id}
-                      className="border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
-                      onClick={() => window.location.href = `/admin/dashboard/leads/${lead.id}`}
-                    >
-                      <td className="px-3 py-3">
-                        <p className="font-semibold hover:underline" style={{ color: '#1E2430' }}>{lead.fullName}</p>
-                        {lead.companyName && <p style={{ color: '#5E6470' }}>{lead.companyName}</p>}
-                      </td>
-                      <td className="px-3 py-3" style={{ color: '#5E6470' }}>
-                        <MapPin className="w-3 h-3 inline-block mr-1" />
-                        {lead.country}
-                      </td>
-                      <td className="px-3 py-3" style={{ color: '#5E6470' }}>
-                        <Briefcase className="w-3 h-3 inline-block mr-1" />
-                        {lead.serviceInterest}
-                      </td>
-                      <td className="px-3 py-3" style={{ color: '#5E6470' }}>{lead.sourceChannel}</td>
-                      <td className="px-3 py-3">
-                        <DollarSign className="w-3 h-3 inline-block mr-1" style={{ color: '#15803D' }} />
-                        <span style={{ color: '#15803D', fontWeight: 'bold' }}>{lead.estimatedBudget}</span>
-                      </td>
-                      <td className="px-3 py-3">
-                        <span className="px-2 py-1 rounded text-xs font-semibold" style={{ backgroundColor: priColor.bg, color: priColor.color }}>
-                          {priColor.badge} {lead.priorityLevel}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3">
-                        <span className="px-2 py-1 rounded text-xs font-semibold" style={{ backgroundColor: statColor.bg, color: statColor.color }}>
-                          {lead.status}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3" style={{ color: '#5E6470' }}>
-                        {lead.assignedToName === 'Unassigned' || !lead.assignedToName ? <span style={{ color: '#DC2626' }}>⚠️ Unassigned</span> : lead.assignedToName}
-                      </td>
-                      <td className="px-3 py-3" style={{ color: '#5E6470' }}>
-                        <Clock className="w-3 h-3 inline-block mr-1" />
-                        {lead.lastContactAt ? new Date(lead.lastContactAt).toLocaleDateString() : 'Never'}
-                      </td>
-                      <td className="px-3 py-3">
-                        {lead.exportStatus ? (
-                          <span className="px-2 py-1 rounded text-xs font-semibold" style={{ backgroundColor: LEAD_EXPORT_STATUS_LABELS[lead.exportStatus].bg, color: LEAD_EXPORT_STATUS_LABELS[lead.exportStatus].color }}>
-                            {LEAD_EXPORT_STATUS_LABELS[lead.exportStatus].icon} {lead.exportStatus}
+          {/* Table or Empty State */}
+          {filteredLeads.length === 0 ? (
+            <div className="py-12 text-center">
+              <Zap className="w-12 h-12 mx-auto mb-4" style={{ color: '#CBD5E0' }} />
+              <h3 className="text-lg font-bold mb-2" style={{ color: '#1E2430' }}>
+                No leads yet
+              </h3>
+              <p className="mb-6" style={{ color: '#5E6470' }}>
+                No real leads found. Connect your website form or add leads manually to get started.
+              </p>
+              <button
+                onClick={() => setShowAddLeadModal(true)}
+                className="px-6 py-2 rounded-lg font-semibold inline-flex items-center gap-2"
+                style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
+              >
+                <Plus className="w-4 h-4" />
+                Add Your First Lead
+              </button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr style={{ borderBottom: '2px solid #E5E7EB' }}>
+                    <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Name</th>
+                    <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Country</th>
+                    <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Service</th>
+                    <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Source</th>
+                    <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Budget</th>
+                    <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Priority</th>
+                    <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Status</th>
+                    <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Assigned</th>
+                    <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Last Contact</th>
+                    <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Sheet Export</th>
+                    <th className="text-left px-3 py-3 font-bold" style={{ color: '#1E2430' }}>Next Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredLeads.map((lead) => {
+                    const priColor = getPriorityColor(lead.priorityLevel);
+                    const statColor = getStatusColor(lead.status);
+                    return (
+                      <tr
+                        key={lead.id}
+                        className="border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+                        onClick={() => window.location.href = `/admin/dashboard/leads/${lead.id}`}
+                      >
+                        <td className="px-3 py-3">
+                          <p className="font-semibold hover:underline" style={{ color: '#1E2430' }}>{lead.fullName}</p>
+                          {lead.companyName && <p style={{ color: '#5E6470' }}>{lead.companyName}</p>}
+                        </td>
+                        <td className="px-3 py-3" style={{ color: '#5E6470' }}>
+                          <MapPin className="w-3 h-3 inline-block mr-1" />
+                          {lead.country}
+                        </td>
+                        <td className="px-3 py-3" style={{ color: '#5E6470' }}>
+                          <Briefcase className="w-3 h-3 inline-block mr-1" />
+                          {lead.serviceInterest}
+                        </td>
+                        <td className="px-3 py-3" style={{ color: '#5E6470' }}>{lead.sourceChannel}</td>
+                        <td className="px-3 py-3">
+                          <DollarSign className="w-3 h-3 inline-block mr-1" style={{ color: '#15803D' }} />
+                          <span style={{ color: '#15803D', fontWeight: 'bold' }}>{lead.estimatedBudget}</span>
+                        </td>
+                        <td className="px-3 py-3">
+                          <span className="px-2 py-1 rounded text-xs font-semibold" style={{ backgroundColor: priColor.bg, color: priColor.color }}>
+                            {priColor.badge} {lead.priorityLevel}
                           </span>
-                        ) : (
-                          <span className="px-2 py-1 rounded text-xs font-semibold" style={{ backgroundColor: '#F3F4F6', color: '#6B7280' }}>
-                            ⭕ Not Exported
+                        </td>
+                        <td className="px-3 py-3">
+                          <span className="px-2 py-1 rounded text-xs font-semibold" style={{ backgroundColor: statColor.bg, color: statColor.color }}>
+                            {lead.status}
                           </span>
-                        )}
-                      </td>
-                      <td className="px-3 py-3" style={{ color: '#1E40AF', fontWeight: 'bold' }}>→ {lead.aiRecommendedAction || 'No action'}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                        </td>
+                        <td className="px-3 py-3" style={{ color: '#5E6470' }}>
+                          {lead.assignedToName === 'Unassigned' || !lead.assignedToName ? <span style={{ color: '#DC2626' }}>⚠️ Unassigned</span> : lead.assignedToName}
+                        </td>
+                        <td className="px-3 py-3" style={{ color: '#5E6470' }}>
+                          <Clock className="w-3 h-3 inline-block mr-1" />
+                          {lead.lastContactAt ? new Date(lead.lastContactAt).toLocaleDateString() : 'Never'}
+                        </td>
+                        <td className="px-3 py-3">
+                          {lead.exportStatus ? (
+                            <span className="px-2 py-1 rounded text-xs font-semibold" style={{ backgroundColor: LEAD_EXPORT_STATUS_LABELS[lead.exportStatus].bg, color: LEAD_EXPORT_STATUS_LABELS[lead.exportStatus].color }}>
+                              {LEAD_EXPORT_STATUS_LABELS[lead.exportStatus].icon} {lead.exportStatus}
+                            </span>
+                          ) : (
+                            <span className="px-2 py-1 rounded text-xs font-semibold" style={{ backgroundColor: '#F3F4F6', color: '#6B7280' }}>
+                              ⭕ Not Exported
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-3 py-3" style={{ color: '#1E40AF', fontWeight: 'bold' }}>→ {lead.aiRecommendedAction || 'No action'}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           {/* Pagination */}
           <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
