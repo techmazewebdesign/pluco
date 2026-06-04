@@ -445,9 +445,13 @@ export default function AILeadAgent() {
                   const priColor = getPriorityColor(lead.priorityLevel);
                   const statColor = getStatusColor(lead.status);
                   return (
-                    <tr key={lead.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={lead.id}
+                      className="border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={() => window.location.href = `/admin/dashboard/leads/${lead.id}`}
+                    >
                       <td className="px-3 py-3">
-                        <p className="font-semibold" style={{ color: '#1E2430' }}>{lead.fullName}</p>
+                        <p className="font-semibold hover:underline" style={{ color: '#1E2430' }}>{lead.fullName}</p>
                         {lead.companyName && <p style={{ color: '#5E6470' }}>{lead.companyName}</p>}
                       </td>
                       <td className="px-3 py-3" style={{ color: '#5E6470' }}>
