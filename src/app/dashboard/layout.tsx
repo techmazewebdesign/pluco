@@ -43,14 +43,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       try {
         const snap = await getDoc(doc(db, 'clients', user.uid));
         if (snap.exists()) {
-          const data = snap.data() as { name?: string; photo?: string; emailVerified?: boolean };
+          const data = snap.data() as { name?: string; photo?: string };
           setProfile(data);
-
-          // If email not verified, redirect to verification page
-          if (!data.emailVerified) {
-            router.push(`/verify-email?email=${encodeURIComponent(user.email || '')}`);
-            return;
-          }
         }
       } catch { /* ignore */ }
     };
