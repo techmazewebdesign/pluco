@@ -6,11 +6,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Lock, Mail, User, ArrowRight, AlertCircle } from 'lucide-react';
+import { Lock, Mail, User, ArrowRight, AlertCircle, Loader } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
-  const { user, loading, signUp, signOut, error, clearError } = useAuth();
+  const { user, loading, signUp, error, clearError } = useAuth();
   const { isRTL } = useLanguage();
 
   const [formData, setFormData] = useState({
@@ -68,27 +68,13 @@ export default function SignupPage() {
     setIsSubmitting(true);
 
     try {
-      // Sign up user
+      console.log('Signing up user:', formData.email);
+      // Sign up user directly
       await signUp(formData.email, formData.password, formData.name);
 
-      // Send verification email
-      const verificationResponse = await fetch('/api/auth/send-verification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-        }),
-      });
-
-      if (!verificationResponse.ok) {
-        throw new Error('Failed to send verification email');
-      }
-
-      // Sign out user so they must verify email first
-      await signOut();
-
-      // Redirect to email verification page
-      router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+      console.log('Sign up successful, redirecting to dashboard');
+      // Redirect directly to dashboard (no email verification needed)
+      router.push('/dashboard');
     } catch (err) {
       console.error('Signup error:', err);
       setValidationError(isRTL ? 'خطا در ثبت نام' : 'Error during signup');
@@ -100,7 +86,7 @@ export default function SignupPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-gray-200 border-t-[#C9A35A] rounded-full animate-spin"></div>
+          <Loader className="w-8 h-8 animate-spin" style={{ color: '#C9A35A' }} />
         </div>
       </div>
     );
@@ -109,13 +95,13 @@ export default function SignupPage() {
   const inputStyles = 'w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A35A] focus:border-[#C9A35A] disabled:opacity-50';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 pt-32 pb-12" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 pt-20 pb-12 px-4" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Background Elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-[#C9A35A] rounded-full mix-blend-multiply filter blur-3xl opacity-10 -z-10"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#071C3C] rounded-full mix-blend-multiply filter blur-3xl opacity-10 -z-10"></div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex items-center justify-center px-4">
+      <div className="relative z-10 flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -244,8 +230,8 @@ export default function SignupPage() {
               >
                 {isSubmitting ? (
                   <>
-                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    {isRTL ? 'در حال ثبت نام...' : 'Signing up...'}
+                    <Loader className="w-4 h-4 animate-spin" />
+                    {isRTL ? 'درحال ثبت نام...' : 'Signing up...'}
                   </>
                 ) : (
                   <>
