@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Mail, Inbox, Clock, CheckCircle, TrendingUp, Search, MessageSquare } from 'lucide-react';
 import { collection, query, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import RoleBadge from '@/components/shared/RoleBadge';
 
 interface EnquiryData {
   id: string;
@@ -121,9 +122,12 @@ export default function EnquiryHandlerDashboard() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2" style={{ color: '#071C3C' }}>Enquiry Handler Dashboard</h1>
-          <p style={{ color: '#5E6470' }}>Process and manage incoming client inquiries</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-2" style={{ color: '#071C3C' }}>Enquiry Handler Dashboard</h1>
+            <p style={{ color: '#5E6470' }}>Process and manage incoming client inquiries</p>
+          </div>
+          <RoleBadge role="enquiry_handler" email={user?.email} size="md" />
         </div>
 
         {/* Stats */}

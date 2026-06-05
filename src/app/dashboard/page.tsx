@@ -13,6 +13,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import RoleBadge from '@/components/shared/RoleBadge';
 import type { Case, Message, Invoice, ClientProfile, DocumentCategory } from '@/lib/types';
 import { DOCUMENT_CATEGORY_LABELS, CASE_STATUS_LABELS, DOCUMENT_STATUS_LABELS } from '@/lib/types';
 import type { DocumentStatus } from '@/lib/types';
@@ -129,6 +130,14 @@ export default function Dashboard() {
 
   return (
     <div style={{ backgroundColor: '#F8F9FA', minHeight: '100vh' }}>
+      {/* Header with Role Badge */}
+      <div className="border-b bg-white" style={{ borderColor: '#E5E7EB' }}>
+        <div className="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+          <div />
+          <RoleBadge role="user" email={user?.email} size="sm" />
+        </div>
+      </div>
+
       {/* Scrollable tab bar */}
       <div className="border-b overflow-x-auto" style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' }} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="flex min-w-max px-2">

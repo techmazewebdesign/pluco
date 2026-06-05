@@ -42,10 +42,10 @@ export async function POST(req: NextRequest) {
         email: userEmail,
         role: 'consultant',
         active: true,
-        status: 'pending',
+        status: 'email_verified',
         emailVerified: false,
         createdAt: new Date().toISOString(),
-      });
+      }, { merge: true }); // Merge to preserve admin-created fields
     } else {
       // Create in users collection for regular users
       const userRef = doc(db, 'users', userEmail);
@@ -55,11 +55,11 @@ export async function POST(req: NextRequest) {
         displayName: name.trim(),
         email: userEmail,
         role: 'user',
-        status: 'pending',
+        status: 'email_verified',
         emailVerified: false,
         preferredLanguage: 'en',
         createdAt: new Date().toISOString(),
-      });
+      }, { merge: true }); // Merge to preserve admin-created fields
     }
 
     // Sign out user - they must verify email before logging in

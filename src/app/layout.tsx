@@ -20,8 +20,8 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "PLUCO GROUP Sp. z o.o." }],
   icons: {
-    icon: "/images/logo-pluco.png",
-    apple: "/images/logo-pluco.png",
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
   },
   openGraph: {
     title: "PLUCO GROUP – European Immigration Law & Private Client Advisory",

@@ -10,6 +10,7 @@ import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
 import NotificationDropdown from '@/components/admin/NotificationDropdown';
+import RoleBadge from '@/components/shared/RoleBadge';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -196,6 +197,7 @@ export default function AdminDashboard() {
               Dashboard
             </h1>
             <div className="flex items-center gap-3">
+              <RoleBadge role="admin" email={user?.email} size="sm" />
               <NotificationDropdown />
             </div>
           </div>

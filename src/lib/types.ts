@@ -546,10 +546,22 @@ export const MEETING_PLATFORM_LABELS: Record<MeetingPlatform, { en: string; fa: 
   other:       { en: 'Other',         fa: 'سایر',         icon: '🔗' },
 };
 
+export const PRODUCT_TYPES: Record<string, { en: string; fa: string; icon: string }> = {
+  'eu-residency':       { en: 'EU Residency',        fa: 'اقامت اروپا',          icon: '🇪🇺' },
+  'eu-property':        { en: 'EU Property Purchase', fa: 'خرید ملک اروپا',       icon: '🏠' },
+  'us-green-card':      { en: 'US Green Card',       fa: 'کارت سبز آمریکا',      icon: '🇺🇸' },
+  'banking':            { en: 'Banking Solutions',   fa: 'خدمات بانکی',          icon: '🏦' },
+  'dispute-resolution': { en: 'Dispute Resolution',  fa: 'حل و فصل اختلاف',      icon: '⚖️' },
+  'contracts':          { en: 'International Contracts', fa: 'قرارداد بین‌المللی', icon: '📜' },
+  'business':           { en: 'Business Solutions',  fa: 'راه‌حل کسب‌وکار',      icon: '💼' },
+  'company-registration': { en: 'Company Registration', fa: 'ثبت شرکت',             icon: '📋' },
+};
+
 export interface Consultant {
   uid: string;
   name: string;
   email: string;
+  personalEmail?: string;
   phone?: string;
   role: ConsultantRole;
   bio?: string;
@@ -558,7 +570,13 @@ export interface Consultant {
   timezone?: string;
   languages?: string[];
   specializations?: string[];
+  productTypes?: string[]; // e.g., ['eu-residency', 'us-green-card', 'banking']
+  linkedin?: string;
+  yearsOfExperience?: number;
+  certifications?: string[];
   active: boolean;
+  profileComplete: boolean; // Whether consultant has completed profile setup
+  profileCompletedAt?: string;
   consultationFee?: number;
   currency?: string;
   averageRating?: number;

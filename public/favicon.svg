@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Background -->
+  <rect width="200" height="200" fill="#071C3C" rx="40"/>
+
+  <!-- Golden PLUCO -->
+  <text x="100" y="110" font-size="48" font-weight="bold" text-anchor="middle" dominant-baseline="middle" fill="#C9A35A" font-family="Arial, sans-serif" letter-spacing="1">PLUCO</text>
+</svg>

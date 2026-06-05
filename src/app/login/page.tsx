@@ -43,55 +43,85 @@ export default function LoginPage() {
         return;
       }
 
-      console.log('Checking role for user:', uid, 'email:', user.email);
+      console.log('=== CHECKING USER ROLE ===');
+      console.log('UID:', uid);
+      console.log('Email:', user.email);
 
       // First check Firestore for user role
       let userRole = 'user';
       let found = false;
+      let foundLocation = '';
 
       // Method 1: Check agents collection by UID
-      const agentRef = doc(db, 'agents', uid);
-      const agentSnap = await getDoc(agentRef);
-      if (agentSnap.exists()) {
-        userRole = agentSnap.data()?.role || 'user';
-        console.log('Found user in agents collection with role:', userRole);
-        found = true;
+      try {
+        const agentRef = doc(db, 'agents', uid);
+        const agentSnap = await getDoc(agentRef);
+        if (agentSnap.exists()) {
+          userRole = agentSnap.data()?.role || 'user';
+          console.log('✓ Found in agents (by UID) with role:', userRole);
+          found = true;
+          foundLocation = 'agents-uid';
+        }
+      } catch (err) {
+        console.log('✗ Error checking agents by UID:', err);
       }
 
-      // Method 2: If not found, check users collection by UID
-      if (!found) {
-        const userRef = doc(db, 'users', uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          userRole = userSnap.data()?.role || 'user';
-          console.log('Found user in users collection with role:', userRole);
-          found = true;
+      // Method 2: If not found by UID, check agents collection by EMAIL (priority over users)
+      if (!found && user.email) {
+        try {
+          const userEmailLower = user.email.toLowerCase();
+          const agentByEmailRef = doc(db, 'agents', userEmailLower);
+          const agentByEmailSnap = await getDoc(agentByEmailRef);
+          if (agentByEmailSnap.exists()) {
+            userRole = agentByEmailSnap.data()?.role || 'user';
+            console.log('✓ Found in agents (by email) with role:', userRole);
+            found = true;
+            foundLocation = 'agents-email';
+          }
+        } catch (err) {
+          console.log('✗ Error checking agents by email:', err);
         }
       }
 
-      // Method 3: If still not found, search by email in agents collection
-      if (!found && user.email) {
-        const agentByEmailRef = doc(db, 'agents', user.email.toLowerCase());
-        const agentByEmailSnap = await getDoc(agentByEmailRef);
-        if (agentByEmailSnap.exists()) {
-          userRole = agentByEmailSnap.data()?.role || 'user';
-          console.log('Found user in agents collection (by email) with role:', userRole);
-          found = true;
+      // Method 3: If still not found, check users collection by UID
+      if (!found) {
+        try {
+          const userRef = doc(db, 'users', uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            userRole = userSnap.data()?.role || 'user';
+            console.log('✓ Found in users (by UID) with role:', userRole);
+            found = true;
+            foundLocation = 'users-uid';
+          }
+        } catch (err) {
+          console.log('✗ Error checking users by UID:', err);
         }
       }
 
       // Method 4: If still not found, search by email in users collection
       if (!found && user.email) {
-        const userByEmailRef = doc(db, 'users', user.email.toLowerCase());
-        const userByEmailSnap = await getDoc(userByEmailRef);
-        if (userByEmailSnap.exists()) {
-          userRole = userByEmailSnap.data()?.role || 'user';
-          console.log('Found user in users collection (by email) with role:', userRole);
-          found = true;
+        try {
+          const userEmailLower = user.email.toLowerCase();
+          const userByEmailRef = doc(db, 'users', userEmailLower);
+          const userByEmailSnap = await getDoc(userByEmailRef);
+          if (userByEmailSnap.exists()) {
+            userRole = userByEmailSnap.data()?.role || 'user';
+            console.log('✓ Found in users (by email) with role:', userRole);
+            found = true;
+            foundLocation = 'users-email';
+          }
+        } catch (err) {
+          console.log('✗ Error checking users by email:', err);
         }
       }
 
+      if (!found) {
+        console.log('⚠ User not found in any collection, using default role: user');
+      }
+
       console.log('Final role detected:', userRole);
+      console.log('Found location:', foundLocation);
 
       // Redirect based on role
       const roleRoutes: { [key: string]: string } = {
@@ -108,9 +138,11 @@ export default function LoginPage() {
 
       const redirectUrl = roleRoutes[userRole] || '/dashboard';
       console.log('Redirecting to:', redirectUrl);
+      console.log('=== END ROLE CHECK ===');
       router.push(redirectUrl);
     } catch (err) {
-      console.error('Error checking user role:', err);
+      console.error('=== ERROR IN ROLE CHECK ===');
+      console.error('Error:', err);
       router.push('/dashboard');
     }
   };
@@ -222,7 +254,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 pt-20 pb-12 px-4" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 pb-12 px-4" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="absolute top-0 right-0 w-96 h-96 bg-[#C9A35A] rounded-full mix-blend-multiply filter blur-3xl opacity-10 -z-10"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#071C3C] rounded-full mix-blend-multiply filter blur-3xl opacity-10 -z-10"></div>
 

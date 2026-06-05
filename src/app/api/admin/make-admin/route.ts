@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getAdminDb } from '@/lib/firebase-admin';
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,23 +23,25 @@ export async function POST(req: NextRequest) {
     console.log('=== MAKING USER ADMIN ===');
     console.log('UID:', uid);
 
+    const db = getAdminDb();
+
     // Check if user exists in agents collection (by UID)
     let foundIn = null;
     let userData = null;
 
-    const agentRef = doc(db, 'agents', uid);
-    const agentSnap = await getDoc(agentRef);
+    const agentRef = db.collection('agents').doc(uid);
+    const agentSnap = await agentRef.get();
 
-    if (agentSnap.exists()) {
+    if (agentSnap.exists) {
       foundIn = 'agents';
       userData = agentSnap.data();
       console.log('Found in agents collection');
     } else {
       // Check users collection (by UID)
-      const userRef = doc(db, 'users', uid);
-      const userSnap = await getDoc(userRef);
+      const userRef = db.collection('users').doc(uid);
+      const userSnap = await userRef.get();
 
-      if (userSnap.exists()) {
+      if (userSnap.exists) {
         foundIn = 'users';
         userData = userSnap.data();
         console.log('Found in users collection');
@@ -59,13 +60,13 @@ export async function POST(req: NextRequest) {
     // If user is in users collection, need to move to agents
     if (foundIn === 'users') {
       // Get user data from users collection
-      const userRef = doc(db, 'users', uid);
-      const userSnap = await getDoc(userRef);
+      const userRef = db.collection('users').doc(uid);
+      const userSnap = await userRef.get();
       const userDoc = userSnap.data();
 
       // Create in agents collection
-      const agentRef = doc(db, 'agents', uid);
-      await setDoc(agentRef, {
+      const agentRef = db.collection('agents').doc(uid);
+      await agentRef.set({
         ...userDoc,
         role: 'admin',
         active: true,
@@ -76,8 +77,8 @@ export async function POST(req: NextRequest) {
       console.log('Moved user from users to agents collection and set as admin');
     } else {
       // Update role in agents collection
-      const agentRef = doc(db, 'agents', uid);
-      await updateDoc(agentRef, {
+      const agentRef = db.collection('agents').doc(uid);
+      await agentRef.update({
         role: 'admin',
         active: true,
         updatedAt: new Date().toISOString(),

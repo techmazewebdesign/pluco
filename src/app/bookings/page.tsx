@@ -175,6 +175,7 @@ export default function BookingsPage() {
         clientName: user.displayName || 'Unknown',
         clientEmail: user.email,
         consultantUid: selectedConsultant.uid,
+        consultantEmail: selectedConsultant.email,
         consultantName: selectedConsultant.name,
         title: booking.title,
         description: booking.description,
@@ -184,6 +185,30 @@ export default function BookingsPage() {
         meetingPlatform: booking.meetingPlatform,
         createdAt: new Date().toISOString()
       });
+
+      // Send notification email to consultant
+      try {
+        await fetch('/api/bookings/send-notification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            consultantUid: selectedConsultant.uid,
+            consultantEmail: selectedConsultant.email,
+            consultantName: selectedConsultant.name,
+            clientName: user.displayName || 'Unknown',
+            clientEmail: user.email,
+            bookingDetails: {
+              title: booking.title,
+              description: booking.description,
+              scheduledAt,
+              duration: booking.duration,
+              meetingPlatform: booking.meetingPlatform
+            }
+          })
+        });
+      } catch (emailErr) {
+        console.warn('Failed to send notification email:', emailErr);
+      }
 
       setSuccess('Consultation booked successfully! The consultant will confirm shortly.');
       setTimeout(() => {

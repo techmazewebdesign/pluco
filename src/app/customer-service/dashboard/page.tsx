@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { MessageSquare, Clock, CheckCircle, AlertCircle, Search, TrendingUp } from 'lucide-react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import RoleBadge from '@/components/shared/RoleBadge';
 
 interface TicketData {
   id: string;
@@ -132,9 +133,12 @@ export default function CustomerServiceDashboard() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2" style={{ color: '#071C3C' }}>Customer Service Dashboard</h1>
-          <p style={{ color: '#5E6470' }}>Manage customer support tickets and inquiries</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-2" style={{ color: '#071C3C' }}>Customer Service Dashboard</h1>
+            <p style={{ color: '#5E6470' }}>Manage customer support tickets and inquiries</p>
+          </div>
+          <RoleBadge role="customer_service" email={user?.email} size="md" />
         </div>
 
         {/* Stats */}

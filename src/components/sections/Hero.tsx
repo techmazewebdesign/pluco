@@ -35,7 +35,7 @@ export default function Hero() {
 
   return (
     <>
-      <section className="flex flex-col lg:flex-row" style={{ minHeight: '100vh', paddingTop: '92px' }}>
+      <section className="flex flex-col lg:flex-row" style={{ minHeight: '100vh' }}>
         {/* LEFT: Dark Navy Panel */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}

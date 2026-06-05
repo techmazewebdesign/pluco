@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { FileText, Users, Clock, CheckCircle, AlertCircle, Search, Plus } from 'lucide-react';
 import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import RoleBadge from '@/components/shared/RoleBadge';
 
 interface CaseData {
   id: string;
@@ -121,9 +122,12 @@ export default function CaseManagerDashboard() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2" style={{ color: '#071C3C' }}>Case Manager Dashboard</h1>
-          <p style={{ color: '#5E6470' }}>Manage and track all your assigned cases</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-2" style={{ color: '#071C3C' }}>Case Manager Dashboard</h1>
+            <p style={{ color: '#5E6470' }}>Manage and track all your assigned cases</p>
+          </div>
+          <RoleBadge role="case_manager" email={user?.email} size="md" />
         </div>
 
         {/* Stats */}

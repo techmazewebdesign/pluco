@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { FileText, CheckCircle, AlertCircle, XCircle, Search, TrendingUp, Flag } from 'lucide-react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import RoleBadge from '@/components/shared/RoleBadge';
 
 interface DocumentData {
   id: string;
@@ -129,9 +130,12 @@ export default function DocumentReviewerDashboard() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2" style={{ color: '#071C3C' }}>Document Reviewer Dashboard</h1>
-          <p style={{ color: '#5E6470' }}>Review and approve submitted documents</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-2" style={{ color: '#071C3C' }}>Document Reviewer Dashboard</h1>
+            <p style={{ color: '#5E6470' }}>Review and approve submitted documents</p>
+          </div>
+          <RoleBadge role="document_reviewer" email={user?.email} size="md" />
         </div>
 
         {/* Stats */}

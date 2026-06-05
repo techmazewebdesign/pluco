@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ArrowLeft, LogOut, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import UserManagement from '@/components/admin/UserManagement';
+import ProUserManagement from '@/components/admin/ProUserManagement';
 import NotificationDropdown from '@/components/admin/NotificationDropdown';
 
 export default function UsersPage() {
@@ -102,7 +102,7 @@ export default function UsersPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <UserManagement />
+        <ProUserManagement />
       </main>
     </div>
   );
