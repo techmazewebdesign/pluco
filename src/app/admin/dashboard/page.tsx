@@ -152,8 +152,12 @@ export default function AdminDashboard() {
           ].map((item) => {
             const { Icon, href, titleEn, titleFa } = item;
             return (
-              <Link key={titleEn} href={href} onClick={() => setSidebarOpen(false)}>
-                <div className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer" style={{ color: '#5E6470' }}>
+              <Link key={titleEn} href={href}>
+                <div
+                  onClick={() => setSidebarOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                  style={{ color: '#5E6470' }}
+                >
                   <Icon className="w-5 h-5" />
                   <span className="text-sm font-medium">{isRTL ? titleFa : titleEn}</span>
                 </div>
@@ -262,19 +266,22 @@ export default function AdminDashboard() {
             {menuItems.map((item) => {
               const { Icon, href, titleEn, titleFa } = item;
               return (
-                <Link key={titleEn} href={href}>
-                  <motion.div
-                    whileHover={{ y: -4 }}
-                    className="bg-white rounded-lg md:rounded-xl p-4 md:p-6 border border-gray-200 hover:shadow-lg transition-all cursor-pointer h-full flex flex-col items-center text-center"
-                  >
-                    <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style={{ backgroundColor: '#F0EDE6' }}>
-                      <Icon className="w-6 h-6" style={{ color: '#C9A35A' }} />
+                <motion.div
+                  key={titleEn}
+                  whileHover={{ y: -4 }}
+                  className="h-full"
+                >
+                  <Link href={href} className="h-full">
+                    <div className="bg-white rounded-lg md:rounded-xl p-4 md:p-6 border border-gray-200 hover:shadow-lg transition-all cursor-pointer h-full flex flex-col items-center text-center">
+                      <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style={{ backgroundColor: '#F0EDE6' }}>
+                        <Icon className="w-6 h-6" style={{ color: '#C9A35A' }} />
+                      </div>
+                      <p className="text-sm font-semibold" style={{ color: '#1E2430' }}>
+                        {isRTL ? titleFa : titleEn}
+                      </p>
                     </div>
-                    <p className="text-sm font-semibold" style={{ color: '#1E2430' }}>
-                      {isRTL ? titleFa : titleEn}
-                    </p>
-                  </motion.div>
-                </Link>
+                  </Link>
+                </motion.div>
               );
             })}
           </div>
