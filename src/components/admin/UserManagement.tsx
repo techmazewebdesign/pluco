@@ -254,14 +254,34 @@ export default function UserManagement() {
         active: newUserRole !== 'user',
         createdAt: Timestamp.now(),
         createdBy: auth.currentUser?.email,
-        status: 'pending', // User needs to set password via sign-up
+        status: 'pending', // User needs to verify email
       });
+
+      // Send invitation email
+      try {
+        const inviteResponse = await fetch('/api/auth/send-invitation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: userEmail,
+            name: newUserName || userEmail.split('@')[0],
+            role: newUserRole,
+            invitedBy: auth.currentUser?.email || 'admin',
+          }),
+        });
+
+        if (!inviteResponse.ok) {
+          console.warn('Failed to send invitation email, but user was created');
+        }
+      } catch (emailErr) {
+        console.warn('Error sending invitation email:', emailErr);
+      }
 
       // Add to activity log
       await addDoc(collection(db, 'user_activity'), {
         userId: userEmail,
         action: 'user_created',
-        details: `New ${newUserRole} user created: ${userEmail}`,
+        details: `New ${newUserRole} user created: ${userEmail} - Invitation email sent`,
         performedBy: auth.currentUser?.email || 'unknown',
         timestamp: new Date().toISOString(),
       });
@@ -275,12 +295,12 @@ export default function UserManagement() {
         createdAt: new Date().toISOString(),
       }]);
 
-      setSuccess(`${newUserRole} user created: ${newUserEmail}`);
+      setSuccess(`${newUserRole} user created and invitation sent to ${newUserEmail}`);
       setNewUserEmail('');
       setNewUserName('');
       setNewUserRole('user');
       setShowCreateModal(false);
-      setTimeout(() => setSuccess(null), 3000);
+      setTimeout(() => setSuccess(null), 5000);
 
       await loadAllData();
     } catch (err) {
@@ -321,7 +341,7 @@ export default function UserManagement() {
           style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
         >
           <Plus className="w-4 h-4" />
-          Create Admin
+          Create New User
         </button>
       </div>
 
@@ -782,7 +802,7 @@ export default function UserManagement() {
               </div>
 
               <p className="text-xs" style={{ color: '#5E6470' }}>
-                The user will need to sign up using this email to complete their account setup.
+                An invitation email will be sent to this address. The user will need to verify their email and set their password to complete account setup.
               </p>
             </div>
 
