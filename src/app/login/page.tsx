@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { Lock, Mail, ArrowRight, AlertCircle, Loader } from 'lucide-react';
 import { signInWithEmailAndPassword, sendEmailVerification, signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 export default function LoginPage() {
@@ -37,24 +37,39 @@ export default function LoginPage() {
 
   const checkAdminAndRedirect = async (uid: string) => {
     try {
-      // Get the current user from auth
       const user = auth.currentUser;
       if (!user) {
         router.push('/dashboard');
         return;
       }
 
-      // Check Firebase custom claims for admin role
-      const idTokenResult = await user.getIdTokenResult();
-      const userRole = idTokenResult.claims.role as string | undefined;
+      // First check Firestore for user role
+      let userRole = 'user';
 
+      // Check agents collection (for consultants, admins, case managers, etc.)
+      const agentRef = doc(db, 'agents', uid);
+      const agentSnap = await getDoc(agentRef);
+      if (agentSnap.exists()) {
+        userRole = agentSnap.data()?.role || 'user';
+      } else {
+        // Check users collection (for regular users)
+        const userRef = doc(db, 'users', uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          userRole = userSnap.data()?.role || 'user';
+        }
+      }
+
+      // Redirect based on role
       if (userRole === 'admin') {
         router.push('/admin/dashboard');
+      } else if (userRole === 'consultant') {
+        router.push('/consultant/dashboard');
       } else {
         router.push('/dashboard');
       }
     } catch (err) {
-      console.error('Error checking admin status:', err);
+      console.error('Error checking user role:', err);
       router.push('/dashboard');
     }
   };

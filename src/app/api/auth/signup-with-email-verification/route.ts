@@ -6,7 +6,7 @@ import { doc, setDoc } from 'firebase/firestore';
 export async function POST(req: NextRequest) {
   try {
     console.log('=== SIGNUP WITH EMAIL VERIFICATION ===');
-    const { name, email, password } = await req.json();
+    const { name, email, password, role = 'user' } = await req.json();
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -15,29 +15,48 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log('Creating user with email:', email);
+    console.log('Creating user with email:', email, 'role:', role);
 
     // Create user with Firebase Auth
     const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
     const user = userCredential.user;
     console.log('User created with UID:', user.uid);
 
-    // Update profile name
+    // Send verification email
     console.log('Sending verification email...');
     await sendEmailVerification(user);
     console.log('Verification email sent');
 
-    // Create Firestore profile
-    console.log('Creating Firestore profile');
-    const clientRef = doc(db, 'clients', user.uid);
-    await setDoc(clientRef, {
-      uid: user.uid,
-      name: name.trim(),
-      email: email.trim(),
-      emailVerified: false,
-      preferredLanguage: 'en',
-      createdAt: new Date().toISOString(),
-    });
+    // Create Firestore profile in appropriate collection based on role
+    console.log('Creating Firestore profile in', role === 'consultant' ? 'agents' : 'users', 'collection');
+
+    if (role === 'consultant') {
+      // Create in agents collection for consultants
+      const agentRef = doc(db, 'agents', user.uid);
+      await setDoc(agentRef, {
+        uid: user.uid,
+        name: name.trim(),
+        email: email.trim(),
+        role: 'consultant',
+        active: true,
+        status: 'pending',
+        emailVerified: false,
+        createdAt: new Date().toISOString(),
+      });
+    } else {
+      // Create in users collection for regular users
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, {
+        uid: user.uid,
+        displayName: name.trim(),
+        email: email.trim(),
+        role: 'user',
+        status: 'pending',
+        emailVerified: false,
+        preferredLanguage: 'en',
+        createdAt: new Date().toISOString(),
+      });
+    }
 
     // Sign out user - they must verify email before logging in
     console.log('Signing out user');
@@ -47,6 +66,7 @@ export async function POST(req: NextRequest) {
       success: true,
       message: 'Account created. Verification email sent.',
       email: user.email,
+      role: role,
     });
   } catch (error: any) {
     console.error('=== SIGNUP ERROR ===');

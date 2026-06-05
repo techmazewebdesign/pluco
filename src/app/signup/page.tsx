@@ -18,6 +18,7 @@ export default function SignupPage() {
     email: '',
     password: '',
     confirmPassword: '',
+    role: 'user' as 'user' | 'consultant',
   });
 
   const [validationError, setValidationError] = useState('');
@@ -30,7 +31,7 @@ export default function SignupPage() {
     }
   }, [user, loading, router]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     setValidationError('');
@@ -76,6 +77,7 @@ export default function SignupPage() {
           name: formData.name.trim(),
           email: formData.email.trim(),
           password: formData.password,
+          role: formData.role,
         }),
       });
 
@@ -154,6 +156,23 @@ export default function SignupPage() {
                     className={`${inputStyles} ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'}`}
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: '#1E2430' }}>
+                  {isRTL ? 'نقش' : 'Role'}
+                </label>
+                <select
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  disabled={isSubmitting}
+                  className={`${inputStyles} bg-white`}
+                  style={{ color: '#1E2430' }}
+                >
+                  <option value="user">{isRTL ? 'کاربر عادی' : 'Client/User'}</option>
+                  <option value="consultant">{isRTL ? 'مشاور' : 'Consultant'}</option>
+                </select>
               </div>
 
               <div>
