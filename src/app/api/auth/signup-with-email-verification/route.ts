@@ -28,15 +28,18 @@ export async function POST(req: NextRequest) {
     console.log('Verification email sent');
 
     // Create Firestore profile in appropriate collection based on role
-    console.log('Creating Firestore profile in', role === 'consultant' ? 'agents' : 'users', 'collection');
+    // Use email as document ID for consistency with admin user creation
+    const userEmail = email.trim().toLowerCase();
+    console.log('Creating Firestore profile in', role === 'consultant' ? 'agents' : 'users', 'collection with email ID:', userEmail);
 
     if (role === 'consultant') {
       // Create in agents collection for consultants
-      const agentRef = doc(db, 'agents', user.uid);
+      const agentRef = doc(db, 'agents', userEmail);
       await setDoc(agentRef, {
         uid: user.uid,
+        firebaseUid: user.uid,
         name: name.trim(),
-        email: email.trim(),
+        email: userEmail,
         role: 'consultant',
         active: true,
         status: 'pending',
@@ -45,11 +48,12 @@ export async function POST(req: NextRequest) {
       });
     } else {
       // Create in users collection for regular users
-      const userRef = doc(db, 'users', user.uid);
+      const userRef = doc(db, 'users', userEmail);
       await setDoc(userRef, {
         uid: user.uid,
+        firebaseUid: user.uid,
         displayName: name.trim(),
-        email: email.trim(),
+        email: userEmail,
         role: 'user',
         status: 'pending',
         emailVerified: false,

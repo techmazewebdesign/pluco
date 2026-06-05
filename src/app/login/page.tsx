@@ -43,22 +43,55 @@ export default function LoginPage() {
         return;
       }
 
+      console.log('Checking role for user:', uid, 'email:', user.email);
+
       // First check Firestore for user role
       let userRole = 'user';
+      let found = false;
 
-      // Check agents collection (for consultants, admins, case managers, etc.)
+      // Method 1: Check agents collection by UID
       const agentRef = doc(db, 'agents', uid);
       const agentSnap = await getDoc(agentRef);
       if (agentSnap.exists()) {
         userRole = agentSnap.data()?.role || 'user';
-      } else {
-        // Check users collection (for regular users)
+        console.log('Found user in agents collection with role:', userRole);
+        found = true;
+      }
+
+      // Method 2: If not found, check users collection by UID
+      if (!found) {
         const userRef = doc(db, 'users', uid);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           userRole = userSnap.data()?.role || 'user';
+          console.log('Found user in users collection with role:', userRole);
+          found = true;
         }
       }
+
+      // Method 3: If still not found, search by email in agents collection
+      if (!found && user.email) {
+        const agentByEmailRef = doc(db, 'agents', user.email.toLowerCase());
+        const agentByEmailSnap = await getDoc(agentByEmailRef);
+        if (agentByEmailSnap.exists()) {
+          userRole = agentByEmailSnap.data()?.role || 'user';
+          console.log('Found user in agents collection (by email) with role:', userRole);
+          found = true;
+        }
+      }
+
+      // Method 4: If still not found, search by email in users collection
+      if (!found && user.email) {
+        const userByEmailRef = doc(db, 'users', user.email.toLowerCase());
+        const userByEmailSnap = await getDoc(userByEmailRef);
+        if (userByEmailSnap.exists()) {
+          userRole = userByEmailSnap.data()?.role || 'user';
+          console.log('Found user in users collection (by email) with role:', userRole);
+          found = true;
+        }
+      }
+
+      console.log('Final role detected:', userRole);
 
       // Redirect based on role
       const roleRoutes: { [key: string]: string } = {
@@ -74,6 +107,7 @@ export default function LoginPage() {
       };
 
       const redirectUrl = roleRoutes[userRole] || '/dashboard';
+      console.log('Redirecting to:', redirectUrl);
       router.push(redirectUrl);
     } catch (err) {
       console.error('Error checking user role:', err);
