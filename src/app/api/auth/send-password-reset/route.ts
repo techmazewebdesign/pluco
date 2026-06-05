@@ -1,0 +1,181 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import nodemailer from 'nodemailer';
+import crypto from 'crypto';
+
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: process.env.SMTP_SECURE === 'true',
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.plucogroup.com';
+
+export async function POST(req: NextRequest) {
+  try {
+    const { email } = await req.json();
+
+    if (!email) {
+      return NextResponse.json(
+        { error: 'Email is required' },
+        { status: 400 }
+      );
+    }
+
+    const userEmail = email.trim().toLowerCase();
+
+    // Check if user exists in agents or users collection
+    let userExists = false;
+    let userName = '';
+
+    // Check agents collection
+    const agentRef = doc(db, 'agents', userEmail);
+    const agentSnap = await getDoc(agentRef);
+    if (agentSnap.exists()) {
+      userExists = true;
+      userName = agentSnap.data()?.name || agentSnap.data()?.displayName || '';
+    }
+
+    // Check users collection
+    if (!userExists) {
+      const userRef = doc(db, 'users', userEmail);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        userExists = true;
+        userName = userSnap.data()?.displayName || userSnap.data()?.name || '';
+      }
+    }
+
+    if (!userExists) {
+      // For security, still show success message (don't reveal if email exists)
+      return NextResponse.json({
+        success: true,
+        message: 'If an account with this email exists, a password reset link has been sent.',
+        email: userEmail,
+      });
+    }
+
+    // Generate secure reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
+
+    // Store reset token in Firestore
+    const resetTokenRef = doc(db, 'password_reset_tokens', tokenHash);
+    await setDoc(resetTokenRef, {
+      email: userEmail,
+      tokenHash,
+      createdAt: new Date().toISOString(),
+      expiresAt,
+      used: false,
+    });
+
+    // Create reset link
+    const resetLink = `${APP_URL}/reset-password?token=${resetToken}`;
+
+    const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial, sans-serif; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background-color: #071C3C; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+    .content { background-color: #f9f9f9; padding: 20px; border: 1px solid #e0e0e0; }
+    .footer { background-color: #f0f0f0; padding: 10px; text-align: center; font-size: 12px; color: #666; }
+    .button { display: inline-block; padding: 12px 30px; background-color: #C9A35A; color: #071C3C; text-decoration: none; border-radius: 5px; margin-top: 20px; font-weight: bold; }
+    .warning { color: #DC2626; margin-top: 20px; font-size: 14px; }
+    .code { background-color: #f3f4f6; padding: 10px; border-radius: 4px; font-family: monospace; word-break: break-all; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Reset Your Password</h1>
+    </div>
+    <div class="content">
+      <p>Hello ${userName || 'User'},</p>
+
+      <p>We received a request to reset your password. Click the button below to create a new password:</p>
+
+      <a href="${resetLink}" class="button">Reset Password</a>
+
+      <p style="margin-top: 30px; color: #666; font-size: 14px;">
+        <strong>Or copy this link:</strong><br>
+        <span class="code">${resetLink}</span>
+      </p>
+
+      <p style="margin-top: 30px; color: #666; font-size: 14px;">
+        <strong>This link expires in 24 hours.</strong>
+      </p>
+
+      <div class="warning">
+        ⚠️ <strong>Didn't request this?</strong><br>
+        If you didn't request a password reset, please ignore this email. Your account is safe. If you have concerns, contact support.
+      </div>
+
+      <p style="margin-top: 30px; color: #666; font-size: 14px;">
+        Best regards,<br>
+        PLUCO GROUP Support Team
+      </p>
+    </div>
+    <div class="footer">
+      <p>&copy; 2024 PLUCO GROUP. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
+    `;
+
+    const textContent = `
+Reset Your Password
+
+Hello ${userName || 'User'},
+
+We received a request to reset your password. Visit the link below to create a new password:
+
+${resetLink}
+
+This link expires in 24 hours.
+
+If you didn't request this, please ignore this email.
+
+---
+PLUCO GROUP Support Team
+© 2024 PLUCO GROUP
+    `;
+
+    // Send email
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || 'noreply@plucogroup.com',
+      to: userEmail,
+      subject: 'Reset Your PLUCO GROUP Password',
+      html: htmlContent,
+      text: textContent,
+    });
+
+    console.log('Password reset email sent to:', userEmail);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Password reset link sent to your email',
+      email: userEmail,
+    });
+  } catch (error: any) {
+    console.error('Error sending password reset email:', error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: error.message || 'Failed to send password reset email',
+      },
+      { status: 500 }
+    );
+  }
+}

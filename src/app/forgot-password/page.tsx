@@ -6,8 +6,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Mail, ArrowLeft, CheckCircle, AlertCircle, Loader } from 'lucide-react';
-import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -36,31 +34,27 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      await sendPasswordResetEmail(auth, email.trim());
+      const response = await fetch('/api/auth/send-password-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || (isRTL ? 'خطا در ارسال ایمیل' : 'Error sending email'));
+        setIsLoading(false);
+        return;
+      }
+
       setSuccess(true);
       setSubmittedEmail(email);
       setEmail('');
       console.log('Password reset email sent to:', email);
     } catch (err: any) {
       console.error('Reset password error:', err);
-
-      let errorMessage = isRTL
-        ? 'خطا در ارسال ایمیل بازنشانی رمز عبور'
-        : 'Error sending password reset email';
-
-      if (err.code === 'auth/user-not-found') {
-        errorMessage = isRTL
-          ? 'هیچ حسابی با این ایمیل یافت نشد'
-          : 'No account found with this email';
-      } else if (err.code === 'auth/invalid-email') {
-        errorMessage = isRTL ? 'ایمیل نامعتبر است' : 'Invalid email address';
-      } else if (err.code === 'auth/too-many-requests') {
-        errorMessage = isRTL
-          ? 'تلاش‌های بیش‌ازحد زیاد. لطفا بعدا دوباره تلاش کنید'
-          : 'Too many attempts. Please try again later';
-      }
-
-      setError(errorMessage);
+      setError(isRTL ? 'خطا در ارسال ایمیل' : 'Error sending email');
     } finally {
       setIsLoading(false);
     }
