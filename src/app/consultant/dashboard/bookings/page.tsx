@@ -52,17 +52,46 @@ export default function ConsultantBookingsPage() {
     const loadBookings = async () => {
       try {
         setIsLoading(true);
+
+        // Debug logging
+        console.log('DEBUG: Consultant Dashboard');
+        console.log('  Current user UID:', user.uid);
+        console.log('  Current user email:', user.email);
+
+        // Query both collections for bookings assigned to this consultant
         const bookingsSnap = await getDocs(
-          query(collection(db, 'consultation_bookings'), where('consultantUid', '==', user.uid))
+          query(collection(db, 'bookings'), where('consultantId', '==', user.uid))
         );
 
+        console.log('  Bookings found (bookings collection):', bookingsSnap.size);
+
         const bookingsList = bookingsSnap.docs
-          .map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          } as ConsultationBooking))
+          .map(doc => {
+            const data = doc.data();
+            console.log('    Booking:', {
+              id: doc.id,
+              clientName: data.clientName,
+              consultantId: data.consultantId,
+              status: data.status,
+              createdAt: data.createdAt,
+            });
+
+            return {
+              id: doc.id,
+              clientName: data.clientName || '',
+              clientEmail: data.clientEmail || '',
+              title: data.service || 'Consultation',
+              description: data.message || data.description,
+              status: data.status === 'assigned' ? 'pending' : data.status,
+              scheduledAt: data.preferredDate || new Date().toISOString(),
+              duration: 60,
+              meetingPlatform: 'google_meet' as const,
+              meetingLink: data.meetingLink,
+            } as ConsultationBooking;
+          })
           .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
 
+        console.log('  Total bookings loaded:', bookingsList.length);
         setBookings(bookingsList);
       } catch (e) {
         console.error('Error loading bookings:', e);

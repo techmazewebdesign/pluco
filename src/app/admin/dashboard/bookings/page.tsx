@@ -55,12 +55,50 @@ export default function BookingsPage() {
         setIsLoading(true);
         setError('');
 
-        // Load all enquiries
+        // Load all bookings from the primary 'bookings' collection
+        const bookingsSnap = await getDocs(collection(db, 'bookings'));
+        const bookingsList = bookingsSnap.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
+            email: data.clientEmail || data.email || '',
+            phone: data.clientPhone || data.phone || '',
+            service: data.service || '',
+            urgency: data.urgency || '',
+            preferredDate: data.preferredDate,
+            preferredTime: data.preferredTime,
+            status: data.status || 'pending',
+            consultantId: data.consultantId,
+            consultantName: data.consultantName,
+            preferredContactMethod: data.preferredContactMethod,
+            createdAt: data.createdAt || new Date().toISOString(),
+          } as Enquiry;
+        });
+
+        // Also load from 'enquiries' collection for backward compatibility
         const enquiriesSnap = await getDocs(collection(db, 'enquiries'));
         const enquiriesList = enquiriesSnap.docs.map(doc => ({
           id: doc.id,
-          ...doc.data(),
+          firstName: doc.data().firstName || '',
+          lastName: doc.data().lastName || '',
+          email: doc.data().email || '',
+          phone: doc.data().phone || '',
+          service: doc.data().service || '',
+          urgency: doc.data().urgency || '',
+          preferredDate: doc.data().preferredDate,
+          preferredTime: doc.data().preferredTime,
+          status: doc.data().status || 'pending',
+          consultantId: doc.data().consultantId,
+          consultantName: doc.data().consultantName,
+          preferredContactMethod: doc.data().preferredContactMethod,
+          createdAt: doc.data().createdAt || new Date().toISOString(),
         } as Enquiry));
+
+        // Combine and deduplicate by email
+        const allEnquiries = [...bookingsList, ...enquiriesList];
+        const uniqueEnquiries = Array.from(new Map(allEnquiries.map(e => [e.email, e])).values());
 
         // Load all consultants
         const consultantsSnap = await getDocs(
@@ -72,7 +110,7 @@ export default function BookingsPage() {
           email: doc.data().email || '',
         } as Consultant));
 
-        setEnquiries(enquiriesList.sort((a, b) =>
+        setEnquiries(uniqueEnquiries.sort((a, b) =>
           new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
         ));
         setConsultants(consultantsList);
@@ -93,11 +131,21 @@ export default function BookingsPage() {
 
     try {
       setAssigningId(enquiryId);
-      await updateDoc(doc(db, 'enquiries', enquiryId), {
+
+      // Update in 'bookings' collection first
+      await updateDoc(doc(db, 'bookings', enquiryId), {
         consultantId: consultantUid,
         consultantName: consultant.name,
         status: 'assigned',
         updatedAt: new Date().toISOString(),
+      }).catch(() => {
+        // If not in bookings, try enquiries collection for backward compatibility
+        return updateDoc(doc(db, 'enquiries', enquiryId), {
+          consultantId: consultantUid,
+          consultantName: consultant.name,
+          status: 'assigned',
+          updatedAt: new Date().toISOString(),
+        });
       });
 
       // Update local state

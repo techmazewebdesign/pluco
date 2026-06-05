@@ -102,8 +102,19 @@ export async function POST(req: NextRequest) {
       updatedAt: new Date().toISOString(),
     };
 
-    const enquiryRef = await addDoc(collection(db, 'enquiries'), enquiryData);
-    console.log('✓ Enquiry saved to Firestore:', enquiryRef.id);
+    // Save to 'bookings' collection (used by consultant dashboard)
+    const bookingRef = await addDoc(collection(db, 'bookings'), {
+      ...enquiryData,
+      clientName: `${firstNameValue} ${lastNameValue}`,
+      clientEmail: email,
+      clientPhone: phone,
+      countryOfResidence: country,
+      message: description,
+      preferredLanguage: language,
+      preferredContactMethod: preferredContact,
+      source: consultantId ? 'consultant_book_now' : 'private_enquiry',
+    });
+    console.log('✓ Booking saved to Firestore:', bookingRef.id);
 
     const isFarsi = language === 'Farsi / Persian' || language === 'فارسی';
     const timestamp = new Date().toLocaleString('en-GB', { timeZone: 'Europe/Warsaw' });
