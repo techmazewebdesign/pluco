@@ -7,11 +7,13 @@ import { db } from '@/lib/firebase';
 import { getAuth } from 'firebase/auth';
 import { motion } from 'framer-motion';
 
+import { AgentRole, AGENT_ROLE_LABELS } from '@/lib/types';
+
 interface AdminUser {
   uid: string;
   email: string;
   displayName?: string;
-  role: 'admin' | 'user';
+  role: string;
   createdAt?: string;
 }
 
@@ -44,8 +46,9 @@ export default function UserManagement() {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [selectedUserForDelete, setSelectedUserForDelete] = useState<AdminUser | null>(null);
   const [selectedUserForHistory, setSelectedUserForHistory] = useState<AdminUser | null>(null);
-  const [newAdminEmail, setNewAdminEmail] = useState('');
-  const [newAdminName, setNewAdminName] = useState('');
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserName, setNewUserName] = useState('');
+  const [newUserRole, setNewUserRole] = useState<string>('user');
   const [isCreating, setIsCreating] = useState(false);
   const [updateingUserId, setUpdatingUserId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -71,10 +74,14 @@ export default function UserManagement() {
           uid: doc.id,
           email: doc.data().email || '',
           displayName: doc.data().displayName,
-          role: doc.data().role === 'admin' ? 'admin' : 'user',
+          role: doc.data().role || 'user',
           createdAt: doc.data().createdAt,
         }));
-        setUsers(usersData.sort((a, b) => (b.role === 'admin' ? 1 : -1)));
+        setUsers(usersData.sort((a, b) => {
+          const aIsAdmin = a.role === 'admin' ? 1 : 0;
+          const bIsAdmin = b.role === 'admin' ? 1 : 0;
+          return bIsAdmin - aIsAdmin;
+        }));
       } catch (err) {
         console.error('Error loading users:', err);
         setUsers([]);
@@ -126,10 +133,11 @@ export default function UserManagement() {
     }
   };
 
-  const handleToggleRole = async (user: AdminUser) => {
+  const handleChangeRole = async (user: AdminUser, newRole: string) => {
+    if (user.role === newRole) return;
+
     try {
       setUpdatingUserId(user.uid);
-      const newRole = user.role === 'admin' ? 'user' : 'admin';
 
       // Update in Firestore
       await updateDoc(doc(db, 'users', user.uid), {
@@ -209,9 +217,14 @@ export default function UserManagement() {
     }
   };
 
-  const handleCreateAdmin = async () => {
-    if (!newAdminEmail.trim()) {
+  const handleCreateUser = async () => {
+    if (!newUserEmail.trim()) {
       setError('Email is required');
+      return;
+    }
+
+    if (!newUserRole) {
+      setError('Please select a role');
       return;
     }
 
@@ -220,19 +233,25 @@ export default function UserManagement() {
       setError(null);
 
       // Check if user already exists
-      const existingUser = users.find(u => u.email === newAdminEmail.toLowerCase());
+      const existingUser = users.find(u => u.email === newUserEmail.toLowerCase());
       if (existingUser) {
         setError('This email is already registered');
         return;
       }
 
-      const userEmail = newAdminEmail.toLowerCase();
+      const userEmail = newUserEmail.toLowerCase();
+
+      // Determine where to create the user (agents or users collection)
+      const isAgent = newUserRole !== 'user' && newUserRole !== 'client';
+      const collection_name = isAgent ? 'agents' : 'users';
 
       // Create user in Firestore
-      await setDoc(doc(db, 'users', userEmail), {
+      await setDoc(doc(db, collection_name, userEmail), {
         email: userEmail,
-        displayName: newAdminName || userEmail.split('@')[0],
-        role: 'admin',
+        displayName: newUserName || userEmail.split('@')[0],
+        name: newUserName || userEmail.split('@')[0],
+        role: newUserRole,
+        active: newUserRole !== 'user',
         createdAt: Timestamp.now(),
         createdBy: auth.currentUser?.email,
         status: 'pending', // User needs to set password via sign-up
@@ -242,7 +261,7 @@ export default function UserManagement() {
       await addDoc(collection(db, 'user_activity'), {
         userId: userEmail,
         action: 'user_created',
-        details: `New admin user created: ${userEmail}`,
+        details: `New ${newUserRole} user created: ${userEmail}`,
         performedBy: auth.currentUser?.email || 'unknown',
         timestamp: new Date().toISOString(),
       });
@@ -251,21 +270,22 @@ export default function UserManagement() {
       setUsers([...users, {
         uid: userEmail,
         email: userEmail,
-        displayName: newAdminName,
-        role: 'admin',
+        displayName: newUserName,
+        role: newUserRole,
         createdAt: new Date().toISOString(),
       }]);
 
-      setSuccess(`Admin user created: ${newAdminEmail}`);
-      setNewAdminEmail('');
-      setNewAdminName('');
+      setSuccess(`${newUserRole} user created: ${newUserEmail}`);
+      setNewUserEmail('');
+      setNewUserName('');
+      setNewUserRole('user');
       setShowCreateModal(false);
       setTimeout(() => setSuccess(null), 3000);
 
       await loadAllData();
     } catch (err) {
-      console.error('Error creating admin:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create admin user';
+      console.error('Error creating user:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create user';
       if (errorMessage.includes('permission')) {
         setError('Permission denied. Check your Firestore security rules.');
       } else {
@@ -407,9 +427,13 @@ export default function UserManagement() {
                         <>
                           <Shield className="w-3 h-3" /> Admin
                         </>
+                      ) : user.role === 'consultant' ? (
+                        <>
+                          <User className="w-3 h-3" /> Consultant
+                        </>
                       ) : (
                         <>
-                          <User className="w-3 h-3" /> User
+                          <User className="w-3 h-3" /> {user.role}
                         </>
                       )}
                     </span>
@@ -419,24 +443,27 @@ export default function UserManagement() {
                   </td>
                   <td className="px-6 py-4 text-sm space-y-2">
                     <div className="flex flex-col gap-2">
-                      <button
-                        onClick={() => handleToggleRole(user)}
+                      <select
+                        value={user.role}
+                        onChange={(e) => handleChangeRole(user, e.target.value)}
                         disabled={updateingUserId === user.uid}
-                        className="px-3 py-1 text-xs font-semibold rounded transition-colors"
+                        className="px-3 py-1 text-xs font-semibold rounded border border-gray-300 transition-colors"
                         style={{
-                          backgroundColor: updateingUserId === user.uid ? '#E5E7EB' : '#F3F4F6',
+                          backgroundColor: updateingUserId === user.uid ? '#E5E7EB' : 'white',
                           color: '#5E6470',
                           opacity: updateingUserId === user.uid ? 0.6 : 1,
+                          cursor: updateingUserId === user.uid ? 'not-allowed' : 'pointer',
                         }}
                       >
-                        {updateingUserId === user.uid ? (
-                          'Updating...'
-                        ) : user.role === 'admin' ? (
-                          'Make User'
-                        ) : (
-                          'Make Admin'
-                        )}
-                      </button>
+                        <option value="user">Client/User</option>
+                        <option value="consultant">Consultant</option>
+                        <option value="admin">Admin</option>
+                        <option value="case_manager">Case Manager</option>
+                        <option value="customer_service">Customer Service</option>
+                        <option value="document_reviewer">Document Reviewer</option>
+                        <option value="compliance_officer">Compliance Officer</option>
+                        <option value="enquiry_handler">Enquiry Handler</option>
+                      </select>
                       <button
                         onClick={() => {
                           setSelectedUserForHistory(user);
@@ -689,7 +716,7 @@ export default function UserManagement() {
         </div>
       )}
 
-      {/* Create Admin Modal */}
+      {/* Create User Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <motion.div
@@ -698,7 +725,7 @@ export default function UserManagement() {
             className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4"
           >
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-lg font-bold" style={{ color: '#1E2430' }}>Create New Admin</h3>
+              <h3 className="text-lg font-bold" style={{ color: '#1E2430' }}>Create New User</h3>
               <button
                 onClick={() => setShowCreateModal(false)}
                 className="p-1 hover:bg-gray-100 rounded transition-colors"
@@ -714,9 +741,9 @@ export default function UserManagement() {
                 </label>
                 <input
                   type="email"
-                  value={newAdminEmail}
-                  onChange={(e) => setNewAdminEmail(e.target.value)}
-                  placeholder="admin@example.com"
+                  value={newUserEmail}
+                  onChange={(e) => setNewUserEmail(e.target.value)}
+                  placeholder="user@example.com"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#C9A35A]"
                 />
               </div>
@@ -727,11 +754,31 @@ export default function UserManagement() {
                 </label>
                 <input
                   type="text"
-                  value={newAdminName}
-                  onChange={(e) => setNewAdminName(e.target.value)}
+                  value={newUserName}
+                  onChange={(e) => setNewUserName(e.target.value)}
                   placeholder="John Doe"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#C9A35A]"
                 />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold block mb-2" style={{ color: '#1E2430' }}>
+                  Role *
+                </label>
+                <select
+                  value={newUserRole}
+                  onChange={(e) => setNewUserRole(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#C9A35A]"
+                >
+                  <option value="user">Client/User</option>
+                  <option value="consultant">Consultant</option>
+                  <option value="admin">Admin</option>
+                  <option value="case_manager">Case Manager</option>
+                  <option value="customer_service">Customer Service</option>
+                  <option value="document_reviewer">Document Reviewer</option>
+                  <option value="compliance_officer">Compliance Officer</option>
+                  <option value="enquiry_handler">Enquiry Handler</option>
+                </select>
               </div>
 
               <p className="text-xs" style={{ color: '#5E6470' }}>
@@ -748,15 +795,15 @@ export default function UserManagement() {
                 Cancel
               </button>
               <button
-                onClick={handleCreateAdmin}
-                disabled={isCreating || !newAdminEmail.trim()}
+                onClick={handleCreateUser}
+                disabled={isCreating || !newUserEmail.trim()}
                 className="flex-1 px-4 py-2 text-sm font-semibold rounded-lg text-white transition-colors"
                 style={{
-                  backgroundColor: isCreating || !newAdminEmail.trim() ? '#CBD5E0' : '#C9A35A',
+                  backgroundColor: isCreating || !newUserEmail.trim() ? '#CBD5E0' : '#C9A35A',
                   color: '#071C3C',
                 }}
               >
-                {isCreating ? 'Creating...' : 'Create Admin'}
+                {isCreating ? 'Creating...' : 'Create User'}
               </button>
             </div>
           </motion.div>
