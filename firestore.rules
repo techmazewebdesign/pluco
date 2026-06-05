@@ -5,6 +5,7 @@ service cloud.firestore {
     function isSignedIn() { return request.auth != null; }
     function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
 
+    // Simplified functions to avoid errors when documents don't exist
     function isAgent() {
       return isSignedIn() &&
         exists(/databases/$(database)/documents/agents/$(request.auth.uid)) &&
@@ -15,9 +16,12 @@ service cloud.firestore {
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
+
     function agentRole() {
-      return get(/databases/$(database)/documents/agents/$(request.auth.uid)).data.role;
+      return exists(/databases/$(database)/documents/agents/$(request.auth.uid)) ?
+        get(/databases/$(database)/documents/agents/$(request.auth.uid)).data.role : null;
     }
+
     function hasRole(role) {
       return (isAgent() && agentRole() == role) ||
              (role == 'admin' && (isAdminUser() || (isAgent() && agentRole() == 'admin')));
@@ -185,12 +189,29 @@ service cloud.firestore {
       allow delete: if isSignedIn();
     }
 
-    // ── Catch-all for any other collections ──────────────────────────
-    match /{document=**} {
+    // ── AI Lead Agent Tasks ─────────────────────────────────────────
+    match /aiLeadAgentTasks/{docId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update: if isSignedIn();
-      allow delete: if isSignedIn();
+      allow create, update, delete: if isSignedIn();
+    }
+
+    // ── Leads (Alternative) ──────────────────────────────────────────
+    match /aiLeads/{docId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn();
+    }
+
+    // ── AI Agent Activities ──────────────────────────────────────────
+    match /aiAgentActivities/{docId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn();
+    }
+
+    // Default catch-all - allow authenticated users full access
+    // This ensures any collection not explicitly defined above is accessible to signed-in users
+    match /{allPaths=**} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
     }
   }
 }
