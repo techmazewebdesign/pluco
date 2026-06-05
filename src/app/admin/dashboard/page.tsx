@@ -107,22 +107,25 @@ export default function AdminDashboard() {
   ];
 
   const menuItems = [
-    { titleEn: 'View Clients', titleFa: 'مشاهده موکلین', href: '/agent/clients', Icon: Users },
-    { titleEn: 'View Cases', titleFa: 'مشاهده پرونده‌ها', href: '/agent/clients', Icon: FileText },
-    { titleEn: 'Messages', titleFa: 'پیام‌ها', href: '/agent/enquiries', Icon: MessageSquare },
     { titleEn: 'AI Leads', titleFa: 'AI سرنخ‌ها', href: '/admin/dashboard/leads', Icon: Zap },
     { titleEn: 'AI Agents', titleFa: 'AI عوامل', href: '/admin/dashboard/ai-agents', Icon: Bot },
+    { titleEn: 'Consultants', titleFa: 'مشاورین', href: '/admin/dashboard/consultants', Icon: Users },
     { titleEn: 'User Management', titleFa: 'مدیریت کاربران', href: '/admin/dashboard/users', Icon: Shield },
-    { titleEn: 'Training Manual', titleFa: 'راهنمای آموزش', href: '/admin/dashboard/training', Icon: FileText },
-    { titleEn: 'Reports', titleFa: 'گزارش‌ها', href: '/agent/reports', Icon: BarChart3 },
+    { titleEn: 'Training Manual', titleFa: 'راهنمای آموزش', href: '/admin/dashboard/training', Icon: BookOpen },
+    { titleEn: 'Activity Logs', titleFa: 'سوابق فعالیت', href: '/admin/dashboard/consultant-activities', Icon: BarChart3 },
+    { titleEn: 'Notifications', titleFa: 'اطلاعیه‌ها', href: '/admin/dashboard/notifications', Icon: MessageSquare },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 flex flex-col md:flex-row" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Sidebar */}
       <div
-        className={`fixed md:static inset-y-0 ${isRTL ? 'right-0' : 'left-0'} w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 z-40 md:z-0 ${
-          sidebarOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full') + ' md:translate-x-0'
+        className={`fixed md:static inset-y-0 ${isRTL ? 'right-0' : 'left-0'} w-64 bg-white ${isRTL ? 'border-l' : 'border-r'} border-gray-200 transform transition-transform duration-300 z-40 md:z-0 md:translate-x-0 ${
+          sidebarOpen
+            ? 'translate-x-0'
+            : isRTL
+              ? 'translate-x-64'
+              : '-translate-x-64'
         }`}
       >
         {/* Sidebar Header */}
@@ -141,13 +144,15 @@ export default function AdminDashboard() {
             { titleEn: 'Dashboard', titleFa: 'داشبورد', href: '/admin/dashboard', Icon: BarChart3 },
             { titleEn: 'AI Leads', titleFa: 'AI سرنخ‌ها', href: '/admin/dashboard/leads', Icon: Zap },
             { titleEn: 'AI Agents', titleFa: 'AI عوامل', href: '/admin/dashboard/ai-agents', Icon: Bot },
+            { titleEn: 'Consultants', titleFa: 'مشاورین', href: '/admin/dashboard/consultants', Icon: Users },
             { titleEn: 'User Management', titleFa: 'مدیریت کاربران', href: '/admin/dashboard/users', Icon: Shield },
             { titleEn: 'Training Manual', titleFa: 'راهنمای آموزش', href: '/admin/dashboard/training', Icon: BookOpen },
-            { titleEn: 'Reports', titleFa: 'گزارش‌ها', href: '/agent/reports', Icon: FileText },
+            { titleEn: 'Activity Logs', titleFa: 'سوابق فعالیت', href: '/admin/dashboard/consultant-activities', Icon: BarChart3 },
+            { titleEn: 'Notifications', titleFa: 'اطلاعیه‌ها', href: '/admin/dashboard/notifications', Icon: MessageSquare },
           ].map((item) => {
             const { Icon, href, titleEn, titleFa } = item;
             return (
-              <Link key={titleEn} href={href}>
+              <Link key={titleEn} href={href} onClick={() => setSidebarOpen(false)}>
                 <div className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer" style={{ color: '#5E6470' }}>
                   <Icon className="w-5 h-5" />
                   <span className="text-sm font-medium">{isRTL ? titleFa : titleEn}</span>
