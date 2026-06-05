@@ -160,5 +160,37 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow update: if isSignedIn();
     }
+
+    // ── Agent Tasks ──────────────────────────────────────────────────
+    match /agent_tasks/{docId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isSignedIn();
+    }
+
+    // ── Activity Logs ────────────────────────────────────────────────
+    match /activity_logs/{docId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isSignedIn();
+    }
+
+    // ── Leads ────────────────────────────────────────────────────────
+    match /leads/{docId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isSignedIn();
+    }
+
+    // ── Catch-all for any other collections ──────────────────────────
+    match /{document=**} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isSignedIn();
+    }
   }
 }
