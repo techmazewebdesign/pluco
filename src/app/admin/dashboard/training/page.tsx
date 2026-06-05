@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 export default function TrainingPage() {
   const router = useRouter();
   const { user, signOut, loading } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'lead-agent' | 'case-agent' | 'automation' | 'checklist'>('overview');
 
   useEffect(() => {
@@ -46,15 +46,12 @@ export default function TrainingPage() {
     );
   }
 
-  if (!isAdmin) {
+  if (!user || !isAdmin) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <h1 className="text-2xl font-bold" style={{ color: '#071C3C' }}>Access Denied</h1>
-          <p style={{ color: '#5E6470' }}>Only admins can access training materials.</p>
-          <Link href="/admin/dashboard" className="text-sm font-semibold px-4 py-2 rounded-lg" style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>
-            Back to Dashboard
-          </Link>
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-gray-200 border-t-[#C9A35A] rounded-full animate-spin"></div>
+          <p style={{ color: '#5E6470' }}>Loading...</p>
         </div>
       </div>
     );
