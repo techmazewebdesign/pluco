@@ -66,20 +66,43 @@ export default function AgentProfilePage() {
 
   const handlePhotoUpload = async (file: File) => {
     if (!user) return;
-    if (!file.type.startsWith('image/')) { setPhotoError('Please select an image.'); return; }
-    if (file.size > 5 * 1024 * 1024) { setPhotoError('Max 5MB.'); return; }
+    if (!file.type.startsWith('image/')) { setPhotoError('Please select an image file (JPG, PNG, WEBP).'); return; }
+    if (file.size > 5 * 1024 * 1024) { setPhotoError('File is too large. Maximum size is 5MB.'); return; }
     setPhotoUploading(true); setPhotoError('');
     try {
-      const ext = file.name.split('.').pop() || 'jpg';
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
       const path = `agents/${user.uid}/photo.${ext}`;
       const storageRef = ref(storage, path);
+
+      console.log('Uploading agent photo to path:', path);
       const snap = await uploadBytes(storageRef, file, { contentType: file.type });
+      console.log('Getting download URL...');
       const url = await getDownloadURL(snap.ref);
       setPhoto(url);
+      console.log('Agent photo upload successful:', { path, url });
+
       // Update Firebase Auth profile photo
       if (auth.currentUser) await updateProfile(auth.currentUser, { photoURL: url });
     } catch (e: unknown) {
-      setPhotoError(`Upload failed: ${(e as { code?: string })?.code || String(e)}`);
+      const err = e as { code?: string; message?: string };
+      const code = err?.code || '';
+      const msg = err?.message || String(e);
+      console.error('Agent photo upload error:', code, msg, e);
+
+      let errorMsg = 'Upload failed. Please try again.';
+      if (code === 'storage/unauthorized') {
+        errorMsg = 'Permission denied. Make sure you\'re signed in.';
+      } else if (code === 'storage/object-not-found') {
+        errorMsg = 'Storage configuration error. Contact support.';
+      } else if (code.includes('cors') || msg.includes('CORS')) {
+        errorMsg = 'Network error. Check your connection and try again.';
+      } else if (code === 'storage/quota-exceeded') {
+        errorMsg = 'Storage quota exceeded. Please contact support.';
+      } else if (msg.includes('Network')) {
+        errorMsg = 'Network error. Check your connection.';
+      }
+
+      setPhotoError(errorMsg);
     } finally { setPhotoUploading(false); }
   };
 

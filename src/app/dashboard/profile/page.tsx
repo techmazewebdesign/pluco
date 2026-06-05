@@ -147,34 +147,48 @@ function PhotoUploader({
       return;
     }
     setUploading(true);
-    setProgress(10); // show immediate feedback
+    setProgress(10);
     try {
       const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
       const path = `${storagePath}.${ext}`;
       const storageRef = ref(storage, path);
       setProgress(30);
+
+      console.log('Uploading to path:', path);
       const snapshot = await uploadBytes(storageRef, file, { contentType: file.type });
       setProgress(80);
+
+      console.log('Getting download URL...');
       const url = await getDownloadURL(snapshot.ref);
       setProgress(100);
+
+      console.log('Upload successful:', { path, url });
       onUploaded(url, path);
+
+      // Clear progress after a short delay
+      setTimeout(() => setProgress(0), 500);
     } catch (e: unknown) {
       const err = e as { code?: string; message?: string };
       const code = err?.code || '';
       const msg = err?.message || String(e);
-      console.error('Storage upload error:', code, msg);
+      console.error('Storage upload error:', code, msg, e);
+
+      let errorMsg = 'Upload failed. Please try again.';
       if (code === 'storage/unauthorized') {
-        setUploadErr('Permission denied. Check Firebase Storage rules.');
+        errorMsg = 'Permission denied. Make sure you\'re signed in.';
       } else if (code === 'storage/object-not-found') {
-        setUploadErr('Storage path error. Please try again.');
+        errorMsg = 'Storage configuration error. Contact support.';
       } else if (code.includes('cors') || msg.includes('CORS')) {
-        setUploadErr('CORS error. Check Firebase Storage CORS config.');
-      } else {
-        setUploadErr(`Upload failed: ${code || msg}`);
+        errorMsg = 'Network error. Check your connection and try again.';
+      } else if (code === 'storage/quota-exceeded') {
+        errorMsg = 'Storage quota exceeded. Please contact support.';
+      } else if (msg.includes('Network')) {
+        errorMsg = 'Network error. Check your connection.';
       }
+
+      setUploadErr(errorMsg);
     } finally {
       setUploading(false);
-      setTimeout(() => setProgress(0), 500);
     }
   };
 
@@ -239,7 +253,7 @@ export default function ProfilePage() {
   const [saveError, setSaveError] = useState('');
   const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
   const [showAddMember, setShowAddMember] = useState(false);
-  const [newMember, setNewMember] = useState<Partial<FamilyMember>>({ relationship: 'Child' });
+  const [newMember, setNewMember] = useState<Partial<FamilyMember>>({ relationship: 'Child', id: '' });
 
   useEffect(() => {
     if (!user) return;
@@ -304,11 +318,22 @@ export default function ProfilePage() {
   const handleAddMember = async () => {
     if (!user || !newMember.name) return;
     try {
-      const docRef = await addDoc(collection(db, 'clients', user.uid, 'family'), {
-        ...newMember, addedAt: new Date().toISOString(),
+      // Use the temporary ID generated when the form was created, or generate a new one
+      const memberId = newMember.id || `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      // Create the member document in Firestore with the ID we'll use
+      const memberRef = doc(db, 'clients', user.uid, 'family', memberId);
+      await setDoc(memberRef, {
+        ...newMember,
+        id: memberId,
+        addedAt: new Date().toISOString(),
       });
-      setFamilyMembers(prev => [...prev, { id: docRef.id, name: '', relationship: 'Child', ...newMember } as FamilyMember]);
-      setNewMember({ relationship: 'Child' });
+
+      // Add to local state
+      const createdMember = { id: memberId, name: '', relationship: 'Child', ...newMember } as FamilyMember;
+      setFamilyMembers(prev => [...prev, createdMember]);
+
+      setNewMember({ relationship: 'Child', id: '' });
       setShowAddMember(false);
     } catch (e: unknown) {
       const code = (e as { code?: string })?.code || String(e);
@@ -613,7 +638,11 @@ export default function ProfilePage() {
             <p className="text-sm" style={{ color: '#5E6470', fontFamily: isRTL ? ff : undefined }}>
               {isRTL ? `${familyMembers.length} عضو خانواده ثبت شده` : `${familyMembers.length} family member${familyMembers.length !== 1 ? 's' : ''} registered`}
             </p>
-            <button onClick={() => setShowAddMember(true)} className="flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg hover:brightness-110 transition-all" style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>
+            <button onClick={() => {
+              const tempId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+              setNewMember({ relationship: 'Child', id: tempId });
+              setShowAddMember(true);
+            }} className="flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg hover:brightness-110 transition-all" style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>
               <Plus className="w-3.5 h-3.5" />
               {isRTL ? 'افزودن عضو' : 'Add Member'}
             </button>
@@ -734,7 +763,7 @@ function MemberForm({ member, onChange, onSave, onCancel, uid, isRTL, ff, isNew 
       <div className="flex items-center gap-4">
         <PhotoUploader
           currentUrl={member.photo}
-          storagePath={`profiles/${uid}/family/${member.id || 'new'}/photo`}
+          storagePath={`profiles/${uid}/family/${member.id}/photo`}
           onUploaded={(url, path) => onChange({ ...member, photo: url, photoPath: path })}
           size="sm"
           label={isRTL ? 'عکس' : 'Photo'}
