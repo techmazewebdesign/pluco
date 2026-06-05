@@ -61,13 +61,20 @@ export default function LoginPage() {
       }
 
       // Redirect based on role
-      if (userRole === 'admin') {
-        router.push('/admin/dashboard');
-      } else if (userRole === 'consultant') {
-        router.push('/consultant/dashboard');
-      } else {
-        router.push('/dashboard');
-      }
+      const roleRoutes: { [key: string]: string } = {
+        admin: '/admin/dashboard',
+        consultant: '/consultant/dashboard',
+        case_manager: '/case-manager/dashboard',
+        customer_service: '/customer-service/dashboard',
+        document_reviewer: '/document-reviewer/dashboard',
+        compliance_officer: '/compliance-officer/dashboard',
+        enquiry_handler: '/enquiry-handler/dashboard',
+        user: '/dashboard',
+        client: '/dashboard',
+      };
+
+      const redirectUrl = roleRoutes[userRole] || '/dashboard';
+      router.push(redirectUrl);
     } catch (err) {
       console.error('Error checking user role:', err);
       router.push('/dashboard');
