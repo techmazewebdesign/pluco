@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
-import { LogOut, Users, FileText, MessageSquare, Settings, BarChart3, AlertCircle, Clock, Bot, Zap, Shield, Menu, X, BookOpen } from 'lucide-react';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { LogOut, Users, FileText, MessageSquare, BarChart3, Bot, Zap, Shield, Menu, X, BookOpen } from 'lucide-react';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
 import NotificationDropdown from '@/components/admin/NotificationDropdown';
@@ -106,7 +106,18 @@ export default function AdminDashboard() {
     },
   ];
 
-  const menuItems = [
+  const sidebarMenuItems = [
+    { titleEn: 'Dashboard', titleFa: 'داشبورد', href: '/admin/dashboard', Icon: BarChart3 },
+    { titleEn: 'AI Leads', titleFa: 'AI سرنخ‌ها', href: '/admin/dashboard/leads', Icon: Zap },
+    { titleEn: 'AI Agents', titleFa: 'AI عوامل', href: '/admin/dashboard/ai-agents', Icon: Bot },
+    { titleEn: 'Consultants', titleFa: 'مشاورین', href: '/admin/dashboard/consultants', Icon: Users },
+    { titleEn: 'User Management', titleFa: 'مدیریت کاربران', href: '/admin/dashboard/users', Icon: Shield },
+    { titleEn: 'Training Manual', titleFa: 'راهنمای آموزش', href: '/admin/dashboard/training', Icon: BookOpen },
+    { titleEn: 'Activity Logs', titleFa: 'سوابق فعالیت', href: '/admin/dashboard/consultant-activities', Icon: BarChart3 },
+    { titleEn: 'Notifications', titleFa: 'اطلاعیه‌ها', href: '/admin/dashboard/notifications', Icon: MessageSquare },
+  ];
+
+  const quickAccessItems = [
     { titleEn: 'AI Leads', titleFa: 'AI سرنخ‌ها', href: '/admin/dashboard/leads', Icon: Zap },
     { titleEn: 'AI Agents', titleFa: 'AI عوامل', href: '/admin/dashboard/ai-agents', Icon: Bot },
     { titleEn: 'Consultants', titleFa: 'مشاورین', href: '/admin/dashboard/consultants', Icon: Users },
@@ -140,21 +151,15 @@ export default function AdminDashboard() {
 
         {/* Sidebar Menu */}
         <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100vh-120px)]">
-          {[
-            { titleEn: 'Dashboard', titleFa: 'داشبورد', href: '/admin/dashboard', Icon: BarChart3 },
-            { titleEn: 'AI Leads', titleFa: 'AI سرنخ‌ها', href: '/admin/dashboard/leads', Icon: Zap },
-            { titleEn: 'AI Agents', titleFa: 'AI عوامل', href: '/admin/dashboard/ai-agents', Icon: Bot },
-            { titleEn: 'Consultants', titleFa: 'مشاورین', href: '/admin/dashboard/consultants', Icon: Users },
-            { titleEn: 'User Management', titleFa: 'مدیریت کاربران', href: '/admin/dashboard/users', Icon: Shield },
-            { titleEn: 'Training Manual', titleFa: 'راهنمای آموزش', href: '/admin/dashboard/training', Icon: BookOpen },
-            { titleEn: 'Activity Logs', titleFa: 'سوابق فعالیت', href: '/admin/dashboard/consultant-activities', Icon: BarChart3 },
-            { titleEn: 'Notifications', titleFa: 'اطلاعیه‌ها', href: '/admin/dashboard/notifications', Icon: MessageSquare },
-          ].map((item) => {
+          {sidebarMenuItems.map((item) => {
             const { Icon, href, titleEn, titleFa } = item;
             return (
-              <Link key={titleEn} href={href}>
+              <Link
+                key={titleEn}
+                href={href}
+                onClick={() => setSidebarOpen(false)}
+              >
                 <div
-                  onClick={() => setSidebarOpen(false)}
                   className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
                   style={{ color: '#5E6470' }}
                 >
@@ -188,7 +193,7 @@ export default function AdminDashboard() {
       )}
 
       {/* Main Content */}
-      <div className="flex-1 w-full md:w-auto">
+      <div className="flex-1 w-full">
         {/* Top Header */}
         <header className="bg-white border-b border-gray-200 sticky top-0 z-20">
           <div className="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
@@ -203,7 +208,7 @@ export default function AdminDashboard() {
               )}
             </button>
             <h1 className="text-xl md:text-2xl font-bold hidden md:block flex-1" style={{ color: '#071C3C' }}>
-              Dashboard
+              {isRTL ? 'داشبورد' : 'Dashboard'}
             </h1>
             <div className="flex items-center gap-3">
               <RoleBadge role="admin" email={user?.email} size="sm" />
@@ -220,38 +225,38 @@ export default function AdminDashboard() {
             animate={{ opacity: 1, y: 0 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12"
           >
-          {stats.map((stat, index) => {
-            const { Icon, color, value, titleEn, titleFa, badge } = stat;
-            return (
-              <motion.div
-                key={titleEn}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-xl shadow-md p-4 md:p-6 border border-gray-200"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
-                    <Icon className="w-6 h-6" style={{ color }} />
-                  </div>
-                  <div className="text-right">
-                    <span className="text-3xl font-bold block" style={{ color: '#1E2430' }}>
-                      {value}
-                    </span>
-                    {badge && (
-                      <span className="text-xs font-semibold" style={{ color: '#15803D' }}>
-                        {badge}
+            {stats.map((stat, index) => {
+              const { Icon, color, value, titleEn, titleFa, badge } = stat;
+              return (
+                <motion.div
+                  key={titleEn}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-white rounded-xl shadow-md p-4 md:p-6 border border-gray-200"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
+                      <Icon className="w-6 h-6" style={{ color }} />
+                    </div>
+                    <div className="text-right">
+                      <span className="text-3xl font-bold block" style={{ color: '#1E2430' }}>
+                        {value}
                       </span>
-                    )}
+                      {badge && (
+                        <span className="text-xs font-semibold" style={{ color: '#15803D' }}>
+                          {badge}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <p className="text-sm" style={{ color: '#5E6470' }}>
-                  {isRTL ? titleFa : titleEn}
-                </p>
-              </motion.div>
-            );
-          })}
-        </motion.div>
+                  <p className="text-sm" style={{ color: '#5E6470' }}>
+                    {isRTL ? titleFa : titleEn}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </motion.div>
 
           {/* Quick Actions */}
           <motion.div
@@ -263,29 +268,26 @@ export default function AdminDashboard() {
               {isRTL ? 'دسترسی سریع' : 'Quick Access'}
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
-            {menuItems.map((item) => {
-              const { Icon, href, titleEn, titleFa } = item;
-              return (
-                <motion.div
-                  key={titleEn}
-                  whileHover={{ y: -4 }}
-                  className="h-full"
-                >
-                  <Link href={href} className="h-full">
-                    <div className="bg-white rounded-lg md:rounded-xl p-4 md:p-6 border border-gray-200 hover:shadow-lg transition-all cursor-pointer h-full flex flex-col items-center text-center">
+              {quickAccessItems.map((item) => {
+                const { Icon, href, titleEn, titleFa } = item;
+                return (
+                  <Link key={titleEn} href={href}>
+                    <motion.div
+                      whileHover={{ y: -4 }}
+                      className="bg-white rounded-lg md:rounded-xl p-4 md:p-6 border border-gray-200 hover:shadow-lg transition-all cursor-pointer h-full flex flex-col items-center text-center"
+                    >
                       <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style={{ backgroundColor: '#F0EDE6' }}>
                         <Icon className="w-6 h-6" style={{ color: '#C9A35A' }} />
                       </div>
                       <p className="text-sm font-semibold" style={{ color: '#1E2430' }}>
                         {isRTL ? titleFa : titleEn}
                       </p>
-                    </div>
+                    </motion.div>
                   </Link>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
 
           {/* Welcome Section */}
           <motion.div
