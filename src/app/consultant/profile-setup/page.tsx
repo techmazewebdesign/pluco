@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { Upload, CheckCircle, Loader, AlertCircle, ArrowRight } from 'lucide-react';
-import { doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc, Timestamp } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { PRODUCT_TYPES } from '@/lib/types';
@@ -160,9 +160,9 @@ export default function ConsultantProfileSetup() {
         photoUrl = await getDownloadURL(snapshot.ref);
       }
 
-      // Update Firestore
+      // Update Firestore (use setDoc to create or merge)
       const docRef = doc(db, 'agents', user.email!.toLowerCase());
-      await updateDoc(docRef, {
+      await setDoc(docRef, {
         name: profile.name,
         personalEmail: profile.personalEmail,
         phone: profile.phone,
@@ -175,7 +175,7 @@ export default function ConsultantProfileSetup() {
         profileComplete: true,
         profileCompletedAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
-      });
+      }, { merge: true });
 
       // Redirect to dashboard
       router.push('/consultant/dashboard');
