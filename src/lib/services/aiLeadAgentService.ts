@@ -232,12 +232,26 @@ export async function getNotifications(): Promise<AgentNotification[]> {
       limit(100)
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-      readAt: doc.data().readAt?.toDate?.()?.toISOString(),
-    } as AgentNotification));
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
+      const notification: AgentNotification = {
+        id: doc.id,
+        type: data.type || 'message',
+        title: data.title || 'Notification',
+        message: data.message || '',
+        severity: data.severity || 'info',
+        isRead: data.isRead || false,
+        createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+      };
+
+      // Add optional fields only if they exist
+      if (data.relatedLeadId) notification.relatedLeadId = data.relatedLeadId;
+      if (data.relatedTaskId) notification.relatedTaskId = data.relatedTaskId;
+      if (data.actionUrl) notification.actionUrl = data.actionUrl;
+      if (data.readAt) notification.readAt = data.readAt?.toDate?.()?.toISOString();
+
+      return notification;
+    });
   } catch (error) {
     console.error('Error getting notifications:', error);
     return [];

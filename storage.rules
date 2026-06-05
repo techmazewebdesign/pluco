@@ -26,5 +26,20 @@ service firebase.storage {
                       request.resource.size < 5 * 1024 * 1024 &&
                       request.resource.contentType.matches('image/.*');
     }
+
+    // Allow consultant photo uploads (with timestamp in filename)
+    match /consultant-photos/{filename} {
+      allow write: if request.auth != null &&
+                      request.resource.size < 5 * 1024 * 1024 &&
+                      request.resource.contentType.matches('image/.*');
+      allow read: if request.auth != null;
+    }
+
+    // Allow any authenticated user to write to any path
+    // (backup for development - can be restricted later)
+    match /{allPaths=**} {
+      allow write: if request.auth != null &&
+                     request.resource.size < 10 * 1024 * 1024;
+    }
   }
 }
