@@ -273,7 +273,7 @@ export default function LoginPage() {
                     {isRTL ? 'رمز عبور' : 'Password'}
                   </label>
                   <Link
-                    href="/contact"
+                    href="/forgot-password"
                     className="text-xs hover:underline"
                     style={{ color: '#C9A35A' }}
                   >
