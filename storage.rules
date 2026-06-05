@@ -1,10 +1,9 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Allow all authenticated users to read and write all files
-    // This is for development/testing - restrict later as needed
+    // Allow all authenticated users full access (development only)
     match /{allPaths=**} {
-      allow read, write: if request.auth != null;
+      allow read, write, delete: if request.auth != null;
     }
   }
 }
