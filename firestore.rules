@@ -94,6 +94,18 @@ service cloud.firestore {
       allow create: if isSignedIn();
     }
 
+    // ── Agent Notifications ────────────────────────────────────────────
+    match /agentNotifications/{notifId} {
+      allow read: if hasRole('admin') || isAdminUser() || isAgent();
+      allow create, update, delete: if hasRole('admin') || isAdminUser() || isAgent();
+    }
+
+    // ── Email Verifications ────────────────────────────────────────────
+    match /email_verifications/{docId} {
+      allow read: if hasRole('admin') || isAdminUser();
+      allow write: if isSignedIn();
+    }
+
     // ── Consultation Bookings ─────────────────────────────────────────
     match /consultation_bookings/{bookingId} {
       allow read: if isSignedIn() && (resource.data.clientUid == request.auth.uid || resource.data.consultantUid == request.auth.uid);
