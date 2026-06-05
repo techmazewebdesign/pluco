@@ -37,6 +37,33 @@ const ROLE_OPTIONS = [
   { value: 'enquiry_handler', label: 'Enquiry Handler' },
 ];
 
+// Helper function to format dates from Firestore
+const formatDate = (date: any): string => {
+  if (!date) return '—';
+  try {
+    // Handle Firestore Timestamp objects
+    if (date.toDate) {
+      return date.toDate().toLocaleDateString();
+    }
+    // Handle string dates
+    if (typeof date === 'string') {
+      return new Date(date).toLocaleDateString();
+    }
+    // Handle Date objects
+    if (date instanceof Date) {
+      return date.toLocaleDateString();
+    }
+    // Handle seconds (Unix timestamp from Firestore)
+    if (typeof date === 'number') {
+      return new Date(date * 1000).toLocaleDateString();
+    }
+    return '—';
+  } catch (err) {
+    console.error('Error formatting date:', date, err);
+    return '—';
+  }
+};
+
 export default function ProUserManagement() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [activities, setActivities] = useState<UserActivity[]>([]);
@@ -70,41 +97,74 @@ export default function ProUserManagement() {
     try {
       setIsLoading(true);
 
-      // Load all users
+      // Load all users from all collections
       const allUsers: AdminUser[] = [];
+      const userEmails = new Set<string>(); // Track emails to avoid duplicates
 
+      // Load from users collection
       try {
         const usersSnap = await getDocs(collection(db, 'users'));
         usersSnap.docs.forEach(doc => {
           const userData = doc.data();
-          allUsers.push({
-            uid: userData.uid || doc.id,
-            email: userData.email || doc.id,
-            displayName: userData.displayName || userData.name,
-            role: userData.role || 'user',
-            createdAt: userData.createdAt,
-            status: userData.status || 'pending',
-          });
+          const email = userData.email || doc.id;
+          if (!userEmails.has(email)) {
+            userEmails.add(email);
+            allUsers.push({
+              uid: userData.uid || doc.id,
+              email: email,
+              displayName: userData.displayName || userData.name,
+              role: userData.role || 'user',
+              createdAt: userData.createdAt,
+              status: userData.status || 'pending',
+            });
+          }
         });
       } catch (err) {
         console.error('Error loading users:', err);
       }
 
+      // Load from agents collection
       try {
         const agentsSnap = await getDocs(collection(db, 'agents'));
         agentsSnap.docs.forEach(doc => {
           const agentData = doc.data();
-          allUsers.push({
-            uid: agentData.uid || doc.id,
-            email: agentData.email || doc.id,
-            displayName: agentData.name || agentData.displayName,
-            role: agentData.role || 'consultant',
-            createdAt: agentData.createdAt,
-            status: agentData.status || 'active',
-          });
+          const email = agentData.email || doc.id;
+          if (!userEmails.has(email)) {
+            userEmails.add(email);
+            allUsers.push({
+              uid: agentData.uid || doc.id,
+              email: email,
+              displayName: agentData.name || agentData.displayName,
+              role: agentData.role || 'consultant',
+              createdAt: agentData.createdAt,
+              status: agentData.status || 'active',
+            });
+          }
         });
       } catch (err) {
         console.error('Error loading agents:', err);
+      }
+
+      // Load from clients collection
+      try {
+        const clientsSnap = await getDocs(collection(db, 'clients'));
+        clientsSnap.docs.forEach(doc => {
+          const clientData = doc.data();
+          const email = clientData.email || clientData.emailAddress || doc.id;
+          if (!userEmails.has(email)) {
+            userEmails.add(email);
+            allUsers.push({
+              uid: clientData.uid || doc.id,
+              email: email,
+              displayName: clientData.displayName || clientData.fullName || clientData.firstName || clientData.name,
+              role: 'client',
+              createdAt: clientData.createdAt || clientData.registeredAt,
+              status: clientData.status || 'active',
+            });
+          }
+        });
+      } catch (err) {
+        console.error('Error loading clients:', err);
       }
 
       setUsers(allUsers.sort((a, b) => {
@@ -477,7 +537,7 @@ export default function ProUserManagement() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
-                        {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—'}
+                        {formatDate(user.createdAt)}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <button
