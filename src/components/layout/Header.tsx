@@ -236,21 +236,53 @@ export default function Header() {
                   {t(item.key)}
                 </Link>
               ))}
-              {!loading && user && (
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsMenuOpen(false);
-                  }}
-                  className="w-full text-left px-3 py-2.5 text-sm font-medium rounded transition-colors flex items-center gap-2"
-                  style={{ color: '#CBD5E0' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A35A')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = '#CBD5E0')}
-                >
-                  <LogOut className="w-4 h-4" />
-                  {isRTL ? 'خروج' : 'Logout'}
-                </button>
-              )}
+
+              {/* Auth Links */}
+              <div className="border-t border-gray-700 pt-3 mt-3">
+                {!loading && !user ? (
+                  <>
+                    <Link
+                      href="/login"
+                      className="block px-3 py-2.5 text-sm font-medium rounded transition-colors"
+                      style={{ color: '#C9A35A' }}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {isRTL ? 'ورود' : 'Login'}
+                    </Link>
+                    <Link
+                      href="/signup"
+                      className="block px-3 py-2.5 text-sm font-medium rounded transition-colors text-white"
+                      style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {isRTL ? 'ثبت نام' : 'Sign up'}
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium rounded transition-colors"
+                      style={{ color: '#C9A35A' }}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <User className="w-4 h-4" />
+                      {isRTL ? 'پنل' : 'Dashboard'}
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2.5 text-sm font-medium rounded transition-colors flex items-center gap-2"
+                      style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      {isRTL ? 'خروج' : 'Logout'}
+                    </button>
+                  </>
+                )}
+              </div>
             </nav>
           </motion.div>
         )}
