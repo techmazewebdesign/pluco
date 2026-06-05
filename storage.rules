@@ -1,45 +1,10 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Allow authenticated users to read all photos
+    // Allow all authenticated users to read and write all files
+    // This is for development/testing - restrict later as needed
     match /{allPaths=**} {
-      allow read: if request.auth != null;
-    }
-
-    // Allow users to upload and manage their own profile photos
-    match /profiles/{uid}/photo.{extension=jpg|jpeg|png|webp} {
-      allow write: if request.auth.uid == uid &&
-                      request.resource.size < 5 * 1024 * 1024 &&
-                      request.resource.contentType.matches('image/.*');
-    }
-
-    // Allow users to upload and manage family member photos
-    match /profiles/{uid}/family/{memberId}/photo.{extension=jpg|jpeg|png|webp} {
-      allow write: if request.auth.uid == uid &&
-                      request.resource.size < 5 * 1024 * 1024 &&
-                      request.resource.contentType.matches('image/.*');
-    }
-
-    // Allow agents to upload and manage their own photos
-    match /agents/{uid}/photo.{extension=jpg|jpeg|png|webp} {
-      allow write: if request.auth.uid == uid &&
-                      request.resource.size < 5 * 1024 * 1024 &&
-                      request.resource.contentType.matches('image/.*');
-    }
-
-    // Allow consultant photo uploads (with timestamp in filename)
-    match /consultant-photos/{filename} {
-      allow write: if request.auth != null &&
-                      request.resource.size < 5 * 1024 * 1024 &&
-                      request.resource.contentType.matches('image/.*');
-      allow read: if request.auth != null;
-    }
-
-    // Allow any authenticated user to write to any path
-    // (backup for development - can be restricted later)
-    match /{allPaths=**} {
-      allow write: if request.auth != null &&
-                     request.resource.size < 10 * 1024 * 1024;
+      allow read, write: if request.auth != null;
     }
   }
 }
