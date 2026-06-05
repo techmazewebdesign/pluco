@@ -6,12 +6,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 import {
   LogOut, Calendar, Clock, Users, Star, MessageSquare, Settings, Loader2,
-  CheckCircle, AlertCircle, Plus, Eye, BarChart3
+  CheckCircle, AlertCircle, Plus, Eye, BarChart3, Bell
 } from 'lucide-react';
 import { collection, getDocs, query, where, doc, getDoc, updateDoc, Timestamp, addDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
 import Image from 'next/image';
+import RoleBadge from '@/components/shared/RoleBadge';
 
 interface ConsultationBooking {
   id: string;
@@ -43,6 +44,7 @@ export default function ConsultantDashboard() {
 
   const [consultant, setConsultant] = useState<Consultant | null>(null);
   const [bookings, setBookings] = useState<ConsultationBooking[]>([]);
+  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
   const [stats, setStats] = useState({
     upcomingCount: 0,
     todayCount: 0,
@@ -59,6 +61,27 @@ export default function ConsultantDashboard() {
     }
   }, [user, loading, router]);
 
+  // Load unread notifications count
+  useEffect(() => {
+    if (!user) return;
+
+    const loadUnreadNotifications = async () => {
+      try {
+        const notificationsSnap = await getDocs(
+          query(collection(db, 'notifications'),
+            where('recipientUid', '==', user.uid),
+            where('read', '==', false)
+          )
+        );
+        setUnreadNotificationsCount(notificationsSnap.docs.length);
+      } catch (e) {
+        console.error('Error loading unread notifications:', e);
+      }
+    };
+
+    loadUnreadNotifications();
+  }, [user]);
+
   // Load consultant data
   useEffect(() => {
     if (!user) return;
@@ -68,9 +91,21 @@ export default function ConsultantDashboard() {
         setIsLoading(true);
         setError('');
 
-        // Load consultant profile
-        const consultantDoc = await getDoc(doc(db, 'agents', user.uid));
+        // Load consultant profile - check by both UID and email
+        let consultantDoc = await getDoc(doc(db, 'agents', user.uid));
+
+        // If not found by UID, try by email
+        if (!consultantDoc.exists() && user.email) {
+          consultantDoc = await getDoc(doc(db, 'agents', user.email.toLowerCase()));
+        }
+
         if (consultantDoc.exists() && consultantDoc.data().role === 'consultant') {
+          // Check if profile is complete
+          if (!consultantDoc.data().profileComplete) {
+            router.push('/consultant/profile-setup');
+            return;
+          }
+
           setConsultant({
             uid: user.uid,
             name: consultantDoc.data().name || user.displayName || '',
@@ -200,6 +235,16 @@ export default function ConsultantDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <RoleBadge role="consultant" email={user?.email} size="sm" />
+            <Link href="/consultant/dashboard/notifications" className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <Bell className="w-5 h-5" style={{ color: '#5E6470' }} />
+              {unreadNotificationsCount > 0 && (
+                <span className="absolute top-1 right-1 w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center"
+                  style={{ backgroundColor: '#DC2626', color: '#FFFFFF' }}>
+                  {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                </span>
+              )}
+            </Link>
             <Link href="/consultant/profile" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
               <Settings className="w-5 h-5" style={{ color: '#5E6470' }} />
             </Link>
@@ -217,6 +262,37 @@ export default function ConsultantDashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* New Features Alert */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+          className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+          <div className="flex items-start gap-4">
+            <div className="text-2xl">🆕</div>
+            <div className="flex-1">
+              <h2 className="font-bold mb-2" style={{ color: '#071C3C' }}>New Features Available</h2>
+              <p className="text-sm mb-3" style={{ color: '#5E6470' }}>
+                Manage your consultations, track notifications, and create Google Meet links for your bookings.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Link href="/consultant/dashboard/bookings"
+                  className="text-xs font-semibold px-4 py-2 rounded-lg transition-all hover:brightness-110"
+                  style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>
+                  📅 Manage Bookings
+                </Link>
+                <Link href="/consultant/dashboard/notifications"
+                  className="text-xs font-semibold px-4 py-2 rounded-lg transition-all hover:brightness-110"
+                  style={{ backgroundColor: '#10B981', color: '#FFFFFF' }}>
+                  🔔 View Notifications
+                </Link>
+                <Link href="/consultant/profile-setup"
+                  className="text-xs font-semibold px-4 py-2 rounded-lg transition-all hover:brightness-110"
+                  style={{ backgroundColor: '#8B5CF6', color: '#FFFFFF' }}>
+                  👤 Update Profile
+                </Link>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
@@ -322,24 +398,24 @@ export default function ConsultantDashboard() {
         {/* Quick Links */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Link href="/consultant/dashboard/bookings"
-            className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+            className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow hover:border-amber-300">
             <Calendar className="w-8 h-8 mb-3" style={{ color: '#C9A35A' }} />
             <h3 className="font-semibold mb-1" style={{ color: '#1E2430' }}>Manage Bookings</h3>
-            <p className="text-xs" style={{ color: '#5E6470' }}>View and manage all your consultations</p>
+            <p className="text-xs" style={{ color: '#5E6470' }}>Create meet links & cancel appointments</p>
           </Link>
 
-          <Link href="/consultant/dashboard/availability"
-            className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
-            <Clock className="w-8 h-8 mb-3" style={{ color: '#C9A35A' }} />
-            <h3 className="font-semibold mb-1" style={{ color: '#1E2430' }}>Set Availability</h3>
-            <p className="text-xs" style={{ color: '#5E6470' }}>Update your working hours and timezone</p>
+          <Link href="/consultant/dashboard/notifications"
+            className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow hover:border-green-300">
+            <Bell className="w-8 h-8 mb-3" style={{ color: '#10B981' }} />
+            <h3 className="font-semibold mb-1" style={{ color: '#1E2430' }}>Notifications</h3>
+            <p className="text-xs" style={{ color: '#5E6470' }}>View booking requests & updates</p>
           </Link>
 
-          <Link href="/consultant/dashboard/reviews"
-            className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
-            <Star className="w-8 h-8 mb-3" style={{ color: '#C9A35A' }} />
-            <h3 className="font-semibold mb-1" style={{ color: '#1E2430' }}>Reviews & Ratings</h3>
-            <p className="text-xs" style={{ color: '#5E6470' }}>See what clients think about you</p>
+          <Link href="/consultant/profile-setup"
+            className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow hover:border-purple-300">
+            <Star className="w-8 h-8 mb-3" style={{ color: '#8B5CF6' }} />
+            <h3 className="font-semibold mb-1" style={{ color: '#1E2430' }}>Update Profile</h3>
+            <p className="text-xs" style={{ color: '#5E6470' }}>Manage your professional details</p>
           </Link>
         </div>
       </main>
