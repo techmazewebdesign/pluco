@@ -1,15 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: process.env.SMTP_SECURE === 'true',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
-});
+// Initialize Resend if API key is available
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 const SIGNUP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.plucogroup.com';
 
@@ -123,16 +116,25 @@ If you have any questions, contact: support@plucogroup.com
 © 2024 PLUCO GROUP
     `;
 
-    // Send email
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM || 'noreply@plucogroup.com',
+    // Send email via Resend
+    if (!resend) {
+      throw new Error('Email service not configured. Please set RESEND_API_KEY environment variable.');
+    }
+
+    const emailResult = await resend.emails.send({
+      from: process.env.RESEND_FROM || 'PLUCO GROUP <noreply@plucogroup.com>',
       to: email,
       subject: `Invitation to Join PLUCO GROUP as ${roleDisplay}`,
       html: htmlContent,
       text: textContent,
     });
 
-    console.log('Invitation email sent to:', email);
+    if (emailResult.error) {
+      console.error('Resend email error:', emailResult.error);
+      throw new Error(`Failed to send email: ${emailResult.error.message}`);
+    }
+
+    console.log('Invitation email sent to:', email, 'Message ID:', emailResult.data?.id);
 
     return NextResponse.json({
       success: true,
