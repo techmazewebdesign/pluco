@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
-import { LogOut, Users, FileText, MessageSquare, BarChart3, Bot, Zap, Shield, Menu, X, BookOpen } from 'lucide-react';
+import { LogOut, Users, FileText, MessageSquare, BarChart3, Bot, Zap, Shield, Menu, X, BookOpen, Calendar } from 'lucide-react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
@@ -108,6 +108,7 @@ export default function AdminDashboard() {
 
   const sidebarMenuItems = [
     { titleEn: 'Dashboard', titleFa: 'داشبورد', href: '/admin/dashboard', Icon: BarChart3 },
+    { titleEn: 'Enquiry Bookings', titleFa: 'رزروهای درخواست', href: '/admin/dashboard/bookings', Icon: Calendar },
     { titleEn: 'AI Leads', titleFa: 'AI سرنخ‌ها', href: '/admin/dashboard/leads', Icon: Zap },
     { titleEn: 'AI Agents', titleFa: 'AI عوامل', href: '/admin/dashboard/ai-agents', Icon: Bot },
     { titleEn: 'Consultants', titleFa: 'مشاورین', href: '/admin/dashboard/consultants', Icon: Users },
@@ -118,13 +119,12 @@ export default function AdminDashboard() {
   ];
 
   const quickAccessItems = [
+    { titleEn: 'Enquiry Bookings', titleFa: 'رزروهای درخواست', href: '/admin/dashboard/bookings', Icon: Calendar },
     { titleEn: 'AI Leads', titleFa: 'AI سرنخ‌ها', href: '/admin/dashboard/leads', Icon: Zap },
     { titleEn: 'AI Agents', titleFa: 'AI عوامل', href: '/admin/dashboard/ai-agents', Icon: Bot },
     { titleEn: 'Consultants', titleFa: 'مشاورین', href: '/admin/dashboard/consultants', Icon: Users },
     { titleEn: 'User Management', titleFa: 'مدیریت کاربران', href: '/admin/dashboard/users', Icon: Shield },
     { titleEn: 'Training Manual', titleFa: 'راهنمای آموزش', href: '/admin/dashboard/training', Icon: BookOpen },
-    { titleEn: 'Activity Logs', titleFa: 'سوابق فعالیت', href: '/admin/dashboard/consultant-activities', Icon: BarChart3 },
-    { titleEn: 'Notifications', titleFa: 'اطلاعیه‌ها', href: '/admin/dashboard/notifications', Icon: MessageSquare },
   ];
 
   return (

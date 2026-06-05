@@ -5,16 +5,16 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { motion } from 'framer-motion';
 import {
-  Search, Star, Award, Loader2, AlertCircle, ArrowLeft, Filter
+  Search, Star, Award, Loader2, AlertCircle, ArrowLeft
 } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { PRODUCT_TYPES } from '@/lib/types';
+import PrivateEnquiryFormModal from '@/components/shared/PrivateEnquiryFormModal';
 
 interface ConsultantCard {
+  uid: string;
   email: string;
   name: string;
-  photo?: string;
   yearsOfExperience?: number;
   productTypes?: string[];
   bio?: string;
@@ -29,6 +29,8 @@ export default function ConsultantsPage() {
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProductType, setSelectedProductType] = useState<string | null>(null);
+  const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
+  const [selectedConsultant, setSelectedConsultant] = useState<ConsultantCard | null>(null);
 
   useEffect(() => {
     const loadConsultants = async () => {
@@ -44,6 +46,7 @@ export default function ConsultantsPage() {
         );
 
         const consultantsList = consultantsSnap.docs.map(doc => ({
+          uid: doc.data().uid || doc.id,
           email: doc.id,
           ...doc.data(),
         } as ConsultantCard));
@@ -208,24 +211,6 @@ export default function ConsultantsPage() {
                 transition={{ delay: index * 0.05 }}
                 className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
               >
-                {/* Photo */}
-                {consultant.photo ? (
-                  <div className="relative h-48 overflow-hidden">
-                    <Image
-                      src={consultant.photo}
-                      alt={consultant.name}
-                      fill
-                      className="object-cover hover:scale-105 transition-transform"
-                    />
-                  </div>
-                ) : (
-                  <div className="h-48 flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
-                    <span className="text-6xl font-bold" style={{ color: '#C9A35A' }}>
-                      {consultant.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                )}
-
                 {/* Content */}
                 <div className="p-4">
                   <h3 className="text-lg font-bold mb-1" style={{ color: '#071C3C' }}>
@@ -299,13 +284,16 @@ export default function ConsultantsPage() {
                     >
                       View Profile
                     </Link>
-                    <Link
-                      href={`/booking?consultant=${encodeURIComponent(consultant.email)}`}
+                    <button
+                      onClick={() => {
+                        setSelectedConsultant(consultant);
+                        setEnquiryModalOpen(true);
+                      }}
                       className="flex-1 text-center px-3 py-2 rounded-lg text-sm font-semibold transition-all hover:brightness-110"
                       style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
                     >
                       Book Now
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -323,6 +311,19 @@ export default function ConsultantsPage() {
           </motion.div>
         )}
       </div>
+
+      {/* Enquiry Form Modal */}
+      {selectedConsultant && (
+        <PrivateEnquiryFormModal
+          isOpen={enquiryModalOpen}
+          onClose={() => {
+            setEnquiryModalOpen(false);
+            setSelectedConsultant(null);
+          }}
+          consultantId={selectedConsultant.uid}
+          consultantName={selectedConsultant.name}
+        />
+      )}
     </div>
   );
 }

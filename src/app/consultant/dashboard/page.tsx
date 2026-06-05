@@ -15,12 +15,19 @@ import RoleBadge from '@/components/shared/RoleBadge';
 
 interface ConsultationBooking {
   id: string;
+  firstName?: string;
+  lastName?: string;
   clientName: string;
   clientEmail: string;
-  title: string;
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
-  scheduledAt: string;
-  duration: number;
+  service?: string;
+  title?: string;
+  status: 'pending' | 'assigned' | 'confirmed' | 'completed' | 'cancelled';
+  preferredDate?: string;
+  preferredTime?: string;
+  scheduledAt?: string;
+  duration?: number;
+  urgency?: string;
+  preferredContactMethod?: string;
 }
 
 interface ConsultantData {
@@ -92,18 +99,57 @@ export default function ConsultantDashboard() {
           personalEmail: data.personalEmail,
         });
 
-        // Load bookings
-        const bookingsSnap = await getDocs(
-          query(collection(db, 'consultation_bookings'), where('consultantUid', '==', user.uid))
-        );
-        const bookingsList = bookingsSnap.docs
-          .map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          } as ConsultationBooking))
-          .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
+        // Load bookings - from both consultation_bookings and enquiry bookings
+        // Query by consultantId (for enquiries) and consultantUid (for consultation bookings)
+        const [bookingsSnap1, bookingsSnap2] = await Promise.all([
+          getDocs(
+            query(collection(db, 'enquiries'),
+              where('consultantId', '==', user.uid),
+              where('status', 'in', ['assigned', 'confirmed', 'completed'])
+            )
+          ),
+          getDocs(
+            query(collection(db, 'consultation_bookings'),
+              where('consultantUid', '==', user.uid)
+            )
+          )
+        ]);
 
-        setBookings(bookingsList);
+        const enquiryBookings = bookingsSnap1.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            clientName: `${data.firstName || ''} ${data.lastName || ''}`.trim() || 'Client',
+            clientEmail: data.email,
+            service: data.service,
+            status: data.status || 'assigned',
+            preferredDate: data.preferredDate,
+            preferredTime: data.preferredTime,
+            urgency: data.urgency,
+            preferredContactMethod: data.preferredContactMethod,
+          } as ConsultationBooking;
+        });
+
+        const consultationBookings = bookingsSnap2.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          clientName: doc.data().clientName || 'Client',
+          clientEmail: doc.data().clientEmail || '',
+          status: doc.data().status || 'pending',
+          scheduledAt: doc.data().scheduledAt,
+          duration: doc.data().duration,
+        } as ConsultationBooking));
+
+        const allBookings = [...enquiryBookings, ...consultationBookings]
+          .sort((a, b) => {
+            const dateA = new Date(a.preferredDate || a.scheduledAt || 0).getTime();
+            const dateB = new Date(b.preferredDate || b.scheduledAt || 0).getTime();
+            return dateA - dateB;
+          });
+
+        setBookings(allBookings);
 
         // Load unread notifications count
         const notificationsSnap = await getDocs(
@@ -135,10 +181,13 @@ export default function ConsultantDashboard() {
   };
 
   const upcomingBookings = bookings
-    .filter(b => new Date(b.scheduledAt) > new Date() && b.status !== 'cancelled')
+    .filter(b => {
+      const bookingDate = new Date(b.preferredDate || b.scheduledAt || 0);
+      return bookingDate > new Date() && b.status !== 'cancelled';
+    })
     .slice(0, 3);
 
-  const totalBookings = bookings.length;
+  const totalBookings = bookings.filter(b => b.status === 'assigned' || b.status === 'confirmed' || b.status === 'completed').length;
   const completedBookings = bookings.filter(b => b.status === 'completed').length;
 
   if (loading) {
@@ -253,16 +302,32 @@ export default function ConsultantDashboard() {
               <p className="text-sm text-gray-500">No upcoming consultations</p>
             ) : (
               <div className="space-y-3">
-                {upcomingBookings.map(booking => (
-                  <div key={booking.id} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <p className="font-semibold text-sm" style={{ color: '#071C3C' }}>{booking.clientName}</p>
-                    <p className="text-xs text-gray-600 mt-1">{booking.title}</p>
-                    <p className="text-xs text-gray-600 mt-1">
-                      📅 {new Date(booking.scheduledAt).toLocaleDateString()} at {new Date(booking.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                    <p className="text-xs text-gray-600 mt-1">⏱️ {booking.duration} minutes</p>
-                  </div>
-                ))}
+                {upcomingBookings.map(booking => {
+                  const bookingDate = booking.preferredDate || booking.scheduledAt;
+                  const bookingTime = booking.preferredTime || '';
+                  return (
+                    <div key={booking.id} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <p className="font-semibold text-sm" style={{ color: '#071C3C' }}>{booking.clientName}</p>
+                      {booking.service && <p className="text-xs text-gray-600 mt-1">Service: {booking.service}</p>}
+                      {booking.title && <p className="text-xs text-gray-600 mt-1">{booking.title}</p>}
+                      {bookingDate && (
+                        <p className="text-xs text-gray-600 mt-1">
+                          📅 {new Date(bookingDate).toLocaleDateString()}
+                          {bookingTime && ` at ${bookingTime}`}
+                        </p>
+                      )}
+                      {booking.urgency && <p className="text-xs text-gray-600 mt-1">Urgency: {booking.urgency}</p>}
+                      {booking.duration && <p className="text-xs text-gray-600 mt-1">⏱️ {booking.duration} minutes</p>}
+                      <p className="text-xs mt-1 px-2 py-0.5 rounded inline-block"
+                        style={{
+                          backgroundColor: booking.status === 'assigned' ? '#FEF3C7' : booking.status === 'confirmed' ? '#DCFCE7' : '#DBEAFE',
+                          color: booking.status === 'assigned' ? '#92400E' : booking.status === 'confirmed' ? '#15803D' : '#1E40AF'
+                        }}>
+                        {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             )}
             <Link href="/consultant/dashboard/bookings"

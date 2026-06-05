@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { initializeApp, getApps } from 'firebase/app';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
 
 async function sendToGoogleSheets(data: any) {
   try {
@@ -54,7 +56,54 @@ export async function POST(req: NextRequest) {
     const {
       fullName, email, phone, nationality, country,
       familyMembers, numFamilyMembers, service, language, description, urgency, preferredContact,
+      consultantId, consultantName, status, firstName, lastName, preferredDate, preferredTime,
     } = body;
+
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    };
+
+    const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Extract first and last name if not provided separately
+    const names = fullName ? fullName.split(' ') : [];
+    const firstNameValue = firstName || (names[0] || '');
+    const lastNameValue = lastName || (names.slice(1).join(' ') || '');
+
+    // Save enquiry to Firestore
+    const enquiryData = {
+      firstName: firstNameValue,
+      lastName: lastNameValue,
+      email,
+      phone,
+      company: body.company || '',
+      service,
+      description,
+      nationality,
+      country,
+      language,
+      familyMembers,
+      numFamilyMembers,
+      urgency,
+      preferredContactMethod: preferredContact,
+      preferredDate,
+      preferredTime,
+      consultantId: consultantId || null,
+      consultantName: consultantName || null,
+      status: status || (consultantId ? 'assigned' : 'pending'),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const enquiryRef = await addDoc(collection(db, 'enquiries'), enquiryData);
+    console.log('✓ Enquiry saved to Firestore:', enquiryRef.id);
 
     const isFarsi = language === 'Farsi / Persian' || language === 'فارسی';
     const timestamp = new Date().toLocaleString('en-GB', { timeZone: 'Europe/Warsaw' });
