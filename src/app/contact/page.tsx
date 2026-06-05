@@ -2,140 +2,16 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MapPin, Clock, ArrowRight, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, MapPin, Clock, ArrowRight } from 'lucide-react';
 import ConsultationProcess from '@/components/sections/ConsultationProcess';
 import DiscreetFirstContact from '@/components/sections/DiscreetFirstContact';
 import LegalDisclaimer from '@/components/shared/LegalDisclaimer';
+import PrivateEnquiryFormModal from '@/components/shared/PrivateEnquiryFormModal';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-interface FormState {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  company: string;
-  service: string;
-  message: string;
-}
-
-interface UIState {
-  isLoading: boolean;
-  isSuccess: boolean;
-  error: string;
-}
-
-const SERVICES = [
-  'International Contracts',
-  'Dispute Resolution & Settlements',
-  'Banking Compliance',
-  'Financial Discrimination',
-  'High-Tech Industrial Contracts',
-  'General Consultation'
-];
-
-const inputStyles = 'w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A35A] focus:border-[#C9A35A] disabled:opacity-50 disabled:cursor-not-allowed';
 
 export default function ContactPage() {
   const { isRTL } = useLanguage();
-
-  // Form state
-  const [form, setForm] = useState<FormState>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    company: '',
-    service: '',
-    message: '',
-  });
-
-  // UI state
-  const [ui, setUI] = useState<UIState>({
-    isLoading: false,
-    isSuccess: false,
-    error: '',
-  });
-
-  // Validation
-  const isFormValid = form.firstName.trim() && form.lastName.trim() && form.email.trim() && form.service.trim() && form.message.trim();
-
-  // Handle input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-  };
-
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (!isFormValid) {
-      setUI(prev => ({ ...prev, error: 'Please fill in all required fields.' }));
-      return;
-    }
-
-    setUI({ isLoading: true, isSuccess: false, error: '' });
-
-    try {
-      const payload = {
-        fullName: `${form.firstName.trim()} ${form.lastName.trim()}`,
-        email: form.email.trim(),
-        phone: form.phone.trim(),
-        currentCountry: form.company.trim(),
-        preferredLanguage: 'English',
-        serviceNeeded: form.service.trim(),
-        shortCaseDescription: form.message.trim(),
-      };
-
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        setUI({ isLoading: false, isSuccess: true, error: '' });
-        setForm({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          company: '',
-          service: '',
-          message: '',
-        });
-      } else {
-        setUI({
-          isLoading: false,
-          isSuccess: false,
-          error: result.error || 'Failed to submit. Please try again.',
-        });
-      }
-    } catch (error) {
-      setUI({
-        isLoading: false,
-        isSuccess: false,
-        error: 'Connection error. Please check your internet and try again.',
-      });
-    }
-  };
-
-  // Reset form
-  const handleReset = () => {
-    setUI({ isLoading: false, isSuccess: false, error: '' });
-    setForm({
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      company: '',
-      service: '',
-      message: '',
-    });
-  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -209,7 +85,7 @@ export default function ContactPage() {
               </div>
             </motion.div>
 
-            {/* Contact Form */}
+            {/* Contact Form - Start Private Enquiry */}
             <motion.div
               className="lg:col-span-3"
               initial={{ opacity: 0, x: 30 }}
@@ -217,156 +93,21 @@ export default function ContactPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.7 }}
             >
-              {ui.isSuccess ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center">
-                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
-                    <CheckCircle className="w-16 h-16 mb-6" style={{ color: '#C9A35A' }} />
-                  </motion.div>
-                  <h3 className="text-2xl font-serif mb-3" style={{ color: '#1E2430' }}>Thank You</h3>
-                  <p className="text-sm mb-6" style={{ color: '#5E6470' }}>
-                    Your enquiry has been received. Our team will contact you shortly.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleReset}
-                    className="text-xs font-semibold underline hover:opacity-70 transition-opacity"
-                    style={{ color: '#C9A35A' }}
-                  >
-                    Send another enquiry
-                  </button>
-                </div>
-              ) : (
-                <div className="bg-gray-50 rounded-2xl p-8">
-                  <h2 className="text-2xl font-serif mb-2" style={{ color: '#1E2430' }}>Request a Consultation</h2>
-                  <p className="text-xs mb-8" style={{ color: '#5E6470' }}>
-                    Fill in the form and we will be in touch within 24 hours.
-                  </p>
+              <div className="bg-gray-50 rounded-2xl p-8">
+                <h2 className="text-2xl font-serif mb-2" style={{ color: '#1E2430' }}>Start Private Client Enquiry</h2>
+                <p className="text-xs mb-8" style={{ color: '#5E6470' }}>
+                  Submit your confidential legal or commercial matter for a discreet consultation.
+                </p>
 
-                  <form onSubmit={handleSubmit} className="space-y-5">
-                    {/* Name Fields */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <input
-                        type="text"
-                        name="firstName"
-                        placeholder="First Name *"
-                        value={form.firstName}
-                        onChange={handleInputChange}
-                        disabled={ui.isLoading}
-                        className={inputStyles}
-                        required
-                      />
-                      <input
-                        type="text"
-                        name="lastName"
-                        placeholder="Last Name *"
-                        value={form.lastName}
-                        onChange={handleInputChange}
-                        disabled={ui.isLoading}
-                        className={inputStyles}
-                        required
-                      />
-                    </div>
-
-                    {/* Email */}
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Email Address *"
-                      value={form.email}
-                      onChange={handleInputChange}
-                      disabled={ui.isLoading}
-                      className={inputStyles}
-                      required
-                    />
-
-                    {/* Phone and Company */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <input
-                        type="tel"
-                        name="phone"
-                        placeholder="Phone Number"
-                        value={form.phone}
-                        onChange={handleInputChange}
-                        disabled={ui.isLoading}
-                        className={inputStyles}
-                      />
-                      <input
-                        type="text"
-                        name="company"
-                        placeholder="Company / Organisation"
-                        value={form.company}
-                        onChange={handleInputChange}
-                        disabled={ui.isLoading}
-                        className={inputStyles}
-                      />
-                    </div>
-
-                    {/* Service */}
-                    <select
-                      name="service"
-                      value={form.service}
-                      onChange={handleInputChange}
-                      disabled={ui.isLoading}
-                      className={inputStyles}
-                      required
-                    >
-                      <option value="">Select a service *</option>
-                      {SERVICES.map(svc => (
-                        <option key={svc} value={svc}>
-                          {svc}
-                        </option>
-                      ))}
-                    </select>
-
-                    {/* Message */}
-                    <textarea
-                      name="message"
-                      placeholder="Please describe your legal or commercial needs..."
-                      value={form.message}
-                      onChange={handleInputChange}
-                      disabled={ui.isLoading}
-                      rows={5}
-                      className={inputStyles}
-                      required
-                    />
-
-                    {/* Error Message */}
-                    {ui.error && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex items-start gap-3 p-4 rounded-lg"
-                        style={{ backgroundColor: '#FEF2F2', borderColor: '#FCA5A5', border: '1px solid' }}
-                      >
-                        <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#DC2626' }} />
-                        <p className="text-xs" style={{ color: '#991B1B' }}>
-                          {ui.error}
-                        </p>
-                      </motion.div>
-                    )}
-
-                    {/* Submit Button */}
-                    <button
-                      type="submit"
-                      disabled={ui.isLoading || !isFormValid}
-                      className="w-full inline-flex items-center justify-center gap-2 py-3.5 text-sm font-semibold rounded-lg transition-all hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{ backgroundColor: '#071C3C', color: '#FFFFFF' }}
-                    >
-                      {ui.isLoading ? (
-                        <>
-                          <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Sending...
-                        </>
-                      ) : (
-                        <>
-                          Send Enquiry
-                          <ArrowRight className="w-4 h-4" />
-                        </>
-                      )}
-                    </button>
-                  </form>
-                </div>
-              )}
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="w-full inline-flex items-center justify-center gap-2 py-3.5 text-sm font-semibold rounded-lg transition-all hover:brightness-110"
+                  style={{ backgroundColor: '#071C3C', color: '#FFFFFF' }}
+                >
+                  Open Enquiry Form
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
             </motion.div>
           </div>
         </div>
@@ -379,6 +120,12 @@ export default function ContactPage() {
           <LegalDisclaimer />
         </div>
       </section>
+
+      {/* Private Enquiry Modal */}
+      <PrivateEnquiryFormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }
