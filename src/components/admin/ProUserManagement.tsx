@@ -76,13 +76,14 @@ export default function ProUserManagement() {
       try {
         const usersSnap = await getDocs(collection(db, 'users'));
         usersSnap.docs.forEach(doc => {
+          const userData = doc.data();
           allUsers.push({
-            uid: doc.id,
-            email: doc.id,
-            displayName: doc.data().displayName || doc.data().name,
-            role: doc.data().role || 'user',
-            createdAt: doc.data().createdAt,
-            status: doc.data().status || 'pending',
+            uid: userData.uid || doc.id,
+            email: userData.email || doc.id,
+            displayName: userData.displayName || userData.name,
+            role: userData.role || 'user',
+            createdAt: userData.createdAt,
+            status: userData.status || 'pending',
           });
         });
       } catch (err) {
@@ -92,13 +93,14 @@ export default function ProUserManagement() {
       try {
         const agentsSnap = await getDocs(collection(db, 'agents'));
         agentsSnap.docs.forEach(doc => {
+          const agentData = doc.data();
           allUsers.push({
-            uid: doc.id,
-            email: doc.id,
-            displayName: doc.data().name || doc.data().displayName,
-            role: doc.data().role || 'consultant',
-            createdAt: doc.data().createdAt,
-            status: doc.data().status || 'active',
+            uid: agentData.uid || doc.id,
+            email: agentData.email || doc.id,
+            displayName: agentData.name || agentData.displayName,
+            role: agentData.role || 'consultant',
+            createdAt: agentData.createdAt,
+            status: agentData.status || 'active',
           });
         });
       } catch (err) {

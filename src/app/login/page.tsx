@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { Lock, Mail, ArrowRight, AlertCircle, Loader } from 'lucide-react';
 import { signInWithEmailAndPassword, sendEmailVerification, signOut, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, setDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 export default function LoginPage() {
@@ -117,7 +117,30 @@ export default function LoginPage() {
       }
 
       if (!found) {
-        console.log('⚠ User not found in any collection, using default role: user');
+        console.log('⚠ User not found in any collection, creating user document');
+
+        // Create user document if it doesn't exist
+        if (user.email) {
+          try {
+            const userEmailLower = user.email.toLowerCase();
+            const userRef = doc(db, 'users', userEmailLower);
+
+            await setDoc(userRef, {
+              uid: uid,
+              email: userEmailLower,
+              displayName: user.displayName || user.email.split('@')[0],
+              role: 'user',
+              status: 'active',
+              createdAt: Timestamp.now(),
+              createdVia: user.providerData[0]?.providerId || 'password',
+            }, { merge: true });
+
+            console.log('✓ Created new user document for:', userEmailLower);
+            foundLocation = 'users-email-created';
+          } catch (createErr) {
+            console.error('✗ Error creating user document:', createErr);
+          }
+        }
       }
 
       console.log('Final role detected:', userRole);
