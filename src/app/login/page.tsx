@@ -270,21 +270,35 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
+      // Initialize Google provider with proper configuration
       const provider = new GoogleAuthProvider();
+
+      // Set custom parameters for better UX
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      });
+
+      // Add scopes
       provider.addScope('profile');
       provider.addScope('email');
 
       console.log('=== STARTING GOOGLE LOGIN ===');
+      console.log('Current origin:', window.location.origin);
+      console.log('Current hostname:', window.location.hostname);
+      console.log('Auth domain:', auth.config.authDomain);
       console.log('Attempting signInWithPopup...');
 
       let userCredential;
       try {
-        // Try popup first
+        // Try popup first with proper error handling
         userCredential = await signInWithPopup(auth, provider);
+        console.log('✓ signInWithPopup succeeded');
       } catch (popupErr: any) {
-        // If popup blocked, fallback to redirect
-        if (popupErr.code === 'auth/popup-blocked') {
-          console.log('Popup blocked, falling back to redirect...');
+        console.error('✗ signInWithPopup failed:', popupErr.code, popupErr.message);
+
+        // If popup blocked or not supported, fallback to redirect
+        if (popupErr.code === 'auth/popup-blocked' || popupErr.code === 'auth/operation-not-supported-in-this-environment') {
+          console.log('Popup blocked/not supported, falling back to signInWithRedirect...');
           await signInWithRedirect(auth, provider);
           return;
         }
@@ -302,6 +316,7 @@ export default function LoginPage() {
       console.log('User uid:', user.uid);
       console.log('Display name:', user.displayName);
       console.log('Photo URL:', user.photoURL);
+      console.log('Provider:', user.providerData[0]?.providerId);
 
       // Check and create/update user profile
       await ensureUserProfileExists(user);
@@ -311,8 +326,11 @@ export default function LoginPage() {
     } catch (err: any) {
       console.error('✗ Google sign-in error:', err);
       console.error('Error code:', err.code);
+      console.error('Error message:', err.message);
+      console.error('Full error:', err);
 
       let errorMessage = isRTL ? 'خطا در ورود با گوگل' : 'Failed to sign in with Google';
+      let showDomainHelp = false;
 
       // Map all error codes to user-friendly messages
       if (err.code === 'auth/popup-closed-by-user') {
@@ -325,8 +343,9 @@ export default function LoginPage() {
           : 'Sign-in window was blocked. Please check your browser settings';
       } else if (err.code === 'auth/unauthorized-domain') {
         errorMessage = isRTL
-          ? 'این دامنه برای ورود گوگل مجاز نیست'
-          : 'This domain is not authorized for Google sign-in';
+          ? 'این دامنه برای ورود گوگل مجاز نیست. لطفا مدیر سیستم را مطلع کنید'
+          : 'This domain is not authorized for Google sign-in. Please contact admin';
+        showDomainHelp = true;
       } else if (err.code === 'auth/account-exists-with-different-credential') {
         errorMessage = isRTL
           ? 'این ایمیل با روش ورود متفاوتی ثبت شده است'
@@ -343,6 +362,20 @@ export default function LoginPage() {
         errorMessage = isRTL
           ? 'خطا در دریافت ایمیل از حساب گوگل'
           : 'Failed to retrieve email from Google account';
+      }
+
+      if (showDomainHelp) {
+        console.error('Domain configuration help:');
+        console.error('1. Go to Firebase Console > Authentication > Settings > Authorized domains');
+        console.error('2. Verify these domains are listed:');
+        console.error('   - www.plucogroup.com');
+        console.error('   - plucogroup.com');
+        console.error('3. Go to Google Cloud Console > APIs & Services > Credentials');
+        console.error('4. Find the Web Client OAuth 2.0 ID');
+        console.error('5. Edit and add authorized redirect URIs:');
+        console.error('   - https://www.plucogroup.com/__/auth/handler');
+        console.error('   - https://plucogroup.com/__/auth/handler');
+        console.error('6. Wait 5 minutes for changes to propagate');
       }
 
       setError(errorMessage);
