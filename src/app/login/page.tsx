@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Lock, Mail, ArrowRight, AlertCircle, Loader } from 'lucide-react';
-import { signInWithEmailAndPassword, sendEmailVerification, signOut, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendEmailVerification, signOut, onAuthStateChanged, signInWithPopup, signInWithRedirect, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs, setDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -271,28 +271,169 @@ export default function LoginPage() {
 
     try {
       const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
+      provider.addScope('profile');
+      provider.addScope('email');
+
+      console.log('=== STARTING GOOGLE LOGIN ===');
+      console.log('Attempting signInWithPopup...');
+
+      let userCredential;
+      try {
+        // Try popup first
+        userCredential = await signInWithPopup(auth, provider);
+      } catch (popupErr: any) {
+        // If popup blocked, fallback to redirect
+        if (popupErr.code === 'auth/popup-blocked') {
+          console.log('Popup blocked, falling back to redirect...');
+          await signInWithRedirect(auth, provider);
+          return;
+        }
+        throw popupErr;
+      }
+
       const user = userCredential.user;
 
-      console.log('Google sign-in successful:', user.email);
-
-      // For Google auth, email is automatically verified
-      if (user.email) {
-        checkAdminAndRedirect(user.uid);
+      if (!user.email) {
+        throw new Error('Google account does not have email');
       }
+
+      console.log('✓ Google authentication successful');
+      console.log('User email:', user.email);
+      console.log('User uid:', user.uid);
+      console.log('Display name:', user.displayName);
+      console.log('Photo URL:', user.photoURL);
+
+      // Check and create/update user profile
+      await ensureUserProfileExists(user);
+
+      // Now check role and redirect
+      checkAdminAndRedirect(user.uid);
     } catch (err: any) {
-      console.error('Google sign-in error:', err);
+      console.error('✗ Google sign-in error:', err);
+      console.error('Error code:', err.code);
 
       let errorMessage = isRTL ? 'خطا در ورود با گوگل' : 'Failed to sign in with Google';
 
+      // Map all error codes to user-friendly messages
       if (err.code === 'auth/popup-closed-by-user') {
-        errorMessage = isRTL ? 'پنجره ورود بسته شد' : 'Sign-in window was closed';
+        errorMessage = isRTL
+          ? 'پنجره ورود بسته شد. لطفا دوباره سعی کنید'
+          : 'Sign-in window was closed. Please try again';
       } else if (err.code === 'auth/popup-blocked') {
-        errorMessage = isRTL ? 'پنجره ورود مسدود است' : 'Sign-in window was blocked';
+        errorMessage = isRTL
+          ? 'پنجره ورود مسدود است. لطفا تنظیمات مرورگر خود را بررسی کنید'
+          : 'Sign-in window was blocked. Please check your browser settings';
+      } else if (err.code === 'auth/unauthorized-domain') {
+        errorMessage = isRTL
+          ? 'این دامنه برای ورود گوگل مجاز نیست'
+          : 'This domain is not authorized for Google sign-in';
+      } else if (err.code === 'auth/account-exists-with-different-credential') {
+        errorMessage = isRTL
+          ? 'این ایمیل با روش ورود متفاوتی ثبت شده است'
+          : 'This email is already registered with a different sign-in method';
+      } else if (err.code === 'auth/operation-not-supported-in-this-environment') {
+        errorMessage = isRTL
+          ? 'این عملیات در این محیط پشتیبانی نمی‌شود'
+          : 'This operation is not supported in this environment';
+      } else if (err.code === 'auth/user-disabled') {
+        errorMessage = isRTL
+          ? 'این حساب غیرفعال شده است'
+          : 'This account has been disabled';
+      } else if (err.message?.includes('email') || err.message?.includes('Email')) {
+        errorMessage = isRTL
+          ? 'خطا در دریافت ایمیل از حساب گوگل'
+          : 'Failed to retrieve email from Google account';
       }
 
       setError(errorMessage);
       setIsSubmitting(false);
+    }
+  };
+
+  const ensureUserProfileExists = async (googleUser: any) => {
+    try {
+      console.log('=== CHECKING/CREATING USER PROFILE ===');
+
+      if (!googleUser.email) {
+        throw new Error('Google user has no email');
+      }
+
+      const userEmailLower = googleUser.email.toLowerCase();
+      const uid = googleUser.uid;
+
+      // First, check if user exists in agents collection by UID
+      try {
+        const agentByUidRef = doc(db, 'agents', uid);
+        const agentByUidSnap = await getDoc(agentByUidRef);
+        if (agentByUidSnap.exists()) {
+          console.log('✓ User exists in agents (by UID), keeping existing profile');
+          return;
+        }
+      } catch (err) {
+        console.log('✗ Error checking agents by UID:', err);
+      }
+
+      // Check agents by email
+      try {
+        const agentByEmailRef = doc(db, 'agents', userEmailLower);
+        const agentByEmailSnap = await getDoc(agentByEmailRef);
+        if (agentByEmailSnap.exists()) {
+          console.log('✓ User exists in agents (by email), keeping existing profile');
+          return;
+        }
+      } catch (err) {
+        console.log('✗ Error checking agents by email:', err);
+      }
+
+      // Check users collection by UID
+      try {
+        const userByUidRef = doc(db, 'users', uid);
+        const userByUidSnap = await getDoc(userByUidRef);
+        if (userByUidSnap.exists()) {
+          console.log('✓ User exists in users (by UID), keeping existing profile');
+          return;
+        }
+      } catch (err) {
+        console.log('✗ Error checking users by UID:', err);
+      }
+
+      // Check users collection by email
+      try {
+        const userByEmailRef = doc(db, 'users', userEmailLower);
+        const userByEmailSnap = await getDoc(userByEmailRef);
+        if (userByEmailSnap.exists()) {
+          console.log('✓ User exists in users (by email), keeping existing profile');
+          return;
+        }
+      } catch (err) {
+        console.log('✗ Error checking users by email:', err);
+      }
+
+      // User doesn't exist, create new profile with safe defaults
+      console.log('⚠ User profile not found, creating new profile');
+
+      const newUserProfile = {
+        uid: uid,
+        email: userEmailLower,
+        displayName: googleUser.displayName || userEmailLower.split('@')[0],
+        photoURL: googleUser.photoURL || null,
+        provider: 'google',
+        role: 'client', // Always default to client, never admin/consultant
+        status: 'active',
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+        createdVia: 'google',
+      };
+
+      // Create in users collection with email as document ID for consistency
+      const userRef = doc(db, 'users', userEmailLower);
+      await setDoc(userRef, newUserProfile, { merge: true });
+
+      console.log('✓ Created new user profile for:', userEmailLower);
+      console.log('Profile:', newUserProfile);
+    } catch (err) {
+      console.error('✗ Error ensuring user profile exists:', err);
+      throw err;
     }
   };
 
