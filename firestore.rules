@@ -12,15 +12,15 @@ service cloud.firestore {
     }
     function isAdminUser() {
       return isSignedIn() &&
-        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     function agentRole() {
       return get(/databases/$(database)/documents/agents/$(request.auth.uid)).data.role;
     }
     function hasRole(role) {
       return (isAgent() && agentRole() == role) ||
-             (role == 'admin' && isAdminUser());
+             (role == 'admin' && (isAdminUser() || (isAgent() && agentRole() == 'admin')));
     }
     function canManageClients() { return isAgent() && agentRole() in ['admin','case_manager']; }
     function canReviewDocs() { return isAgent() && agentRole() in ['admin','case_manager','document_reviewer','compliance_officer']; }
@@ -64,7 +64,8 @@ service cloud.firestore {
       allow write: if canManageClients();
     }
     match /reports/{reportId} {
-      allow read, create: if isAgent() || isAdminUser();
+      allow read: if isSignedIn();
+      allow create: if isAgent() || isAdminUser();
       allow update, delete: if hasRole('admin');
     }
     match /followups/{followupId} {
@@ -96,13 +97,14 @@ service cloud.firestore {
 
     // ── Agent Notifications ────────────────────────────────────────────
     match /agentNotifications/{notifId} {
-      allow read: if hasRole('admin') || isAdminUser() || isAgent();
-      allow create, update, delete: if hasRole('admin') || isAdminUser() || isAgent();
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn();
+      allow delete: if isSignedIn();
     }
 
     // ── Email Verifications ────────────────────────────────────────────
     match /email_verifications/{docId} {
-      allow read: if hasRole('admin') || isAdminUser();
+      allow read: if isSignedIn();
       allow write: if isSignedIn();
     }
 
@@ -123,15 +125,15 @@ service cloud.firestore {
 
     // ── Consultant Activities (Audit Log) ────────────────────────────
     match /consultant_activities/{activityId} {
-      allow read: if hasRole('admin') || isAdminUser() || (isSignedIn() && resource.data.consultantUid == request.auth.uid);
+      allow read: if isSignedIn();
       allow create: if isSignedIn();
       allow update, delete: if hasRole('admin') || isAdminUser();
     }
 
     // ── Users collection ─────────────────────────────────────────────
     match /users/{uid} {
-      allow read: if isOwner(uid) || hasRole('admin') || isAdminUser();
-      allow create: if hasRole('admin') || isAdminUser();
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() || hasRole('admin') || isAdminUser();
       allow update: if isOwner(uid) || hasRole('admin') || isAdminUser();
       allow delete: if hasRole('admin') || isAdminUser();
     }
