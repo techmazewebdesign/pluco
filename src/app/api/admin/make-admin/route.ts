@@ -48,8 +48,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (!foundIn) {
+      console.log('User not found - will create new admin entry');
+      // For now, return error if user doesn't exist
       return NextResponse.json(
-        { error: `User with UID ${uid} not found in either agents or users collection` },
+        { error: `User with UID ${uid} not found. User must exist before making admin.`, debug: 'Create user first via admin dashboard or signup' },
         { status: 404 }
       );
     }
@@ -95,11 +97,27 @@ export async function POST(req: NextRequest) {
       name: userData?.name || userData?.displayName,
     });
   } catch (error: any) {
-    console.error('Error making user admin:', error);
+    console.error('=== ERROR MAKING USER ADMIN ===');
+    console.error('Error message:', error.message);
+    console.error('Error code:', error.code);
+    console.error('Full error:', error);
+
+    let userMessage = 'Failed to make user admin';
+    let debugInfo = '';
+
+    if (error.message?.includes('permission')) {
+      userMessage = 'Firestore permission denied. Check your Firebase credentials.';
+      debugInfo = 'Firestore permission issue - likely credentials problem';
+    } else if (error.message?.includes('not found')) {
+      userMessage = 'User not found in database';
+      debugInfo = 'User UID does not exist in agents or users collection';
+    }
 
     return NextResponse.json(
       {
-        error: error.message || 'Failed to make user admin',
+        error: userMessage,
+        debug: process.env.NODE_ENV === 'development' ? debugInfo : undefined,
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
       },
       { status: 500 }
     );
