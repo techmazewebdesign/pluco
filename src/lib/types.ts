@@ -9,7 +9,8 @@ export type AgentRole =
   | 'customer_service'
   | 'document_reviewer'
   | 'compliance_officer'
-  | 'enquiry_handler';
+  | 'enquiry_handler'
+  | 'consultant';
 
 export const AGENT_ROLE_LABELS: Record<AgentRole, { en: string; fa: string }> = {
   admin:               { en: 'Admin',                fa: 'مدیر سیستم' },
@@ -18,6 +19,7 @@ export const AGENT_ROLE_LABELS: Record<AgentRole, { en: string; fa: string }> = 
   document_reviewer:   { en: 'Document Reviewer',    fa: 'بررسی‌کننده اسناد' },
   compliance_officer:  { en: 'Compliance Officer',   fa: 'مسئول انطباق' },
   enquiry_handler:     { en: 'Enquiry Handler',      fa: 'پردازشگر استعلام' },
+  consultant:          { en: 'Consultant',           fa: 'مشاور' },
 };
 
 export interface Agent {
@@ -365,13 +367,15 @@ export const ROLE_PERMISSIONS: Record<AgentRole, {
   invoices: boolean;
   reports: boolean;
   agents: boolean;
+  consultations: boolean;
 }> = {
-  admin:              { enquiries: true,  clients: true,  cases: true,  documents: true,  messages: true,  invoices: true,  reports: true,  agents: true  },
-  case_manager:       { enquiries: true,  clients: true,  cases: true,  documents: true,  messages: true,  invoices: true,  reports: true,  agents: false },
-  customer_service:   { enquiries: true,  clients: true,  cases: true,  documents: false, messages: true,  invoices: false, reports: true,  agents: false },
-  document_reviewer:  { enquiries: false, clients: true,  cases: true,  documents: true,  messages: false, invoices: false, reports: true,  agents: false },
-  compliance_officer: { enquiries: true,  clients: true,  cases: true,  documents: true,  messages: false, invoices: false, reports: true,  agents: false },
-  enquiry_handler:    { enquiries: true,  clients: false, cases: false, documents: false, messages: true,  invoices: false, reports: true,  agents: false },
+  admin:              { enquiries: true,  clients: true,  cases: true,  documents: true,  messages: true,  invoices: true,  reports: true,  agents: true,   consultations: true  },
+  case_manager:       { enquiries: true,  clients: true,  cases: true,  documents: true,  messages: true,  invoices: true,  reports: true,  agents: false,  consultations: true  },
+  customer_service:   { enquiries: true,  clients: true,  cases: true,  documents: false, messages: true,  invoices: false, reports: true,  agents: false,  consultations: true  },
+  document_reviewer:  { enquiries: false, clients: true,  cases: true,  documents: true,  messages: false, invoices: false, reports: true,  agents: false,  consultations: false },
+  compliance_officer: { enquiries: true,  clients: true,  cases: true,  documents: true,  messages: false, invoices: false, reports: true,  agents: false,  consultations: false },
+  enquiry_handler:    { enquiries: true,  clients: false, cases: false, documents: false, messages: true,  invoices: false, reports: true,  agents: false,  consultations: false },
+  consultant:         { enquiries: false, clients: true,  cases: false, documents: false, messages: true,  invoices: false, reports: false, agents: false,  consultations: true  },
 };
 
 // ── AI Lead Agent ──────────────────────────────────────────────────────
@@ -514,4 +518,123 @@ export interface AgentNotification {
   actionUrl?: string;
   createdAt: string;
   readAt?: string;
+}
+
+// ── Consultant & Consultation Booking ──────────────────────────────────
+export type ConsultantRole = 'consultant' | 'lead_consultant';
+export type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show';
+export type MeetingPlatform = 'google_meet' | 'discord' | 'zoom' | 'teams' | 'other';
+
+export const CONSULTANT_ROLE_LABELS: Record<ConsultantRole, { en: string; fa: string }> = {
+  consultant:        { en: 'Consultant',        fa: 'مشاور' },
+  lead_consultant:   { en: 'Lead Consultant',   fa: 'مشاور ارشد' },
+};
+
+export const BOOKING_STATUS_LABELS: Record<BookingStatus, { en: string; fa: string; color: string; bg: string }> = {
+  pending:    { en: 'Pending',    fa: 'در انتظار',    color: '#92400E', bg: '#FEF3C7' },
+  confirmed:  { en: 'Confirmed',  fa: 'تأیید شده',    color: '#1E40AF', bg: '#DBEAFE' },
+  completed:  { en: 'Completed',  fa: 'تکمیل شده',   color: '#15803D', bg: '#DCFCE7' },
+  cancelled:  { en: 'Cancelled',  fa: 'لغو شده',      color: '#DC2626', bg: '#FEE2E2' },
+  no_show:    { en: 'No Show',    fa: 'حضور نیافت',  color: '#9333EA', bg: '#F3E8FF' },
+};
+
+export const MEETING_PLATFORM_LABELS: Record<MeetingPlatform, { en: string; fa: string; icon: string }> = {
+  google_meet: { en: 'Google Meet',   fa: 'گوگل میت',    icon: '📹' },
+  discord:     { en: 'Discord',       fa: 'دیسکورد',      icon: '💬' },
+  zoom:        { en: 'Zoom',          fa: 'زوم',          icon: '📞' },
+  teams:       { en: 'Microsoft Teams', fa: 'تیمز',       icon: '👥' },
+  other:       { en: 'Other',         fa: 'سایر',         icon: '🔗' },
+};
+
+export interface Consultant {
+  uid: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: ConsultantRole;
+  bio?: string;
+  photo?: string;
+  photoPath?: string;
+  timezone?: string;
+  languages?: string[];
+  specializations?: string[];
+  active: boolean;
+  consultationFee?: number;
+  currency?: string;
+  averageRating?: number;
+  totalConsultations?: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface ConsultantAvailability {
+  id: string;
+  consultantUid: string;
+  dayOfWeek: number;  // 0-6 (Sunday-Saturday)
+  startTime: string;  // HH:mm format
+  endTime: string;    // HH:mm format
+  isAvailable: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ConsultationBooking {
+  id: string;
+  clientUid: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone?: string;
+  consultantUid: string;
+  consultantName: string;
+  title: string;
+  description?: string;
+  status: BookingStatus;
+  scheduledAt: string;  // ISO datetime
+  duration: number;     // minutes
+  meetingPlatform: MeetingPlatform;
+  meetingLink?: string;
+  meetingPassword?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt?: string;
+  completedAt?: string;
+  cancelledAt?: string;
+  cancelReason?: string;
+}
+
+export interface ConsultationReview {
+  id: string;
+  bookingId: string;
+  clientUid: string;
+  clientName: string;
+  consultantUid: string;
+  rating: number;  // 1-5
+  title: string;
+  comment: string;
+  wouldRecommend: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface ConsultationRecord {
+  id: string;
+  bookingId: string;
+  consultantUid: string;
+  clientUid: string;
+  clientName: string;
+  startTime: string;
+  endTime: string;
+  duration: number;
+  summary?: string;
+  notes?: string;
+  followUpRequired: boolean;
+  followUpDate?: string;
+  actionItems?: string[];
+  attachments?: {
+    name: string;
+    url: string;
+    type: string;
+  }[];
+  createdAt: string;
+  updatedAt?: string;
 }

@@ -94,6 +94,11 @@ export function useLeadOperations() {
             created.id
           );
         }
+
+        // Auto-export to Google Sheet (asynchronously, don't block)
+        exportLeadsToGoogleSheet([created.id]).catch(err => {
+          console.error('Auto-export to Google Sheet failed:', err);
+        });
       }
 
       return created;
@@ -124,6 +129,7 @@ export function useLeadOperations() {
       }
 
       const results = { success: 0, failed: 0, errors: [] as string[] };
+      const createdLeadIds: string[] = [];
 
       // Process each row
       for (let i = 1; i < lines.length; i++) {
@@ -169,6 +175,7 @@ export function useLeadOperations() {
           const created = await addLeadManually(leadData);
           if (created) {
             results.success++;
+            createdLeadIds.push(created.id);
           } else {
             results.failed++;
             results.errors.push(`Row ${i + 1}: Failed to create lead`);
@@ -177,6 +184,13 @@ export function useLeadOperations() {
           results.failed++;
           results.errors.push(`Row ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
+      }
+
+      // Auto-export all created leads to Google Sheet (asynchronously)
+      if (createdLeadIds.length > 0) {
+        exportLeadsToGoogleSheet(createdLeadIds).catch(err => {
+          console.error('Auto-export to Google Sheet failed for CSV import:', err);
+        });
       }
 
       return results;

@@ -50,107 +50,15 @@ export default function AIAgentsPage() {
   const [view, setView] = useState<'overview' | 'monitor' | 'settings'>('overview');
   const [unreadAlerts, setUnreadAlerts] = useState(0);
 
-  // Initialize with default AI agent
+  // Initialize with real data only (no demo data)
   useEffect(() => {
-    const defaultAgents: AIAgent[] = [
-      {
-        id: 'ai-case-manager-01',
-        name: 'Case Manager AI',
-        type: 'case_manager',
-        status: 'active',
-        uptime: 99.8,
-        tasksCompleted: 347,
-        tasksInProgress: 12,
-        errorRate: 0.2,
-        lastActivity: new Date().toISOString(),
-        description: 'Smart automation for case processing and client management',
-        capabilities: [
-          'Automatic enquiry analysis',
-          'Case assignment',
-          'Status updates',
-          'Document tracking',
-          'Client notifications',
-          'Deadline reminders'
-        ],
-        performance: 98
-      }
-    ];
-
-    const defaultActivities: AgentActivity[] = [
-      {
-        id: '1',
-        agentId: 'ai-case-manager-01',
-        action: 'Processed Enquiry',
-        timestamp: new Date(Date.now() - 2 * 60000).toISOString(),
-        details: 'Analysed and assigned case #ENQ-2026-0847 to Case Manager',
-        status: 'success'
-      },
-      {
-        id: '2',
-        agentId: 'ai-case-manager-01',
-        action: 'Sent Notification',
-        timestamp: new Date(Date.now() - 5 * 60000).toISOString(),
-        details: 'Document deadline reminder sent to client (3 days remaining)',
-        status: 'success'
-      },
-      {
-        id: '3',
-        agentId: 'ai-case-manager-01',
-        action: 'Updated Status',
-        timestamp: new Date(Date.now() - 10 * 60000).toISOString(),
-        details: 'Case #CASE-2026-0521 status changed to Under Review',
-        status: 'success'
-      },
-      {
-        id: '4',
-        agentId: 'ai-case-manager-01',
-        action: 'Generated Report',
-        timestamp: new Date(Date.now() - 15 * 60000).toISOString(),
-        details: 'Weekly performance report generated (98% accuracy)',
-        status: 'success'
-      },
-      {
-        id: '5',
-        agentId: 'ai-case-manager-01',
-        action: 'Processing Documents',
-        timestamp: new Date(Date.now() - 1 * 60000).toISOString(),
-        details: '5 documents being verified and categorized',
-        status: 'pending'
-      }
-    ];
-
-    const defaultAlerts: AgentAlert[] = [
-      {
-        id: '1',
-        agentId: 'ai-case-manager-01',
-        level: 'success',
-        message: 'Case Manager AI is performing optimally',
-        timestamp: new Date(Date.now() - 3000).toISOString(),
-        read: false
-      },
-      {
-        id: '2',
-        agentId: 'ai-case-manager-01',
-        level: 'info',
-        message: 'Processed 5 new enquiries in last hour',
-        timestamp: new Date(Date.now() - 60000).toISOString(),
-        read: false
-      },
-      {
-        id: '3',
-        agentId: 'ai-case-manager-01',
-        level: 'warning',
-        message: '2 documents require manual review due to quality',
-        timestamp: new Date(Date.now() - 300000).toISOString(),
-        read: false
-      }
-    ];
-
-    setAgents(defaultAgents);
-    setActivities(defaultActivities);
-    setAlerts(defaultAlerts);
-    setSelectedAgent(defaultAgents[0]);
-    setUnreadAlerts(defaultAlerts.filter(a => !a.read).length);
+    // Load real agents from Firestore (to be connected to real data later)
+    // For now, show empty state until real data exists
+    setAgents([]);
+    setActivities([]);
+    setAlerts([]);
+    setSelectedAgent(null);
+    setUnreadAlerts(0);
   }, []);
 
   const toggleAgentStatus = (agentId: string) => {
@@ -290,7 +198,8 @@ export default function AIAgentsPage() {
                 </div>
               </motion.div>
 
-              {/* Quick Stats */}
+              {/* Quick Stats - Only show if there are agents */}
+              {agents.length > 0 && (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mt-6 bg-white rounded-xl border border-gray-200 p-6">
                 <h3 className="text-sm font-bold mb-4" style={{ color: '#1E2430' }}>Overall Performance</h3>
                 <div className="space-y-3">
@@ -323,6 +232,7 @@ export default function AIAgentsPage() {
                   </div>
                 </div>
               </motion.div>
+              )}
             </div>
 
             {/* Agent Details & Monitoring */}
@@ -430,10 +340,24 @@ export default function AIAgentsPage() {
                   </motion.div>
                 </>
               )}
+              {!selectedAgent && (
+                <div className="lg:col-span-2 flex items-center justify-center min-h-96 bg-white rounded-xl border border-gray-200 p-8">
+                  <div className="text-center">
+                    <Bot className="w-16 h-16 mx-auto mb-4" style={{ color: '#CBD5E0' }} />
+                    <h3 className="text-xl font-bold mb-2" style={{ color: '#1E2430' }}>
+                      Case Manager AI - Ready for Real Data
+                    </h3>
+                    <p className="text-sm max-w-md mx-auto" style={{ color: '#5E6470' }}>
+                      This AI agent will start with real materials only. Once you begin processing real cases, the analytics and monitoring will appear here.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Alerts Panel */}
+          {/* Alerts Panel - Only show if there are agents */}
+          {agents.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mt-8 bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <h3 className="text-lg font-bold" style={{ color: '#1E2430' }}>Alerts & Notifications</h3>
@@ -476,6 +400,7 @@ export default function AIAgentsPage() {
               )}
             </div>
           </motion.div>
+          )}
         </div>
       </div>
     </AgentShell>

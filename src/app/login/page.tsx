@@ -37,9 +37,18 @@ export default function LoginPage() {
 
   const checkAdminAndRedirect = async (uid: string) => {
     try {
-      const agentDoc = await getDoc(doc(db, 'agents', uid));
+      // Get the current user from auth
+      const user = auth.currentUser;
+      if (!user) {
+        router.push('/dashboard');
+        return;
+      }
 
-      if (agentDoc.exists() && agentDoc.data()?.role === 'admin') {
+      // Check Firebase custom claims for admin role
+      const idTokenResult = await user.getIdTokenResult();
+      const userRole = idTokenResult.claims.role as string | undefined;
+
+      if (userRole === 'admin') {
         router.push('/admin/dashboard');
       } else {
         router.push('/dashboard');

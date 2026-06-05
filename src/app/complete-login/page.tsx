@@ -16,8 +16,15 @@ export default function CompleteLoginPage() {
     // Check if user is authenticated
     if (!loading) {
       if (user) {
-        // User is authenticated, redirect to dashboard
-        router.push('/dashboard');
+        // Check if user is admin and redirect accordingly
+        user.getIdTokenResult().then((idTokenResult) => {
+          const userRole = idTokenResult.claims.role as string | undefined;
+          const redirectPath = userRole === 'admin' ? '/admin/dashboard' : '/dashboard';
+          router.push(redirectPath);
+        }).catch(() => {
+          // If error checking role, default to regular dashboard
+          router.push('/dashboard');
+        });
       } else {
         // Get verified email from localStorage
         const verifiedEmail = localStorage.getItem('otp_verified_email');

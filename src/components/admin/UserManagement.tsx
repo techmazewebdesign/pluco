@@ -65,47 +65,62 @@ export default function UserManagement() {
       setIsLoading(true);
 
       // Load users
-      const usersSnap = await getDocs(collection(db, 'users'));
-      const usersData: AdminUser[] = usersSnap.docs.map(doc => ({
-        uid: doc.id,
-        email: doc.data().email || '',
-        displayName: doc.data().displayName,
-        role: doc.data().role === 'admin' ? 'admin' : 'user',
-        createdAt: doc.data().createdAt,
-      }));
-      setUsers(usersData.sort((a, b) => (b.role === 'admin' ? 1 : -1)));
+      try {
+        const usersSnap = await getDocs(collection(db, 'users'));
+        const usersData: AdminUser[] = usersSnap.docs.map(doc => ({
+          uid: doc.id,
+          email: doc.data().email || '',
+          displayName: doc.data().displayName,
+          role: doc.data().role === 'admin' ? 'admin' : 'user',
+          createdAt: doc.data().createdAt,
+        }));
+        setUsers(usersData.sort((a, b) => (b.role === 'admin' ? 1 : -1)));
+      } catch (err) {
+        console.error('Error loading users:', err);
+        setUsers([]);
+      }
 
       // Load activity logs
-      const activitiesSnap = await getDocs(
-        query(collection(db, 'user_activity'), where('deleted', '!=', true))
-      );
-      const activitiesData: UserActivity[] = activitiesSnap.docs.map(doc => ({
-        id: doc.id,
-        userId: doc.data().userId,
-        action: doc.data().action,
-        details: doc.data().details,
-        performedBy: doc.data().performedBy,
-        timestamp: doc.data().timestamp,
-      })).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-      setActivities(activitiesData);
+      try {
+        const activitiesSnap = await getDocs(
+          query(collection(db, 'user_activity'), where('deleted', '!=', true))
+        );
+        const activitiesData: UserActivity[] = activitiesSnap.docs.map(doc => ({
+          id: doc.id,
+          userId: doc.data().userId,
+          action: doc.data().action,
+          details: doc.data().details,
+          performedBy: doc.data().performedBy,
+          timestamp: doc.data().timestamp,
+        })).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        setActivities(activitiesData);
+      } catch (err) {
+        console.error('Error loading activities:', err);
+        setActivities([]);
+      }
 
       // Load role history
-      const historySnap = await getDocs(collection(db, 'role_history'));
-      const historyData: RoleHistory[] = historySnap.docs.map(doc => ({
-        id: doc.id,
-        userId: doc.data().userId,
-        userEmail: doc.data().userEmail,
-        oldRole: doc.data().oldRole,
-        newRole: doc.data().newRole,
-        changedBy: doc.data().changedBy,
-        timestamp: doc.data().timestamp,
-      })).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-      setRoleHistory(historyData);
+      try {
+        const historySnap = await getDocs(collection(db, 'role_history'));
+        const historyData: RoleHistory[] = historySnap.docs.map(doc => ({
+          id: doc.id,
+          userId: doc.data().userId,
+          userEmail: doc.data().userEmail,
+          oldRole: doc.data().oldRole,
+          newRole: doc.data().newRole,
+          changedBy: doc.data().changedBy,
+          timestamp: doc.data().timestamp,
+        })).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        setRoleHistory(historyData);
+      } catch (err) {
+        console.error('Error loading role history:', err);
+        setRoleHistory([]);
+      }
 
       setError(null);
     } catch (err) {
       console.error('Error loading data:', err);
-      setError('Failed to load data');
+      setError('Failed to load data from Firestore. Check your database connection and Firestore rules.');
     } finally {
       setIsLoading(false);
     }
@@ -250,7 +265,12 @@ export default function UserManagement() {
       await loadAllData();
     } catch (err) {
       console.error('Error creating admin:', err);
-      setError('Failed to create admin user');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create admin user';
+      if (errorMessage.includes('permission')) {
+        setError('Permission denied. Check your Firestore security rules.');
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setIsCreating(false);
     }
