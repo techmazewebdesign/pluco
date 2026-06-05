@@ -29,26 +29,45 @@ export async function POST(req: NextRequest) {
 
     const userEmail = email.trim().toLowerCase();
 
+    console.log('=== PASSWORD RESET REQUEST ===');
+    console.log('Email:', userEmail);
+    console.log('SMTP_HOST configured:', !!process.env.SMTP_HOST);
+    console.log('SMTP_USER configured:', !!process.env.SMTP_USER);
+    console.log('SMTP_PASSWORD configured:', !!process.env.SMTP_PASSWORD);
+
     // Check if user exists in agents or users collection
     let userExists = false;
     let userName = '';
 
-    // Check agents collection
-    const agentRef = doc(db, 'agents', userEmail);
-    const agentSnap = await getDoc(agentRef);
-    if (agentSnap.exists()) {
-      userExists = true;
-      userName = agentSnap.data()?.name || agentSnap.data()?.displayName || '';
-    }
-
-    // Check users collection
-    if (!userExists) {
-      const userRef = doc(db, 'users', userEmail);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
+    try {
+      console.log('Checking agents collection for:', userEmail);
+      // Check agents collection
+      const agentRef = doc(db, 'agents', userEmail);
+      const agentSnap = await getDoc(agentRef);
+      if (agentSnap.exists()) {
         userExists = true;
-        userName = userSnap.data()?.displayName || userSnap.data()?.name || '';
+        userName = agentSnap.data()?.name || agentSnap.data()?.displayName || '';
+        console.log('Found user in agents collection');
       }
+
+      // Check users collection
+      if (!userExists) {
+        console.log('Checking users collection for:', userEmail);
+        const userRef = doc(db, 'users', userEmail);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          userExists = true;
+          userName = userSnap.data()?.displayName || userSnap.data()?.name || '';
+          console.log('Found user in users collection');
+        }
+      }
+
+      if (!userExists) {
+        console.log('User not found in either collection');
+      }
+    } catch (firestoreError) {
+      console.error('Firestore error:', firestoreError);
+      throw firestoreError;
     }
 
     if (!userExists) {
@@ -168,12 +187,27 @@ PLUCO GROUP Support Team
       email: userEmail,
     });
   } catch (error: any) {
-    console.error('Error sending password reset email:', error);
+    console.error('=== PASSWORD RESET ERROR ===');
+    console.error('Error:', error);
+    console.error('Error message:', error.message);
+    console.error('Error code:', error.code);
+    console.error('Stack:', error.stack);
+
+    let userMessage = 'Failed to send password reset email';
+
+    if (error.message.includes('SMTP')) {
+      userMessage = 'Email service not configured. Please try again later or contact support.';
+    } else if (error.message.includes('permission')) {
+      userMessage = 'Permission denied. Please contact support.';
+    } else if (error.message.includes('Firestore')) {
+      userMessage = 'Database error. Please try again later.';
+    }
 
     return NextResponse.json(
       {
         success: false,
-        error: error.message || 'Failed to send password reset email',
+        error: userMessage,
+        debug: process.env.NODE_ENV === 'development' ? error.message : undefined,
       },
       { status: 500 }
     );
