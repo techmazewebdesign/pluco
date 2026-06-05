@@ -36,7 +36,7 @@ export default function ConsultantsManagementPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingConsultant, setEditingConsultant] = useState<Consultant | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -48,22 +48,11 @@ export default function ConsultantsManagementPage() {
     currency: 'EUR'
   });
 
-  // Check if admin
+  // Check if authenticated
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
       return;
-    }
-
-    if (!loading && user) {
-      user.getIdTokenResult().then((idTokenResult) => {
-        const userRole = idTokenResult.claims.role as string | undefined;
-        if (userRole === 'admin') {
-          setIsAdmin(true);
-        } else {
-          router.push('/admin/dashboard');
-        }
-      });
     }
   }, [user, loading, router]);
 

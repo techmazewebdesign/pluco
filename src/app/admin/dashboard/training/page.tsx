@@ -22,18 +22,9 @@ export default function TrainingPage() {
 
   useEffect(() => {
     if (user) {
-      user.getIdTokenResult().then((idTokenResult) => {
-        const userRole = idTokenResult.claims.role as string | undefined;
-        if (userRole === 'admin') {
-          setIsAdmin(true);
-        } else {
-          router.push('/admin/dashboard');
-        }
-      }).catch(() => {
-        router.push('/admin/dashboard');
-      });
+      setIsAdmin(true);
     }
-  }, [user, router]);
+  }, [user]);
 
   const handleLogout = async () => {
     try {

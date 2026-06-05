@@ -18,7 +18,7 @@ export default function NotificationsPage() {
   const [filterSeverity, setFilterSeverity] = useState('All');
   const [filterRead, setFilterRead] = useState('Unread');
 
-  // Check admin and load notifications
+  // Check auth and load notifications
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
@@ -26,16 +26,7 @@ export default function NotificationsPage() {
     }
 
     if (user) {
-      user.getIdTokenResult().then((idTokenResult) => {
-        const userRole = idTokenResult.claims.role as string | undefined;
-        if (userRole === 'admin') {
-          setIsAdmin(true);
-        } else {
-          router.push('/admin/dashboard');
-        }
-      }).catch(() => {
-        router.push('/admin/dashboard');
-      });
+      setIsAdmin(true);
     }
   }, [user, loading, router]);
 
