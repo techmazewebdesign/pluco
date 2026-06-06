@@ -1,26 +1,38 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
-import ChatWindow from './ChatWindow';
+import { MessageCircle, X } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+// Dynamically import ChatWindow to avoid hydration issues
+const ChatWindow = dynamic(() => import('./ChatWindow'), { ssr: false });
 
 export default function ChatbotWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [sessionId, setSessionId] = useState<string>('');
+  const [isMounted, setIsMounted] = useState(false);
 
   // Initialize session on component mount
   useEffect(() => {
-    // Generate or retrieve session ID
-    const storedSessionId = localStorage.getItem('chatbot_session_id');
-    if (storedSessionId) {
-      setSessionId(storedSessionId);
-    } else {
-      const newSessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      localStorage.setItem('chatbot_session_id', newSessionId);
-      setSessionId(newSessionId);
+    try {
+      setIsMounted(true);
+
+      // Generate or retrieve session ID from localStorage
+      if (typeof window !== 'undefined') {
+        let storedSessionId = localStorage.getItem('chatbot_session_id');
+        if (!storedSessionId) {
+          storedSessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          localStorage.setItem('chatbot_session_id', storedSessionId);
+        }
+        setSessionId(storedSessionId);
+      }
+    } catch (error) {
+      console.error('Chatbot initialization error:', error);
     }
   }, []);
+
+  if (!isMounted) return null;
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
@@ -32,6 +44,7 @@ export default function ChatbotWidget() {
       <motion.button
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.5 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         onClick={toggleChat}
@@ -57,12 +70,7 @@ export default function ChatbotWidget() {
 
       {/* Chat Window */}
       <AnimatePresence>
-        {isOpen && sessionId && (
-          <ChatWindow
-            sessionId={sessionId}
-            onClose={() => setIsOpen(false)}
-          />
-        )}
+        {isOpen && sessionId && <ChatWindow sessionId={sessionId} onClose={() => setIsOpen(false)} />}
       </AnimatePresence>
     </>
   );
