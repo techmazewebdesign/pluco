@@ -223,23 +223,50 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('[Chatbot] API error:', response.status, errorData);
+      // Parse response
+      const data = await response.json();
+      console.log('[Chatbot] API response received. Status:', response.status);
+      console.log('[Chatbot] Response data:', { status: data.status, errorCode: data.errorCode, hasResponse: !!data.response });
 
-        if (response.status === 401) {
-          console.error('[Chatbot] API_KEY_MISSING or ANTHROPIC_BILLING_ISSUE');
-          throw new Error('API is not configured. Please check Anthropic API key and billing.');
-        } else if (response.status === 500) {
-          console.error('[Chatbot] SERVER_ERROR or ANTHROPIC_API_ISSUE');
-          throw new Error('Server error. Please try again.');
+      // Check if API returned an error
+      if (!response.ok) {
+        console.error('[Chatbot] API error response:', response.status, data.errorCode, data.error);
+
+        // Diagnose the error from the API
+        if (data.errorCode === 'MISSING_API_KEY') {
+          console.error('[Chatbot] DIAGNOSIS: Anthropic API key is missing from Vercel environment variables');
+          throw new Error('AI service is not configured. Please contact Pluco support to enable the chatbot.');
+        } else if (data.errorCode === 'INVALID_API_KEY') {
+          console.error('[Chatbot] DIAGNOSIS: Anthropic API key is invalid or expired');
+          throw new Error('AI authentication failed. Our team is working on this.');
+        } else if (data.errorCode === 'QUOTA_EXCEEDED') {
+          console.error('[Chatbot] DIAGNOSIS: Anthropic quota/rate limit exceeded');
+          throw new Error('Too many requests. Please try again in a moment.');
+        } else if (data.errorCode === 'SERVICE_OVERLOADED') {
+          console.error('[Chatbot] DIAGNOSIS: Anthropic service is temporarily down');
+          throw new Error('AI service is temporarily unavailable. Please try again in a moment.');
+        } else if (data.errorCode === 'INVALID_MODEL') {
+          console.error('[Chatbot] DIAGNOSIS: Claude model name is invalid');
+          throw new Error('AI model configuration error. Please contact support.');
+        } else if (data.errorCode === 'INVALID_REQUEST') {
+          console.error('[Chatbot] DIAGNOSIS: Invalid request to Anthropic API');
+          throw new Error('Invalid request to AI. Please try a different question.');
+        } else if (data.errorCode === 'NETWORK_ERROR') {
+          console.error('[Chatbot] DIAGNOSIS: Network error connecting to Anthropic');
+          throw new Error('Network error. Please check your internet connection and try again.');
         } else {
-          throw new Error('Failed to get response from AI');
+          console.error('[Chatbot] DIAGNOSIS: Unknown API error:', data.errorCode || 'UNKNOWN');
+          throw new Error(data.error || 'Failed to get AI response. Please try again.');
         }
       }
 
-      const data = await response.json();
-      console.log('[Chatbot] AI response received');
+      // Success: API returned a response
+      if (!data.response) {
+        console.error('[Chatbot] API response is empty!');
+        throw new Error('Empty response from AI. Please try again.');
+      }
+
+      console.log('[Chatbot] AI response received successfully. Length:', data.response.length);
 
       const assistantMessage: ChatMessage = {
         id: `msg_${Date.now()}`,
@@ -271,7 +298,7 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
 
       setMessages(prev => [...prev, assistantMessage]);
     } catch (err: any) {
-      console.error('[Chatbot] Error sending message:', err?.message || err);
+      console.error('[Chatbot] Error in sendMessage:', err?.message || String(err));
       setError(err?.message || 'Failed to send message. Please try again.');
     } finally {
       setIsLoading(false);

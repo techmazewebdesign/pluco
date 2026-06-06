@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Anthropic } from '@anthropic-ai/sdk';
 
+// Log API key status on startup
+const apiKey = process.env.ANTHROPIC_API_KEY;
+console.log('[FAQ-Chat API] Initializing Anthropic client...');
+console.log('[FAQ-Chat API] API Key exists:', apiKey ? 'YES' : 'NO (MISSING)');
+console.log('[FAQ-Chat API] API Key length:', apiKey ? `${apiKey.length} characters` : 'N/A');
+
 const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: apiKey,
 });
 
 const SYSTEM_PROMPT = `You are Pluco Assistant, a professional FAQ assistant for Pluco Group consulting services.
@@ -50,13 +56,32 @@ Example Responses:
 - "Banking compliance depends on your residence country and business structure. Let me understand your situation better - are you looking to open a business account or restructure existing banking arrangements?"`;
 
 export async function POST(request: NextRequest) {
+  const requestId = `req_${Date.now()}`;
+  console.log(`[FAQ-Chat API] [${requestId}] Incoming request...`);
+
   try {
+    // Parse request
     const { sessionId, userMessage, conversationHistory } = await request.json();
+    console.log(`[FAQ-Chat API] [${requestId}] Parsed request: sessionId=${sessionId}, messageLength=${userMessage?.length || 0}`);
 
     if (!userMessage || typeof userMessage !== 'string') {
+      console.error(`[FAQ-Chat API] [${requestId}] Invalid user message:`, userMessage);
       return NextResponse.json(
-        { error: 'Invalid user message' },
+        { error: 'Invalid user message', errorCode: 'INVALID_MESSAGE' },
         { status: 400 }
+      );
+    }
+
+    // Check API key
+    if (!apiKey) {
+      console.error(`[FAQ-Chat API] [${requestId}] CRITICAL: ANTHROPIC_API_KEY is missing from environment variables`);
+      return NextResponse.json(
+        {
+          error: 'AI service not configured',
+          errorCode: 'MISSING_API_KEY',
+          message: 'The Anthropic API key is not configured. Please contact support.',
+        },
+        { status: 503 }
       );
     }
 
@@ -69,34 +94,100 @@ export async function POST(request: NextRequest) {
       },
     ];
 
-    // Call Claude API
+    console.log(`[FAQ-Chat API] [${requestId}] Calling Claude API with ${messages.length} messages...`);
+    console.log(`[FAQ-Chat API] [${requestId}] Model: claude-3-5-haiku-20241022 (optimized for FAQ, low cost)`);
+
+    // Call Claude API with Haiku model (optimized for FAQ, low cost)
     const response = await client.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-3-5-haiku-20241022',
       max_tokens: 500,
       system: SYSTEM_PROMPT,
       messages,
     });
 
+    console.log(`[FAQ-Chat API] [${requestId}] Claude API response successful`);
+    console.log(`[FAQ-Chat API] [${requestId}] Response status: ${response.stop_reason}, tokens used: ${response.usage?.output_tokens || 0}`);
+
     // Extract text from response
     const assistantMessage = response.content[0];
-    if (assistantMessage.type !== 'text') {
-      throw new Error('Unexpected response type from Claude');
+    if (!assistantMessage) {
+      console.error(`[FAQ-Chat API] [${requestId}] Empty response content from Claude`);
+      throw new Error('Empty response from Claude API');
     }
 
-    return NextResponse.json({
-      response: assistantMessage.text,
-      sessionId,
-    });
-  } catch (error) {
-    console.error('FAQ Chat API error:', error);
+    if (assistantMessage.type !== 'text') {
+      console.error(`[FAQ-Chat API] [${requestId}] Unexpected response type:`, assistantMessage.type);
+      throw new Error(`Unexpected response type from Claude: ${assistantMessage.type}`);
+    }
 
-    // Provide fallback response if API fails
-    const fallbackResponse =
-      "I'm having trouble connecting right now. Please try again in a moment, or submit a private inquiry for our team to reach out to you directly.";
+    const responseText = assistantMessage.text;
+    console.log(`[FAQ-Chat API] [${requestId}] Assistant response text length: ${responseText.length} characters`);
+
+    return NextResponse.json({
+      response: responseText,
+      sessionId,
+      status: 'success',
+    });
+  } catch (error: any) {
+    // Detailed error logging and diagnosis
+    console.error(`[FAQ-Chat API] [${requestId}] ERROR caught:`, error?.message || String(error));
+    console.error(`[FAQ-Chat API] [${requestId}] Error code:`, error?.code || error?.status || 'UNKNOWN');
+    console.error(`[FAQ-Chat API] [${requestId}] Error type:`, error?.constructor?.name || typeof error);
+
+    // Diagnose the error type
+    let errorCode = 'UNKNOWN_ERROR';
+    let errorMessage = 'An unexpected error occurred. Please try again.';
+    let statusCode = 500;
+
+    if (error?.code === 'invalid_api_key' || error?.status === 401) {
+      errorCode = 'INVALID_API_KEY';
+      errorMessage = 'API key is invalid or expired. Please contact support.';
+      console.error(`[FAQ-Chat API] [${requestId}] DIAGNOSIS: Invalid Anthropic API key`);
+      statusCode = 401;
+    } else if (error?.code === 'insufficient_quota' || error?.status === 429) {
+      errorCode = 'QUOTA_EXCEEDED';
+      errorMessage = 'Rate limit exceeded. Please try again in a moment.';
+      console.error(`[FAQ-Chat API] [${requestId}] DIAGNOSIS: Anthropic quota/rate limit exceeded`);
+      statusCode = 429;
+    } else if (error?.code === 'overloaded_error' || error?.status === 529) {
+      errorCode = 'SERVICE_OVERLOADED';
+      errorMessage = 'Anthropic service is temporarily overloaded. Please try again in a moment.';
+      console.error(`[FAQ-Chat API] [${requestId}] DIAGNOSIS: Anthropic service overloaded`);
+      statusCode = 503;
+    } else if (error?.code === 'model_not_found') {
+      errorCode = 'INVALID_MODEL';
+      errorMessage = 'The AI model is not available. Please contact support.';
+      console.error(`[FAQ-Chat API] [${requestId}] DIAGNOSIS: Claude model not found - check model name`);
+      statusCode = 400;
+    } else if (error?.code === 'invalid_request_error') {
+      errorCode = 'INVALID_REQUEST';
+      errorMessage = 'Invalid request to AI service. Please try again.';
+      console.error(`[FAQ-Chat API] [${requestId}] DIAGNOSIS: Invalid request to Anthropic API`);
+      statusCode = 400;
+    } else if (error?.message?.includes('network') || error?.message?.includes('timeout')) {
+      errorCode = 'NETWORK_ERROR';
+      errorMessage = 'Network error connecting to AI service. Please try again.';
+      console.error(`[FAQ-Chat API] [${requestId}] DIAGNOSIS: Network/timeout error`);
+      statusCode = 503;
+    } else if (!apiKey) {
+      errorCode = 'MISSING_API_KEY';
+      errorMessage = 'AI service not configured. Please contact support.';
+      console.error(`[FAQ-Chat API] [${requestId}] DIAGNOSIS: API key is missing`);
+      statusCode = 503;
+    } else {
+      console.error(`[FAQ-Chat API] [${requestId}] DIAGNOSIS: Unknown error - ${error?.message}`);
+    }
+
+    console.log(`[FAQ-Chat API] [${requestId}] Returning error response: ${errorCode} (${statusCode})`);
 
     return NextResponse.json(
-      { response: fallbackResponse },
-      { status: 200 } // Return 200 to prevent client errors
+      {
+        error: errorMessage,
+        errorCode: errorCode,
+        status: 'error',
+        requestId: requestId,
+      },
+      { status: statusCode }
     );
   }
 }
