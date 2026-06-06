@@ -9,7 +9,7 @@ import { auth, db } from '@/lib/firebase';
 import { ChatMessage, ChatSession, ChatRole } from '@/lib/types/chatbot';
 import InquiryForm from './InquiryForm';
 import ConsultationForm from './ConsultationForm';
-import { isBookingIntent, BOOKING_TRIGGER_RESPONSE } from '@/lib/utils/bookingDetection';
+import { isBookingIntent } from '@/lib/utils/bookingDetection';
 
 const FAQ_BUTTONS = [
   'Which service do I need?',
@@ -182,10 +182,11 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
     if (!content.trim() || isLoading || !session) return;
 
     setError('');
+    const trimmedContent = content.trim();
     const userMessage: ChatMessage = {
       id: `msg_${Date.now()}`,
       role: 'user',
-      content: content.trim(),
+      content: trimmedContent,
       createdAt: new Date().toISOString(),
     };
 
@@ -195,6 +196,30 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
     setIsLoading(true);
 
     try {
+      // IMPORTANT: Check for booking intent BEFORE calling Claude
+      const hasBookingIntent = isBookingIntent(trimmedContent);
+      console.log('[Booking] intent detected:', hasBookingIntent);
+
+      if (hasBookingIntent) {
+        console.log('[Booking] opening form');
+        // Show booking help message
+        const bookingMessage: ChatMessage = {
+          id: `msg_${Date.now()}`,
+          role: 'assistant',
+          content: 'I can help you submit a consultation request. This is not a confirmed appointment yet. Our team will review availability and conflict checks before confirming. Please complete the short form below.',
+          createdAt: new Date().toISOString(),
+        };
+        setMessages(prev => [...prev, bookingMessage]);
+
+        // Open the form
+        setTimeout(() => {
+          setShowConsultationForm(true);
+        }, 300);
+
+        setIsLoading(false);
+        return; // Don't call Claude for booking intent
+      }
+
       // Try to save user message to Firestore (non-blocking if fails)
       if (firebaseAvailable) {
         try {
@@ -207,13 +232,12 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
             setFirebaseAvailable(false);
             console.error('[Chatbot] FIRESTORE PERMISSION DENIED - Continuing with API only');
           }
-          // Continue anyway - we can still use the API
         }
       }
 
       // Get assistant response from API
       console.log('[Chatbot] Calling /api/pluco-assistant...');
-      console.log('[Chatbot] Message:', content.trim());
+      console.log('[Chatbot] Message:', trimmedContent);
       console.log('[Chatbot] Session:', sessionId);
       console.log('[Chatbot] History messages:', messages.length);
 
@@ -221,7 +245,7 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: content.trim(),
+          message: trimmedContent,
           sessionId: sessionId,
           history: messages.slice(-8).map(m => ({
             role: m.role,
@@ -248,15 +272,14 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
       if (!response.ok || !data.success) {
         console.error('[Chatbot] API error:', response.status, data.errorType, data.message);
 
-        // Diagnose the error from the API
         if (data.errorType === 'MISSING_MESSAGE') {
-          console.error('[Chatbot] ERROR: No message was sent to the API. Check request body.');
+          console.error('[Chatbot] ERROR: No message was sent to the API.');
           throw new Error('No message sent to server. Please try again.');
         } else if (data.errorType === 'MISSING_API_KEY') {
-          console.error('[Chatbot] ERROR: ANTHROPIC_API_KEY is not set in Vercel environment');
+          console.error('[Chatbot] ERROR: ANTHROPIC_API_KEY is not set');
           throw new Error('AI service not configured. Please add ANTHROPIC_API_KEY to Vercel.');
         } else if (data.errorType === 'ANTHROPIC_AUTH_ERROR') {
-          console.error('[Chatbot] ERROR: Anthropic API key is invalid or expired');
+          console.error('[Chatbot] ERROR: Anthropic API key invalid');
           throw new Error('API authentication failed. Check Anthropic API key.');
         } else if (data.errorType === 'ANTHROPIC_BILLING_ERROR') {
           console.error('[Chatbot] ERROR: Anthropic account has no credits');
@@ -276,7 +299,6 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
         }
       }
 
-      // Success: API returned a response
       if (!data.assistantMessage) {
         console.error('[Chatbot] ERROR: No assistant message in response!');
         throw new Error('Empty response from AI. Please try again.');
@@ -294,14 +316,13 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
         createdAt: new Date().toISOString(),
       };
 
-      // Try to save assistant message to Firestore (non-blocking if fails)
+      // Try to save assistant message to Firestore
       if (firebaseAvailable) {
         try {
           console.log('[Chatbot] Saving assistant message to Firestore...');
           await addDoc(collection(db, 'chatSessions', sessionId, 'messages'), assistantMessage);
           console.log('[Chatbot] Assistant message saved');
 
-          // Update session timestamp
           const sessionRef = doc(db, 'chatSessions', sessionId);
           await updateDoc(sessionRef, {
             updatedAt: new Date().toISOString(),
@@ -311,19 +332,10 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
           if (firebaseErr?.code?.includes('permission-denied')) {
             setFirebaseAvailable(false);
           }
-          // Continue anyway - message is shown in UI
         }
       }
 
       setMessages(prev => [...prev, assistantMessage]);
-
-      // Check if user message indicates booking intent
-      if (isBookingIntent(content.trim())) {
-        console.log('[Chatbot] Booking intent detected!');
-        setTimeout(() => {
-          setShowConsultationForm(true);
-        }, 500);
-      }
     } catch (err: any) {
       console.error('[Chatbot] Error in sendMessage:', err?.message || String(err));
       setError(err?.message || 'Failed to send message. Please try again.');

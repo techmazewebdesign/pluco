@@ -41,6 +41,7 @@ export default function ConsultationRequestsSection() {
         id: doc.id,
         ...doc.data(),
       })) as ConsultationRequest[];
+      console.log('[Admin] consultation requests loaded:', data.length);
       setRequests(data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
     } catch (error) {
       console.error('Error loading consultation requests:', error);

@@ -107,11 +107,13 @@ export default function ConsultationForm({
         adminNotes: '',
       };
 
+      console.log('[Booking] submitting form');
       console.log('[ConsultationForm] Submitting request...');
       const docRef = await addDoc(
         collection(db, 'consultation_requests'),
         consultationRequest
       );
+      console.log('[Booking] Firestore document created:', docRef.id);
       console.log('[ConsultationForm] Request saved:', docRef.id);
 
       setSuccess(true);
