@@ -230,7 +230,7 @@ export default function ConsultantDashboard() {
             <div className="flex items-center gap-3">
               {consultant.photo && (
                 <div className="w-10 h-10 rounded-full overflow-hidden relative">
-                  <Image src={consultant.photo} alt={consultant.name} fill className="object-cover" unoptimized={true} />
+                  <img src={consultant.photo} alt={consultant.name} className="absolute inset-0 w-full h-full object-cover" />
                 </div>
               )}
               <div>

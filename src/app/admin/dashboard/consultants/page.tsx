@@ -246,7 +246,7 @@ export default function ConsultantsManagementPage() {
                   <div className="flex items-center gap-4 flex-1">
                     {consultant.photo && (
                       <div className="w-12 h-12 rounded-full overflow-hidden relative flex-shrink-0">
-                        <Image src={consultant.photo} alt={consultant.name} fill className="object-cover" unoptimized={true} />
+                        <img src={consultant.photo} alt={consultant.name} className="absolute inset-0 w-full h-full object-cover" />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
