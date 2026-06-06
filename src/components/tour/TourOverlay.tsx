@@ -108,6 +108,7 @@ export default function TourOverlay({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-40 pointer-events-none"
+        style={{ pointerEvents: 'auto' }}
       >
         {/* SVG for highlight box */}
         <svg

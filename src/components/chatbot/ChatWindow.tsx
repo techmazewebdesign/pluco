@@ -213,7 +213,7 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
       initial={{ opacity: 0, scale: 0.8, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.8, y: 20 }}
-      className="fixed bottom-24 right-6 w-96 h-[600px] rounded-lg shadow-2xl flex flex-col z-40 bg-white border border-gray-200"
+      className="fixed bottom-24 right-6 w-96 h-[600px] rounded-lg shadow-2xl flex flex-col z-50 bg-white border border-gray-200"
       style={{ maxWidth: 'calc(100vw - 48px)' }}
     >
       {/* Header */}
