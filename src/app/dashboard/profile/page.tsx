@@ -200,7 +200,7 @@ function PhotoUploader({
         onClick={() => { setUploadErr(''); inputRef.current?.click(); }}
       >
         {currentUrl ? (
-          <Image src={currentUrl} alt="Profile" fill className="object-cover" />
+          <Image src={currentUrl} alt="Profile" fill className="object-cover" unoptimized={true} />
         ) : (
           <User className="w-8 h-8" style={{ color: '#94A3B8' }} strokeWidth={1.5} />
         )}
@@ -674,7 +674,7 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-4 p-5">
                   <div className="w-14 h-14 rounded-full overflow-hidden relative flex-shrink-0 border-2" style={{ borderColor: '#C9A35A', backgroundColor: '#F1F5F9' }}>
                     {member.photo ? (
-                      <Image src={member.photo} alt={member.name} fill className="object-cover" />
+                      <Image src={member.photo} alt={member.name} fill className="object-cover" unoptimized={true} />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <User className="w-6 h-6" style={{ color: '#94A3B8' }} strokeWidth={1.5} />

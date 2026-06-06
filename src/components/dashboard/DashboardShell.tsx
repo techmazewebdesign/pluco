@@ -118,7 +118,7 @@ export default function DashboardShell({
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 overflow-hidden relative" style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>
             {userPhoto ? (
-              <Image src={userPhoto} alt="" fill className="object-cover" />
+              <Image src={userPhoto} alt="" fill className="object-cover" unoptimized={true} />
             ) : (
               (userName || userEmail || 'C').charAt(0).toUpperCase()
             )}

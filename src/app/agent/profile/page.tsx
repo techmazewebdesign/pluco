@@ -194,7 +194,7 @@ export default function AgentProfilePage() {
                   onClick={() => fileInputRef.current?.click()}
                 >
                   {photo ? (
-                    <Image src={photo} alt={name} fill className="object-cover" />
+                    <Image src={photo} alt={name} fill className="object-cover" unoptimized={true} />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-3xl font-bold" style={{ backgroundColor: '#071C3C', color: '#C9A35A' }}>
                       {name.charAt(0).toUpperCase() || 'A'}

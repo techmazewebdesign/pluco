@@ -125,7 +125,7 @@ export default function ConsultantProfilePage({
             <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-end -mt-16 mb-6">
               {consultant.photo ? (
                 <div className="relative w-32 h-32 rounded-xl overflow-hidden border-4 border-white shadow-lg">
-                  <Image src={consultant.photo} alt={consultant.name} fill className="object-cover" />
+                  <Image src={consultant.photo} alt={consultant.name} fill className="object-cover" unoptimized={true} />
                 </div>
               ) : (
                 <div className="w-32 h-32 rounded-xl border-4 border-white shadow-lg flex items-center justify-center"

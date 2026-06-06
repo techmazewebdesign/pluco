@@ -385,7 +385,7 @@ export default function BookingsPage() {
                         <div className="flex items-center gap-4 mb-4">
                           {consultant.photo && (
                             <div className="w-12 h-12 rounded-full overflow-hidden relative flex-shrink-0">
-                              <Image src={consultant.photo} alt={consultant.name} fill className="object-cover" />
+                              <Image src={consultant.photo} alt={consultant.name} fill className="object-cover" unoptimized={true} />
                             </div>
                           )}
                           <div>
@@ -470,7 +470,7 @@ export default function BookingsPage() {
                   <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-24">
                     {selectedConsultant.photo && (
                       <div className="w-full h-40 rounded-lg overflow-hidden relative mb-4">
-                        <Image src={selectedConsultant.photo} alt={selectedConsultant.name} fill className="object-cover" />
+                        <Image src={selectedConsultant.photo} alt={selectedConsultant.name} fill className="object-cover" unoptimized={true} />
                       </div>
                     )}
                     <p className="font-bold text-lg mb-2" style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}>
