@@ -209,69 +209,72 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
       }
 
       // Get assistant response from API
-      console.log('[Chatbot] Requesting AI response...');
-      const response = await fetch('/api/faq-chat', {
+      console.log('[Chatbot] Calling /api/pluco-assistant...');
+      const response = await fetch('/api/pluco-assistant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          message: content.trim(),
           sessionId,
-          userMessage: content.trim(),
-          conversationHistory: messages.map(m => ({
-            role: m.role,
-            content: m.content,
-          })),
         }),
       });
 
+      console.log('[Chatbot] API response status:', response.status);
+
       // Parse response
       const data = await response.json();
-      console.log('[Chatbot] API response received. Status:', response.status);
-      console.log('[Chatbot] Response data:', { status: data.status, errorCode: data.errorCode, hasResponse: !!data.response });
+      console.log('[Chatbot] Response data:', {
+        status: data.status,
+        errorType: data.errorType,
+        routeReached: data.routeReached,
+        envKeyExists: data.envKeyExists,
+        hasMessage: !!data.assistantMessage
+      });
 
       // Check if API returned an error
       if (!response.ok) {
-        console.error('[Chatbot] API error response:', response.status, data.errorCode, data.error);
+        console.error('[Chatbot] API error response:', response.status, data.errorType, data.error);
 
         // Diagnose the error from the API
-        if (data.errorCode === 'MISSING_API_KEY') {
-          console.error('[Chatbot] DIAGNOSIS: Anthropic API key is missing from Vercel environment variables');
-          throw new Error('AI service is not configured. Please contact Pluco support to enable the chatbot.');
-        } else if (data.errorCode === 'INVALID_API_KEY') {
+        if (data.errorType === 'MISSING_API_KEY') {
+          console.error('[Chatbot] DIAGNOSIS: ANTHROPIC_API_KEY not set in Vercel environment variables');
+          throw new Error('AI service not configured. Please add ANTHROPIC_API_KEY to Vercel production environment.');
+        } else if (data.errorType === 'INVALID_API_KEY') {
           console.error('[Chatbot] DIAGNOSIS: Anthropic API key is invalid or expired');
-          throw new Error('AI authentication failed. Our team is working on this.');
-        } else if (data.errorCode === 'QUOTA_EXCEEDED') {
-          console.error('[Chatbot] DIAGNOSIS: Anthropic quota/rate limit exceeded');
-          throw new Error('Too many requests. Please try again in a moment.');
-        } else if (data.errorCode === 'SERVICE_OVERLOADED') {
-          console.error('[Chatbot] DIAGNOSIS: Anthropic service is temporarily down');
-          throw new Error('AI service is temporarily unavailable. Please try again in a moment.');
-        } else if (data.errorCode === 'INVALID_MODEL') {
-          console.error('[Chatbot] DIAGNOSIS: Claude model name is invalid');
-          throw new Error('AI model configuration error. Please contact support.');
-        } else if (data.errorCode === 'INVALID_REQUEST') {
-          console.error('[Chatbot] DIAGNOSIS: Invalid request to Anthropic API');
-          throw new Error('Invalid request to AI. Please try a different question.');
-        } else if (data.errorCode === 'NETWORK_ERROR') {
-          console.error('[Chatbot] DIAGNOSIS: Network error connecting to Anthropic');
-          throw new Error('Network error. Please check your internet connection and try again.');
+          throw new Error('API key authentication failed. Check your Anthropic credentials.');
+        } else if (data.errorType === 'BILLING_ISSUE') {
+          console.error('[Chatbot] DIAGNOSIS: Anthropic account has no credits');
+          throw new Error('Anthropic account needs credits. Please add payment method.');
+        } else if (data.errorType === 'MODEL_NOT_FOUND') {
+          console.error('[Chatbot] DIAGNOSIS: Claude model not found or invalid');
+          throw new Error('AI model not available. Contact support.');
+        } else if (data.errorType === 'TIMEOUT') {
+          console.error('[Chatbot] DIAGNOSIS: Request to Anthropic timed out');
+          throw new Error('Request timed out. Please try again.');
+        } else if (data.errorType === 'NETWORK_ERROR') {
+          console.error('[Chatbot] DIAGNOSIS: Network error to Anthropic');
+          throw new Error('Network error. Check internet and try again.');
         } else {
-          console.error('[Chatbot] DIAGNOSIS: Unknown API error:', data.errorCode || 'UNKNOWN');
-          throw new Error(data.error || 'Failed to get AI response. Please try again.');
+          console.error('[Chatbot] DIAGNOSIS: Anthropic error:', data.errorType || 'UNKNOWN');
+          throw new Error(data.error || 'Failed to get AI response.');
         }
       }
 
       // Success: API returned a response
-      if (!data.response) {
+      if (!data.assistantMessage) {
         console.error('[Chatbot] API response is empty!');
         throw new Error('Empty response from AI. Please try again.');
       }
 
-      console.log('[Chatbot] AI response received successfully. Length:', data.response.length);
+      console.log('[Chatbot] ✓ AI response received successfully!');
+      console.log('[Chatbot] Response length:', data.assistantMessage.length, 'characters');
+      console.log('[Chatbot] Model:', data.modelUsed);
+      console.log('[Chatbot] Tokens:', data.tokensUsed);
 
       const assistantMessage: ChatMessage = {
         id: `msg_${Date.now()}`,
         role: 'assistant',
-        content: data.response,
+        content: data.assistantMessage,
         createdAt: new Date().toISOString(),
       };
 
