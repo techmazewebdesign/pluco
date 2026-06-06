@@ -16,6 +16,7 @@ export default function ChatbotWidget() {
   // Initialize session on component mount
   useEffect(() => {
     try {
+      console.log('[Chatbot] ChatbotWidget mounted and initializing...');
       setIsMounted(true);
 
       // Generate or retrieve session ID from localStorage
@@ -24,11 +25,15 @@ export default function ChatbotWidget() {
         if (!storedSessionId) {
           storedSessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
           localStorage.setItem('chatbot_session_id', storedSessionId);
+          console.log('[Chatbot] Created new session:', storedSessionId);
+        } else {
+          console.log('[Chatbot] Using existing session:', storedSessionId);
         }
         setSessionId(storedSessionId);
+        console.log('[Chatbot] Session ID set and component should be visible');
       }
     } catch (error) {
-      console.error('Chatbot initialization error:', error);
+      console.error('[Chatbot] Initialization error:', error);
     }
   }, []);
 

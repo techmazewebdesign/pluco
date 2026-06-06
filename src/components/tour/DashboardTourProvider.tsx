@@ -47,6 +47,15 @@ export default function DashboardTourProvider({
   // Expose reopen method via window for external access
   if (typeof window !== 'undefined') {
     (window as any).__reopenTour = reopenTour;
+    console.log('[Tour] DashboardTourProvider initialized:', {
+      tourId: tour.id,
+      userId,
+      userRole,
+      showWelcome,
+      isActive,
+      isLoading,
+      totalSteps,
+    });
   }
 
   if (isLoading) {

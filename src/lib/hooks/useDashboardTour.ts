@@ -17,7 +17,10 @@ export function useDashboardTour(
 
   // Load progress from Firestore
   useEffect(() => {
+    console.log('[useDashboardTour] Loading tour progress:', { userId, tourId, role });
+
     if (!userId) {
+      console.log('[useDashboardTour] No userId, skipping load');
       setIsLoading(false);
       return;
     }
@@ -29,6 +32,7 @@ export function useDashboardTour(
 
         if (progressSnap.exists()) {
           const progressData = progressSnap.data() as DashboardGuideProgress;
+          console.log('[useDashboardTour] Found existing progress:', progressData);
           setProgress(progressData);
 
           // Show welcome if: tour not completed, not exited, and not "do not show again"
@@ -38,10 +42,19 @@ export function useDashboardTour(
             !progressData.tourExited &&
             !progressData.doNotShowAgain
           ) {
+            console.log('[useDashboardTour] Showing welcome modal');
             setShowWelcome(true);
+          } else {
+            console.log('[useDashboardTour] Not showing welcome:', {
+              sameId: progressData.tourId === tourId,
+              completed: progressData.tourCompleted,
+              exited: progressData.tourExited,
+              doNotShowAgain: progressData.doNotShowAgain,
+            });
           }
         } else {
           // First time user - show welcome
+          console.log('[useDashboardTour] First time user, showing welcome');
           setShowWelcome(true);
           setProgress({
             userId,
@@ -58,7 +71,7 @@ export function useDashboardTour(
           });
         }
       } catch (error) {
-        console.error('Error loading tour progress:', error);
+        console.error('[useDashboardTour] Error loading tour progress:', error);
       } finally {
         setIsLoading(false);
       }

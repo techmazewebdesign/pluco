@@ -239,7 +239,6 @@ export default function ChatbotLeads() {
                         style={{
                           backgroundColor: statusColor.bg,
                           color: statusColor.color,
-                          ringColor: statusColor.color,
                         }}
                       >
                         {statusColor.icon} {status}
