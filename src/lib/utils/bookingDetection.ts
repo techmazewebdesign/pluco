@@ -1,9 +1,14 @@
 /**
  * Detect if user message is about booking/consultation
+ * SIMPLE AND RELIABLE: Check for booking keywords
  */
 export function isBookingIntent(message: string): boolean {
+  if (!message) return false;
+
+  const lowerMessage = message.toLowerCase().trim();
+
+  // BOOKING KEYWORDS - must match AT LEAST ONE
   const bookingKeywords = [
-    // Core booking words
     'book',
     'booking',
     'consultation',
@@ -13,39 +18,12 @@ export function isBookingIntent(message: string): boolean {
     'call',
     'meeting',
     'inquiry',
-    'inquire',
-    'request',
-    'talk',
-    'speak',
-    'discuss',
-    'discussion',
-    'speak with',
-    'talk to',
-    'speak to',
     'private inquiry',
-    'private consultation',
-    'consultation request',
-    'consultation call',
-    'schedule call',
-    'book appointment',
-    'book consultation',
-    'schedule consultation',
-    'set up',
-    'arrange',
-    'organize',
-    'reserve',
-    'reserve time',
-    'want to',
-    'would like to',
-    'interested in',
-    'need help',
-    'need advice',
-    'need consultation',
-    'help with',
-    'assist',
-    'support',
+    'request',
+  ];
 
-    // Days of week
+  // DAYS OF WEEK
+  const days = [
     'sunday',
     'monday',
     'tuesday',
@@ -53,12 +31,10 @@ export function isBookingIntent(message: string): boolean {
     'thursday',
     'friday',
     'saturday',
-    'tomorrow',
-    'next week',
-    'this week',
-    'soon',
+  ];
 
-    // Time patterns
+  // TIME PATTERNS
+  const timePatterns = [
     'at 8',
     'at 9',
     'at 10',
@@ -71,40 +47,50 @@ export function isBookingIntent(message: string): boolean {
     'at 5',
     'at 6',
     'at 7',
-    'am',
-    'pm',
-    'morning',
-    'afternoon',
-    'evening',
-    'time',
-    'slot',
-    'available',
+  ];
 
-    // Services
+  // SERVICES
+  const services = [
     'banking',
     'residency',
     'citizenship',
-    'identity',
     'visa',
     'contract',
     'dispute',
     'property',
     'company',
     'registration',
-    'eu',
-    'green card',
-    'eb-5',
-    'compliance',
   ];
 
-  const lowerMessage = message.toLowerCase().trim();
+  // Check for booking keywords (MAIN TRIGGER)
+  const hasBookingKeyword = bookingKeywords.some(kw => lowerMessage.includes(kw));
 
-  // Check for keyword matches
-  const hasKeyword = bookingKeywords.some(keyword => lowerMessage.includes(keyword));
+  // Check for days + time (SECONDARY TRIGGER)
+  const hasDay = days.some(day => lowerMessage.includes(day));
+  const hasTime = timePatterns.some(time => lowerMessage.includes(time));
+  const hasService = services.some(svc => lowerMessage.includes(svc));
 
-  // Additional check: if message contains time/date info with booking words
-  const hasTimePattern = /(\d{1,2}):?(\d{2})?\s*(am|pm)?|at\s+\d|monday|tuesday|wednesday|thursday|friday|saturday|sunday|tomorrow|next\s+week/i.test(message);
-  const hasBookingWord = /book|consult|schedule|appointment|call|meeting|inquiry|request|private|talk|speak|discuss|want|interested|help/i.test(message);
+  // BOOKING DETECTED IF:
+  // 1. Has booking keyword like "book", "schedule", "appointment", etc.
+  // 2. OR has day + time (e.g., "sunday at 8")
+  // 3. OR has day + service (e.g., "monday for banking")
+  // 4. OR has time + service (e.g., "at 2 for residency")
 
-  return hasKeyword || (hasTimePattern && hasBookingWord);
+  if (hasBookingKeyword) {
+    return true;
+  }
+
+  if (hasDay && hasTime) {
+    return true;
+  }
+
+  if (hasDay && hasService) {
+    return true;
+  }
+
+  if (hasTime && hasService) {
+    return true;
+  }
+
+  return false;
 }

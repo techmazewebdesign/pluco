@@ -181,8 +181,42 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
   const sendMessage = async (content: string) => {
     if (!content.trim() || isLoading || !session) return;
 
+    console.log('[Booking] checking intent');
     setError('');
     const trimmedContent = content.trim();
+
+    // CRITICAL: Check for booking intent FIRST, before anything else
+    const hasBookingIntent = isBookingIntent(trimmedContent);
+    console.log('[Booking] intent detected:', hasBookingIntent);
+
+    if (hasBookingIntent) {
+      console.log('[Booking] opening form');
+
+      // Add user message to UI
+      const userMessage: ChatMessage = {
+        id: `msg_${Date.now()}`,
+        role: 'user',
+        content: trimmedContent,
+        createdAt: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, userMessage]);
+      setInput('');
+
+      // Show assistant response about booking
+      const bookingMessage: ChatMessage = {
+        id: `msg_${Date.now()}`,
+        role: 'assistant',
+        content: 'I can help you submit a consultation request. This is not a confirmed appointment yet. Our team will review availability and conflict checks before confirming. Please complete the short form below.',
+        createdAt: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, bookingMessage]);
+
+      // Open the form immediately
+      setShowConsultationForm(true);
+      return; // EXIT - do NOT call Claude API
+    }
+
+    // NOT a booking intent - proceed with normal chat
     const userMessage: ChatMessage = {
       id: `msg_${Date.now()}`,
       role: 'user',
@@ -196,29 +230,6 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
     setIsLoading(true);
 
     try {
-      // IMPORTANT: Check for booking intent BEFORE calling Claude
-      const hasBookingIntent = isBookingIntent(trimmedContent);
-      console.log('[Booking] intent detected:', hasBookingIntent);
-
-      if (hasBookingIntent) {
-        console.log('[Booking] opening form');
-        // Show booking help message
-        const bookingMessage: ChatMessage = {
-          id: `msg_${Date.now()}`,
-          role: 'assistant',
-          content: 'I can help you submit a consultation request. This is not a confirmed appointment yet. Our team will review availability and conflict checks before confirming. Please complete the short form below.',
-          createdAt: new Date().toISOString(),
-        };
-        setMessages(prev => [...prev, bookingMessage]);
-
-        // Open the form
-        setTimeout(() => {
-          setShowConsultationForm(true);
-        }, 300);
-
-        setIsLoading(false);
-        return; // Don't call Claude for booking intent
-      }
 
       // Try to save user message to Firestore (non-blocking if fails)
       if (firebaseAvailable) {
