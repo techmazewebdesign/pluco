@@ -259,8 +259,8 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
           console.error('[Chatbot] ERROR: Anthropic account has no credits');
           throw new Error('Anthropic account needs credits. Add payment method.');
         } else if (data.errorType === 'ANTHROPIC_MODEL_ERROR') {
-          console.error('[Chatbot] ERROR: Claude model not found');
-          throw new Error('AI model not available. Contact support.');
+          console.error('[Chatbot] ERROR: Claude model not found:', data.modelAttempted);
+          throw new Error(data.message || 'AI model not available. Contact support.');
         } else if (data.errorType === 'ANTHROPIC_SERVICE_ERROR') {
           console.error('[Chatbot] ERROR: Anthropic service error');
           throw new Error('AI service is temporarily unavailable. Try again later.');

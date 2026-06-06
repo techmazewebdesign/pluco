@@ -29,6 +29,7 @@ IMPORTANT: Do not guarantee outcomes. Guide users to book consultations for case
 export async function POST(request: NextRequest) {
   const requestId = Math.random().toString(36).substring(7);
   const startTime = Date.now();
+  const MODEL = 'claude-haiku-4-5-20251001';
 
   console.log(`\n[Pluco Assistant API] [${requestId}] REQUEST RECEIVED`);
   console.log(`[Pluco Assistant API] [${requestId}] Route: /api/pluco-assistant`);
@@ -96,12 +97,13 @@ export async function POST(request: NextRequest) {
     ];
 
     console.log(`[Pluco Assistant API] [${requestId}] Calling Anthropic...`);
-    console.log(`[Pluco Assistant API] [${requestId}] Model: claude-3-5-haiku-20241022`);
+    console.log(`[Pluco Assistant API] [${requestId}] Model: ${MODEL}`);
     console.log(`[Pluco Assistant API] [${requestId}] Messages: ${messages.length}`);
 
     const response = await anthropic.messages.create({
-      model: 'claude-3-5-haiku-20241022',
+      model: MODEL,
       max_tokens: 500,
+      temperature: 0.3,
       system: SYSTEM_PROMPT,
       messages,
     });
@@ -132,7 +134,7 @@ export async function POST(request: NextRequest) {
         routeReached: true,
         envKeyExists: true,
         hasMessage: true,
-        modelUsed: 'claude-3-5-haiku-20241022',
+        modelUsed: MODEL,
         tokensUsed: response.usage?.output_tokens || 0,
       },
       { status: 200 }
@@ -145,29 +147,36 @@ export async function POST(request: NextRequest) {
 
     let errorType = 'ANTHROPIC_UNKNOWN_ERROR';
     let statusCode = 500;
+    let errorMessage = 'Failed to get response from AI service.';
 
     if (error?.code === 'invalid_api_key' || error?.status === 401) {
       errorType = 'ANTHROPIC_AUTH_ERROR';
       statusCode = 401;
+      errorMessage = 'API authentication failed.';
     } else if (error?.code === 'insufficient_quota' || error?.status === 429) {
       errorType = 'ANTHROPIC_BILLING_ERROR';
       statusCode = 429;
+      errorMessage = 'API quota exceeded. Please add credits.';
     } else if (error?.code === 'model_not_found' || error?.status === 404) {
       errorType = 'ANTHROPIC_MODEL_ERROR';
       statusCode = 404;
+      errorMessage = `Model ${MODEL} not found. Please contact support.`;
+      console.error(`[Pluco Assistant API] [${requestId}] Model not found: ${MODEL}`);
     } else if (error?.status === 500 || error?.status === 502 || error?.status === 503) {
       errorType = 'ANTHROPIC_SERVICE_ERROR';
       statusCode = 503;
+      errorMessage = 'AI service temporarily unavailable.';
     }
 
     return NextResponse.json(
       {
         success: false,
         errorType,
-        message: 'Failed to get response from AI service.',
+        message: errorMessage,
         routeReached: true,
         envKeyExists: !!API_KEY,
         hasMessage: true,
+        modelAttempted: MODEL,
       },
       { status: statusCode }
     );
