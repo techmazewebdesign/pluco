@@ -1,13 +1,120 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Simple authentication check
-    function isSignedIn() { return request.auth != null; }
 
-    // Allow all signed-in users to read and write everything
-    // This is for development/testing - can be restricted later
+    // ========== HELPER FUNCTIONS ==========
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.role == 'admin';
+    }
+
+    function isCustomerService() {
+      return isSignedIn() && request.auth.token.role == 'customer-service';
+    }
+
+    function isConsultant() {
+      return isSignedIn() && request.auth.token.role == 'consultant';
+    }
+
+    function isClient() {
+      return isSignedIn() && request.auth.token.email != null;
+    }
+
+    // ========== USERS COLLECTION ==========
+    match /users/{userId} {
+      // Admins can read/write all users
+      allow read, write: if isAdmin();
+
+      // Users can read/write their own document
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ========== CUSTOMER SERVICE PROFILES ==========
+    match /customerServiceProfiles/{userId} {
+      // Customer service can read/write their own profile
+      allow read: if isCustomerService() && request.auth.uid == userId;
+      allow write: if isCustomerService() && request.auth.uid == userId;
+
+      // Admins can read/write all profiles
+      allow read, write: if isAdmin();
+    }
+
+    // ========== SUPPORT TICKETS ==========
+    match /supportTickets/{ticketId} {
+      // Customer service can read tickets assigned to them
+      allow read: if isCustomerService() && resource.data.assignedTo == request.auth.uid;
+
+      // Customer service can update tickets assigned to them
+      allow update: if isCustomerService() && resource.data.assignedTo == request.auth.uid;
+
+      // Admins can read/write all tickets
+      allow read, write: if isAdmin();
+    }
+
+    // ========== CUSTOMER SERVICE ACTIVITY LOG ==========
+    match /customerServiceActivity/{activityId} {
+      // Customer service can read their own activity log
+      allow read: if isCustomerService() && resource.data.userId == request.auth.uid;
+
+      // Customer service can create activity records for themselves
+      allow create: if isCustomerService() && request.resource.data.userId == request.auth.uid;
+
+      // Admins can read/write all activity
+      allow read, write: if isAdmin();
+    }
+
+    // ========== BOOKINGS COLLECTION ==========
+    match /bookings/{bookingId} {
+      // Consultants can read bookings assigned to them
+      allow read: if isConsultant() && resource.data.consultantId == request.auth.uid;
+
+      // Customers can read their own bookings
+      allow read: if isClient() && resource.data.clientEmail == request.auth.token.email;
+
+      // Customer service can read bookings
+      allow read: if isCustomerService();
+
+      // Admins can read/write all bookings
+      allow read, write: if isAdmin();
+
+      // Anyone can create bookings (public form submissions)
+      allow create: if true;
+    }
+
+    // ========== INQUIRIES COLLECTION ==========
+    match /enquiries/{inquiryId} {
+      // Consultants can read inquiries assigned to them
+      allow read: if isConsultant() && resource.data.consultantId == request.auth.uid;
+
+      // Customer service can read inquiries
+      allow read: if isCustomerService();
+
+      // Admins can read/write all inquiries
+      allow read, write: if isAdmin();
+
+      // Anyone can create inquiries (public form submissions)
+      allow create: if true;
+    }
+
+    // ========== CONSULTANT PROFILES ==========
+    match /consultants/{consultantId} {
+      // Anyone can read consultant profiles (public)
+      allow read: if true;
+
+      // Consultants can write their own profile
+      allow write: if isConsultant() && request.auth.uid == consultantId;
+
+      // Admins can read/write all profiles
+      allow read, write: if isAdmin();
+    }
+
+    // ========== DEFAULT DENY ==========
     match /{document=**} {
-      allow read, write: if isSignedIn();
+      allow read, write: if false;
     }
   }
 }
