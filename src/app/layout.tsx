@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { AgentProvider } from "@/contexts/AgentContext";
 import RTLWrapper from "@/components/shared/RTLWrapper";
 import SiteShell from "@/components/layout/SiteShell";
+import ChatbotWidget from "@/components/chatbot/ChatbotWidget";
 
 export const metadata: Metadata = {
   title: {
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </LanguageProvider>
           </AgentProvider>
         </AuthProvider>
+        <ChatbotWidget />
       </body>
     </html>
   );

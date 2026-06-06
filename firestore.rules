@@ -112,6 +112,30 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // ========== CHAT SESSIONS (FAQ CHATBOT) ==========
+    match /chatSessions/{sessionId} {
+      // Customer service can read all chat sessions
+      allow read: if isCustomerService();
+
+      // Admins can read/write all sessions
+      allow read, write: if isAdmin();
+
+      // Anyone can create a session (public chatbot)
+      allow create: if true;
+
+      // Nested messages subcollection
+      match /messages/{messageId} {
+        // Customer service can read messages in sessions they can read
+        allow read: if isCustomerService() && parent.resource.data.source == 'faq-chatbot';
+
+        // Admins can read/write all messages
+        allow read, write: if isAdmin();
+
+        // API can create messages for any session
+        allow create: if request.auth == null || isSignedIn();
+      }
+    }
+
     // ========== DEFAULT DENY ==========
     match /{document=**} {
       allow read, write: if false;

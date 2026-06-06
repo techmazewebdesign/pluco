@@ -8,6 +8,7 @@ import { MessageSquare, Clock, CheckCircle, AlertCircle, LogOut, Loader2 } from 
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { CustomerServiceProfile, SupportTicket, CustomerServiceActivity } from '@/lib/types/customerService';
+import ChatbotLeads from '@/components/dashboard/ChatbotLeads';
 
 export default function CustomerServiceDashboard() {
   const { user, loading, signOut } = useAuth();
@@ -285,6 +286,14 @@ export default function CustomerServiceDashboard() {
               )}
             </motion.div>
           </div>
+        </div>
+
+        {/* Chatbot Leads Section */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-serif font-bold mb-6" style={{ color: '#1E2430' }}>
+            FAQ Chatbot Leads
+          </h2>
+          <ChatbotLeads />
         </div>
       </div>
     </div>
