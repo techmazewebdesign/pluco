@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Send, Loader2, AlertCircle } from 'lucide-react';
 import { collection, addDoc, getDocs, query, where, orderBy, doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import { auth, db } from '@/lib/firebase';
 import { ChatMessage, ChatSession, ChatRole } from '@/lib/types/chatbot';
 import InquiryForm from './InquiryForm';
 
@@ -31,60 +32,143 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
   const [showInquiryForm, setShowInquiryForm] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [hasWelcome, setHasWelcome] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
+  const [firebaseAvailable, setFirebaseAvailable] = useState(true);
 
-  // Load existing session and messages
+  // Authenticate user and load session
   useEffect(() => {
-    const loadSession = async () => {
+    let unsubscribe: (() => void) | undefined;
+
+    const initAuth = async () => {
       try {
-        const sessionRef = doc(db, 'chatSessions', sessionId);
-        const sessionSnap = await getDoc(sessionRef);
+        setIsAuthenticating(true);
+        console.log('[Chatbot] Starting authentication...');
 
-        if (sessionSnap.exists()) {
-          const sessionData = sessionSnap.data() as ChatSession;
-          setSession(sessionData);
+        // Wait for auth to be ready
+        unsubscribe = onAuthStateChanged(auth, async (user) => {
+          try {
+            if (!user) {
+              console.log('[Chatbot] No authenticated user, signing in anonymously...');
+              const anonResult = await signInAnonymously(auth);
+              console.log('[Chatbot] Anonymous sign-in successful. UID:', anonResult.user.uid);
+            } else {
+              console.log('[Chatbot] User already authenticated. UID:', user.uid);
+            }
 
-          // Load messages
-          const messagesRef = collection(db, 'chatSessions', sessionId, 'messages');
-          const messagesQuery = query(messagesRef, orderBy('createdAt', 'asc'));
-          const messagesSnap = await getDocs(messagesQuery);
-          const loadedMessages = messagesSnap.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          } as ChatMessage));
-          setMessages(loadedMessages);
-          setHasWelcome(true);
-        } else {
-          // Create new session
-          const now = new Date().toISOString();
-          const newSession: ChatSession = {
-            sessionId,
-            createdAt: now,
-            updatedAt: now,
-            leadStatus: 'new',
-            source: 'faq-chatbot',
-          };
-          await setDoc(sessionRef, newSession);
-          setSession(newSession);
-
-          // Add welcome message
-          const welcomeMessage: ChatMessage = {
-            id: `msg_${Date.now()}`,
-            role: 'assistant',
-            content: "Hello! I'm Pluco Assistant. I can answer general questions about residency, citizenship, banking, company registration, and consultations. I cannot give legal advice, but I can guide you to the right next step. What would you like to know?",
-            createdAt: now,
-          };
-          await addDoc(collection(db, 'chatSessions', sessionId, 'messages'), welcomeMessage);
-          setMessages([welcomeMessage]);
-          setHasWelcome(true);
-        }
-      } catch (err) {
-        console.error('Error loading session:', err);
-        setError('Failed to load chat');
+            // Now load the session
+            await loadSession();
+            setIsAuthenticating(false);
+          } catch (authErr: any) {
+            console.error('[Chatbot] Authentication error:', authErr?.code, authErr?.message);
+            setError('Authentication failed. Chat may have limited functionality.');
+            setIsAuthenticating(false);
+          }
+        });
+      } catch (err: any) {
+        console.error('[Chatbot] Auth initialization error:', err?.code, err?.message);
+        setError('Unable to initialize chat. Please refresh the page.');
+        setIsAuthenticating(false);
       }
     };
 
-    loadSession();
-  }, [sessionId]);
+    initAuth();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, []);
+
+  // Load existing session and messages
+  const loadSession = async () => {
+    try {
+      console.log('[Chatbot] Loading session:', sessionId);
+      const sessionRef = doc(db, 'chatSessions', sessionId);
+      const sessionSnap = await getDoc(sessionRef);
+
+      if (sessionSnap.exists()) {
+        console.log('[Chatbot] Session found, loading messages...');
+        const sessionData = sessionSnap.data() as ChatSession;
+        setSession(sessionData);
+
+        // Load messages
+        const messagesRef = collection(db, 'chatSessions', sessionId, 'messages');
+        const messagesQuery = query(messagesRef, orderBy('createdAt', 'asc'));
+        const messagesSnap = await getDocs(messagesQuery);
+        const loadedMessages = messagesSnap.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as ChatMessage));
+        console.log('[Chatbot] Loaded', loadedMessages.length, 'messages');
+        setMessages(loadedMessages);
+        setHasWelcome(true);
+      } else {
+        console.log('[Chatbot] No existing session, creating new one...');
+        // Create new session
+        const now = new Date().toISOString();
+        const newSession: ChatSession = {
+          sessionId,
+          createdAt: now,
+          updatedAt: now,
+          leadStatus: 'new',
+          source: 'faq-chatbot',
+        };
+        await setDoc(sessionRef, newSession);
+        console.log('[Chatbot] New session created');
+        setSession(newSession);
+
+        // Add welcome message
+        const welcomeMessage: ChatMessage = {
+          id: `msg_${Date.now()}`,
+          role: 'assistant',
+          content: "Hello! I'm Pluco Assistant. I can answer general questions about residency, citizenship, banking, company registration, and consultations. I cannot give legal advice, but I can guide you to the right next step. What would you like to know?",
+          createdAt: now,
+        };
+        await addDoc(collection(db, 'chatSessions', sessionId, 'messages'), welcomeMessage);
+        console.log('[Chatbot] Welcome message added');
+        setMessages([welcomeMessage]);
+        setHasWelcome(true);
+      }
+    } catch (err: any) {
+      console.error('[Chatbot] Error loading session:', err?.code, err?.message);
+
+      // Diagnose the error
+      if (err?.code?.includes('permission-denied')) {
+        console.error('[Chatbot] FIRESTORE PERMISSION DENIED - Check Firestore rules');
+        setError('Unable to load chat history, but you can still ask questions. They won\'t be saved.');
+        setFirebaseAvailable(false);
+      } else if (err?.code?.includes('unavailable')) {
+        console.error('[Chatbot] FIRESTORE UNAVAILABLE - Service down or network issue');
+        setError('Chat service temporarily unavailable. Please try again in a moment.');
+      } else if (err?.code?.includes('unauthenticated')) {
+        console.error('[Chatbot] UNAUTHENTICATED - Auth failed');
+        setError('Unable to authenticate. Chat may not work properly.');
+      } else {
+        setError('Unable to load chat history. Chat may have limited functionality.');
+      }
+
+      // Set welcome message anyway so user can still chat
+      const welcomeMessage: ChatMessage = {
+        id: `msg_${Date.now()}`,
+        role: 'assistant',
+        content: "Hello! I'm Pluco Assistant. I can answer general questions about residency, citizenship, banking, company registration, and consultations. I cannot give legal advice, but I can guide you to the right next step. What would you like to know?",
+        createdAt: new Date().toISOString(),
+      };
+      setMessages([welcomeMessage]);
+      setHasWelcome(true);
+
+      // Create minimal session
+      const now = new Date().toISOString();
+      setSession({
+        sessionId,
+        createdAt: now,
+        updatedAt: now,
+        leadStatus: 'new',
+        source: 'faq-chatbot',
+      });
+    }
+  };
 
   // Scroll to bottom
   useEffect(() => {
@@ -102,16 +186,30 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
       createdAt: new Date().toISOString(),
     };
 
-    // Add user message to UI
+    // Add user message to UI immediately
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
     try {
-      // Save user message to Firestore
-      await addDoc(collection(db, 'chatSessions', sessionId, 'messages'), userMessage);
+      // Try to save user message to Firestore (non-blocking if fails)
+      if (firebaseAvailable) {
+        try {
+          console.log('[Chatbot] Saving user message to Firestore...');
+          await addDoc(collection(db, 'chatSessions', sessionId, 'messages'), userMessage);
+          console.log('[Chatbot] User message saved');
+        } catch (firebaseErr: any) {
+          console.warn('[Chatbot] Failed to save message to Firestore:', firebaseErr?.code);
+          if (firebaseErr?.code?.includes('permission-denied')) {
+            setFirebaseAvailable(false);
+            console.error('[Chatbot] FIRESTORE PERMISSION DENIED - Continuing with API only');
+          }
+          // Continue anyway - we can still use the API
+        }
+      }
 
-      // Get assistant response
+      // Get assistant response from API
+      console.log('[Chatbot] Requesting AI response...');
       const response = await fetch('/api/faq-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -126,10 +224,23 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to get response');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('[Chatbot] API error:', response.status, errorData);
+
+        if (response.status === 401) {
+          console.error('[Chatbot] API_KEY_MISSING or ANTHROPIC_BILLING_ISSUE');
+          throw new Error('API is not configured. Please check Anthropic API key and billing.');
+        } else if (response.status === 500) {
+          console.error('[Chatbot] SERVER_ERROR or ANTHROPIC_API_ISSUE');
+          throw new Error('Server error. Please try again.');
+        } else {
+          throw new Error('Failed to get response from AI');
+        }
       }
 
       const data = await response.json();
+      console.log('[Chatbot] AI response received');
+
       const assistantMessage: ChatMessage = {
         id: `msg_${Date.now()}`,
         role: 'assistant',
@@ -137,18 +248,31 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
         createdAt: new Date().toISOString(),
       };
 
-      // Save assistant message
-      await addDoc(collection(db, 'chatSessions', sessionId, 'messages'), assistantMessage);
-      setMessages(prev => [...prev, assistantMessage]);
+      // Try to save assistant message to Firestore (non-blocking if fails)
+      if (firebaseAvailable) {
+        try {
+          console.log('[Chatbot] Saving assistant message to Firestore...');
+          await addDoc(collection(db, 'chatSessions', sessionId, 'messages'), assistantMessage);
+          console.log('[Chatbot] Assistant message saved');
 
-      // Update session timestamp
-      const sessionRef = doc(db, 'chatSessions', sessionId);
-      await updateDoc(sessionRef, {
-        updatedAt: new Date().toISOString(),
-      });
-    } catch (err) {
-      console.error('Error sending message:', err);
-      setError('Failed to send message. Please try again.');
+          // Update session timestamp
+          const sessionRef = doc(db, 'chatSessions', sessionId);
+          await updateDoc(sessionRef, {
+            updatedAt: new Date().toISOString(),
+          });
+        } catch (firebaseErr: any) {
+          console.warn('[Chatbot] Failed to save assistant message:', firebaseErr?.code);
+          if (firebaseErr?.code?.includes('permission-denied')) {
+            setFirebaseAvailable(false);
+          }
+          // Continue anyway - message is shown in UI
+        }
+      }
+
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (err: any) {
+      console.error('[Chatbot] Error sending message:', err?.message || err);
+      setError(err?.message || 'Failed to send message. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -160,16 +284,7 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
 
   const handleInquirySubmit = async (data: { name: string; email: string; phone: string; service: string; nationality: string; residenceCountry: string }) => {
     try {
-      // Update session with visitor info
-      const sessionRef = doc(db, 'chatSessions', sessionId);
-      await updateDoc(sessionRef, {
-        visitorName: data.name,
-        visitorEmail: data.email,
-        visitorPhone: data.phone,
-        serviceInterest: data.service,
-        leadStatus: 'qualified',
-        updatedAt: new Date().toISOString(),
-      });
+      console.log('[Chatbot] Submitting inquiry...');
 
       // Create lead/inquiry record compatible with existing system
       const now = new Date().toISOString();
@@ -186,27 +301,87 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
         updatedAt: now,
       };
 
-      const bookingsRef = collection(db, 'bookings');
-      const docRef = await addDoc(bookingsRef, inquiry);
+      // Try to update session and save inquiry (prioritize inquiry save)
+      if (firebaseAvailable) {
+        try {
+          // Update session with visitor info
+          const sessionRef = doc(db, 'chatSessions', sessionId);
+          await updateDoc(sessionRef, {
+            visitorName: data.name,
+            visitorEmail: data.email,
+            visitorPhone: data.phone,
+            serviceInterest: data.service,
+            leadStatus: 'qualified',
+            updatedAt: now,
+          });
+          console.log('[Chatbot] Session updated');
+        } catch (err: any) {
+          console.warn('[Chatbot] Failed to update session:', err?.code);
+        }
 
-      // Add system message confirming inquiry
-      const confirmMessage: ChatMessage = {
-        id: `msg_${Date.now()}`,
-        role: 'system',
-        content: `Thank you, ${data.name}! We've received your information. Our team will review your inquiry and contact you at ${data.email} or ${data.phone} soon.`,
-        createdAt: new Date().toISOString(),
-      };
+        try {
+          // Save inquiry to bookings collection
+          const bookingsRef = collection(db, 'bookings');
+          await addDoc(bookingsRef, inquiry);
+          console.log('[Chatbot] Inquiry saved to bookings');
+        } catch (err: any) {
+          console.warn('[Chatbot] Failed to save inquiry to bookings:', err?.code);
+        }
 
-      await addDoc(collection(db, 'chatSessions', sessionId, 'messages'), confirmMessage);
-      setMessages(prev => [...prev, confirmMessage]);
+        try {
+          // Add system message confirming inquiry
+          const confirmMessage: ChatMessage = {
+            id: `msg_${Date.now()}`,
+            role: 'system',
+            content: `Thank you, ${data.name}! We've received your information. Our team will review your inquiry and contact you at ${data.email} or ${data.phone} soon.`,
+            createdAt: now,
+          };
+          await addDoc(collection(db, 'chatSessions', sessionId, 'messages'), confirmMessage);
+          setMessages(prev => [...prev, confirmMessage]);
+          console.log('[Chatbot] Confirmation message saved');
+        } catch (err: any) {
+          console.warn('[Chatbot] Failed to save confirmation message:', err?.code);
+          // Still show confirmation to user even if save fails
+          const confirmMessage: ChatMessage = {
+            id: `msg_${Date.now()}`,
+            role: 'system',
+            content: `Thank you, ${data.name}! We've received your information. Our team will review your inquiry and contact you at ${data.email} or ${data.phone} soon.`,
+            createdAt: now,
+          };
+          setMessages(prev => [...prev, confirmMessage]);
+        }
+      }
+
       setShowInquiryForm(false);
-
       setSession(prev => prev ? { ...prev, leadStatus: 'qualified' } : null);
-    } catch (err) {
-      console.error('Error submitting inquiry:', err);
+    } catch (err: any) {
+      console.error('[Chatbot] Error submitting inquiry:', err?.message || err);
       setError('Failed to submit inquiry. Please try again.');
     }
   };
+
+  // Show loading state while authenticating
+  if (isAuthenticating) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.8, y: 20 }}
+        className="fixed bottom-24 right-6 w-96 h-[600px] rounded-lg shadow-2xl flex flex-col z-50 bg-white border border-gray-200"
+        style={{ maxWidth: 'calc(100vw - 48px)' }}
+      >
+        <div className="px-6 py-4 border-b border-gray-200" style={{ backgroundColor: '#071C3C' }}>
+          <h3 className="font-semibold text-white">Pluco Assistant</h3>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-blue-600" />
+            <p className="text-sm text-gray-600">Starting chat...</p>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
