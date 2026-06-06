@@ -6,7 +6,6 @@ const API_KEY = process.env.ANTHROPIC_API_KEY || '';
 
 console.log('[Pluco Assistant API] Module loaded');
 console.log('[Pluco Assistant API] ANTHROPIC_API_KEY exists:', API_KEY ? 'YES' : 'NO');
-console.log('[Pluco Assistant API] API Key length:', API_KEY ? `${API_KEY.length} chars` : 'N/A');
 
 const anthropic = new Anthropic({
   apiKey: API_KEY,
@@ -31,160 +30,144 @@ export async function POST(request: NextRequest) {
   const requestId = Math.random().toString(36).substring(7);
   const startTime = Date.now();
 
-  console.log(`\n========================================`);
-  console.log(`[Pluco Assistant API] [${requestId}] ===== REQUEST RECEIVED =====`);
+  console.log(`\n[Pluco Assistant API] [${requestId}] REQUEST RECEIVED`);
   console.log(`[Pluco Assistant API] [${requestId}] Route: /api/pluco-assistant`);
-  console.log(`[Pluco Assistant API] [${requestId}] Method: ${request.method}`);
 
   try {
-    // Parse request body
+    // Parse request body safely with multiple fallbacks
     console.log(`[Pluco Assistant API] [${requestId}] Parsing request body...`);
-    const body = await request.json();
-    const { message, sessionId } = body;
+    const body = await request.json().catch(() => ({}));
 
-    console.log(`[Pluco Assistant API] [${requestId}] Message: "${message?.substring(0, 50)}${message?.length > 50 ? '...' : ''}"`);
-    console.log(`[Pluco Assistant API] [${requestId}] Session ID: ${sessionId}`);
+    // Try multiple field names for message
+    const message = body.message || body.userMessage || body.text || body.prompt || '';
 
-    // Validate input
-    if (!message || typeof message !== 'string') {
-      console.error(`[Pluco Assistant API] [${requestId}] ERROR: Invalid message`);
+    console.log(`[Pluco Assistant API] [${requestId}] Body keys:`, Object.keys(body).join(', ') || 'EMPTY');
+    console.log(`[Pluco Assistant API] [${requestId}] Message found:`, message ? 'YES' : 'NO');
+    console.log(`[Pluco Assistant API] [${requestId}] Message length:`, message?.length || 0);
+
+    if (!message || typeof message !== 'string' || message.trim() === '') {
+      console.error(`[Pluco Assistant API] [${requestId}] MISSING_MESSAGE: No message in request body`);
       return NextResponse.json(
         {
-          error: 'Invalid message',
+          success: false,
+          errorType: 'MISSING_MESSAGE',
+          message: 'No message was received by the assistant API.',
           routeReached: true,
-          envKeyExists: false,
+          envKeyExists: !!API_KEY,
+          hasMessage: false,
         },
         { status: 400 }
       );
     }
 
+    const sessionId = body.sessionId || 'unknown';
+    const history = (body.history || []).filter((msg: any) => msg.role && msg.content);
+
+    console.log(`[Pluco Assistant API] [${requestId}] Message: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`);
+    console.log(`[Pluco Assistant API] [${requestId}] Session: ${sessionId}`);
+    console.log(`[Pluco Assistant API] [${requestId}] History messages: ${history.length}`);
+
     // Check API key
-    console.log(`[Pluco Assistant API] [${requestId}] Checking ANTHROPIC_API_KEY...`);
     const keyExists = API_KEY && API_KEY.length > 0;
     console.log(`[Pluco Assistant API] [${requestId}] ANTHROPIC_API_KEY exists: ${keyExists ? 'YES' : 'NO'}`);
 
     if (!keyExists) {
-      console.error(`[Pluco Assistant API] [${requestId}] CRITICAL ERROR: API key is missing!`);
-      console.error(`[Pluco Assistant API] [${requestId}] Check: process.env.ANTHROPIC_API_KEY in Vercel settings`);
+      console.error(`[Pluco Assistant API] [${requestId}] CRITICAL: API key is missing from Vercel environment`);
       return NextResponse.json(
         {
-          error: 'API key not configured',
+          success: false,
           errorType: 'MISSING_API_KEY',
+          message: 'The Anthropic API key is not configured.',
           routeReached: true,
           envKeyExists: false,
-          debug: 'ANTHROPIC_API_KEY environment variable is not set in Vercel',
+          hasMessage: true,
         },
         { status: 503 }
       );
     }
 
-    // Call Anthropic API
-    console.log(`[Pluco Assistant API] [${requestId}] ===== CALLING ANTHROPIC =====`);
+    // Build messages array - only user/assistant roles, no system
+    const messages: Array<{ role: 'user' | 'assistant'; content: string }> = [
+      ...history.filter((msg: any) => msg.role === 'user' || msg.role === 'assistant'),
+      {
+        role: 'user' as const,
+        content: message.trim(),
+      },
+    ];
+
+    console.log(`[Pluco Assistant API] [${requestId}] Calling Anthropic...`);
     console.log(`[Pluco Assistant API] [${requestId}] Model: claude-3-5-haiku-20241022`);
-    console.log(`[Pluco Assistant API] [${requestId}] Max tokens: 500`);
+    console.log(`[Pluco Assistant API] [${requestId}] Messages: ${messages.length}`);
 
     const response = await anthropic.messages.create({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 500,
       system: SYSTEM_PROMPT,
-      messages: [
-        {
-          role: 'user',
-          content: message,
-        },
-      ],
+      messages,
     });
 
-    // Extract response text
-    console.log(`[Pluco Assistant API] [${requestId}] ===== ANTHROPIC RESPONSE SUCCESS =====`);
-    console.log(`[Pluco Assistant API] [${requestId}] Status: ${response.stop_reason}`);
-    console.log(`[Pluco Assistant API] [${requestId}] Tokens used: ${response.usage?.output_tokens || 0}`);
-    console.log(`[Pluco Assistant API] [${requestId}] Response type: ${response.content[0]?.type}`);
+    // Extract response
+    console.log(`[Pluco Assistant API] [${requestId}] Anthropic success!`);
+    console.log(`[Pluco Assistant API] [${requestId}] Stop reason: ${response.stop_reason}`);
+    console.log(`[Pluco Assistant API] [${requestId}] Tokens: ${response.usage?.output_tokens || 0}`);
 
     const textContent = response.content[0];
-    if (textContent.type !== 'text') {
-      throw new Error(`Expected text response, got ${textContent.type}`);
+    if (!textContent || textContent.type !== 'text') {
+      throw new Error(`Invalid response type: ${textContent?.type || 'none'}`);
     }
 
     const assistantMessage = textContent.text;
-    console.log(`[Pluco Assistant API] [${requestId}] Message length: ${assistantMessage.length} chars`);
-    console.log(`[Pluco Assistant API] [${requestId}] Message preview: "${assistantMessage.substring(0, 80)}..."`);
+    const elapsed = Date.now() - startTime;
 
-    const elapsedTime = Date.now() - startTime;
-    console.log(`[Pluco Assistant API] [${requestId}] Total time: ${elapsedTime}ms`);
-    console.log(`[Pluco Assistant API] [${requestId}] ===== SENDING RESPONSE TO FRONTEND =====\n`);
+    console.log(`[Pluco Assistant API] [${requestId}] Response: ${assistantMessage.length} chars`);
+    console.log(`[Pluco Assistant API] [${requestId}] Time: ${elapsed}ms`);
+    console.log(`[Pluco Assistant API] [${requestId}] SUCCESS\n`);
 
     return NextResponse.json(
       {
+        success: true,
         assistantMessage,
         sessionId,
         status: 'success',
         routeReached: true,
         envKeyExists: true,
+        hasMessage: true,
         modelUsed: 'claude-3-5-haiku-20241022',
         tokensUsed: response.usage?.output_tokens || 0,
       },
       { status: 200 }
     );
   } catch (error: any) {
-    const elapsedTime = Date.now() - startTime;
-    console.error(`\n========================================`);
-    console.error(`[Pluco Assistant API] [${requestId}] ===== ERROR OCCURRED =====`);
-    console.error(`[Pluco Assistant API] [${requestId}] Error message: ${error?.message}`);
-    console.error(`[Pluco Assistant API] [${requestId}] Error type: ${error?.type || error?.constructor?.name}`);
-    console.error(`[Pluco Assistant API] [${requestId}] Error status: ${error?.status || 'N/A'}`);
-    console.error(`[Pluco Assistant API] [${requestId}] Error code: ${error?.code || 'N/A'}`);
-    console.error(`[Pluco Assistant API] [${requestId}] Time elapsed: ${elapsedTime}ms`);
+    const elapsed = Date.now() - startTime;
+    console.error(`[Pluco Assistant API] [${requestId}] ERROR: ${error?.message}`);
+    console.error(`[Pluco Assistant API] [${requestId}] Type: ${error?.type || error?.code || 'UNKNOWN'}`);
+    console.error(`[Pluco Assistant API] [${requestId}] Time: ${elapsed}ms\n`);
 
-    // Diagnose error
-    let errorType = 'UNKNOWN_ERROR';
-    let userMessage = 'An unexpected error occurred';
+    let errorType = 'ANTHROPIC_UNKNOWN_ERROR';
     let statusCode = 500;
 
-    if (error?.code === 'invalid_api_key') {
-      errorType = 'INVALID_API_KEY';
-      userMessage = 'API authentication failed. Please contact support.';
-      console.error(`[Pluco Assistant API] [${requestId}] DIAGNOSIS: Anthropic API key is invalid or expired`);
+    if (error?.code === 'invalid_api_key' || error?.status === 401) {
+      errorType = 'ANTHROPIC_AUTH_ERROR';
       statusCode = 401;
-    } else if (error?.code === 'invalid_request_error') {
-      errorType = 'INVALID_REQUEST';
-      userMessage = 'Invalid request to AI service. Try a different question.';
-      console.error(`[Pluco Assistant API] [${requestId}] DIAGNOSIS: Request format issue`);
-      statusCode = 400;
-    } else if (error?.code === 'model_not_found') {
-      errorType = 'MODEL_NOT_FOUND';
-      userMessage = 'AI model not available.';
-      console.error(`[Pluco Assistant API] [${requestId}] DIAGNOSIS: Claude model name is incorrect`);
-      statusCode = 404;
-    } else if (error?.code === 'insufficient_quota') {
-      errorType = 'BILLING_ISSUE';
-      userMessage = 'API quota exceeded. Our team is working on this.';
-      console.error(`[Pluco Assistant API] [${requestId}] DIAGNOSIS: Anthropic account has no credits`);
+    } else if (error?.code === 'insufficient_quota' || error?.status === 429) {
+      errorType = 'ANTHROPIC_BILLING_ERROR';
       statusCode = 429;
-    } else if (error?.message?.includes('timeout')) {
-      errorType = 'TIMEOUT';
-      userMessage = 'Request timed out. Please try again.';
-      console.error(`[Pluco Assistant API] [${requestId}] DIAGNOSIS: Network timeout calling Anthropic`);
-      statusCode = 504;
-    } else if (error?.message?.includes('network')) {
-      errorType = 'NETWORK_ERROR';
-      userMessage = 'Network error. Please try again.';
-      console.error(`[Pluco Assistant API] [${requestId}] DIAGNOSIS: Network connectivity issue`);
+    } else if (error?.code === 'model_not_found' || error?.status === 404) {
+      errorType = 'ANTHROPIC_MODEL_ERROR';
+      statusCode = 404;
+    } else if (error?.status === 500 || error?.status === 502 || error?.status === 503) {
+      errorType = 'ANTHROPIC_SERVICE_ERROR';
       statusCode = 503;
-    } else {
-      console.error(`[Pluco Assistant API] [${requestId}] DIAGNOSIS: Unknown error type`);
-      console.error(`[Pluco Assistant API] [${requestId}] Full error:`, JSON.stringify(error, null, 2));
     }
-
-    console.error(`[Pluco Assistant API] [${requestId}] ===== RETURNING ERROR RESPONSE =====\n`);
 
     return NextResponse.json(
       {
-        error: userMessage,
+        success: false,
         errorType,
+        message: 'Failed to get response from AI service.',
         routeReached: true,
-        envKeyExists: API_KEY ? true : false,
-        debug: `Error calling Anthropic: ${error?.message}`,
+        envKeyExists: !!API_KEY,
+        hasMessage: true,
       },
       { status: statusCode }
     );
