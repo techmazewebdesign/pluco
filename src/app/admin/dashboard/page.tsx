@@ -15,6 +15,7 @@ import DashboardTourProvider from '@/components/tour/DashboardTourProvider';
 import { adminDashboardTour } from '@/lib/tours/adminDashboardTour';
 import GuideMeButton from '@/components/tour/GuideMeButton';
 import HelpPanel from '@/components/tour/HelpPanel';
+import ConsultationRequestsSection from '@/components/admin/ConsultationRequestsSection';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -372,6 +373,16 @@ export default function AdminDashboard() {
                 ? 'از اینجا می‌توانید تمام موکلین، پرونده‌ها، پیام‌ها و گزارش‌ها را مدیریت کنید.'
                 : 'Manage all clients, cases, messages, and reports from this centralized admin panel.'}
             </p>
+          </motion.div>
+
+          {/* Consultation Requests Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="mt-12 md:mt-16"
+          >
+            <ConsultationRequestsSection />
           </motion.div>
         </main>
       </div>

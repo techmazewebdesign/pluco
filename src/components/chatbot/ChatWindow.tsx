@@ -8,6 +8,8 @@ import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { ChatMessage, ChatSession, ChatRole } from '@/lib/types/chatbot';
 import InquiryForm from './InquiryForm';
+import ConsultationForm from './ConsultationForm';
+import { isBookingIntent, BOOKING_TRIGGER_RESPONSE } from '@/lib/utils/bookingDetection';
 
 const FAQ_BUTTONS = [
   'Which service do I need?',
@@ -30,6 +32,7 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
   const [error, setError] = useState('');
   const [session, setSession] = useState<ChatSession | null>(null);
   const [showInquiryForm, setShowInquiryForm] = useState(false);
+  const [showConsultationForm, setShowConsultationForm] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [hasWelcome, setHasWelcome] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
@@ -313,6 +316,14 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
       }
 
       setMessages(prev => [...prev, assistantMessage]);
+
+      // Check if user message indicates booking intent
+      if (isBookingIntent(content.trim())) {
+        console.log('[Chatbot] Booking intent detected!');
+        setTimeout(() => {
+          setShowConsultationForm(true);
+        }, 500);
+      }
     } catch (err: any) {
       console.error('[Chatbot] Error in sendMessage:', err?.message || String(err));
       setError(err?.message || 'Failed to send message. Please try again.');
@@ -323,6 +334,18 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
 
   const handleFAQButtonClick = (question: string) => {
     sendMessage(question);
+  };
+
+  const handleConsultationSubmitted = (formData: any) => {
+    // Add confirmation message to chat
+    const confirmMessage: ChatMessage = {
+      id: `msg_${Date.now()}`,
+      role: 'system',
+      content: `Thank you for your consultation request, ${formData.fullName}. This is not a confirmed appointment yet. Our team will review availability and conflict checks, then contact you to confirm.`,
+      createdAt: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, confirmMessage]);
+    setShowConsultationForm(false);
   };
 
   const handleInquirySubmit = async (data: { name: string; email: string; phone: string; service: string; nationality: string; residenceCountry: string }) => {
@@ -487,7 +510,7 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
       </div>
 
       {/* FAQ Buttons - Show if no conversation yet */}
-      {messages.length <= 1 && !showInquiryForm && (
+      {messages.length <= 1 && !showInquiryForm && !showConsultationForm && (
         <div className="px-4 py-3 border-t border-gray-200 bg-white">
           <p className="text-xs text-gray-600 mb-2 font-semibold">Quick questions:</p>
           <div className="space-y-2">
@@ -512,6 +535,17 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
         </div>
       )}
 
+      {/* Consultation Form */}
+      {showConsultationForm && (
+        <div className="px-4 py-3 border-t border-gray-200 bg-white overflow-y-auto max-h-96">
+          <ConsultationForm
+            sessionId={sessionId}
+            onClose={() => setShowConsultationForm(false)}
+            onSubmitted={handleConsultationSubmitted}
+          />
+        </div>
+      )}
+
       {/* Error Message */}
       {error && (
         <div className="px-4 py-2 bg-red-50 border-t border-red-200 flex items-center gap-2">
@@ -522,10 +556,10 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
 
       {/* Input Area */}
       <div className="px-4 py-3 border-t border-gray-200 bg-white space-y-2">
-        {!showInquiryForm && (
+        {!showInquiryForm && !showConsultationForm && (
           <>
             <button
-              onClick={() => setShowInquiryForm(true)}
+              onClick={() => setShowConsultationForm(true)}
               className="w-full text-sm py-2 rounded font-semibold transition-all"
               style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
             >
