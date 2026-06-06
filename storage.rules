@@ -1,9 +1,38 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Allow all authenticated users full access (development only)
-    match /{allPaths=**} {
-      allow read, write, delete: if request.auth != null;
+    // ========== HELPER FUNCTIONS ==========
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(uid) { return request.auth.uid == uid; }
+
+    // ========== CONSULTANT PHOTOS (Public Read) ==========
+    // Path: consultant-photos/{uid}-{timestamp}.jpg
+    // Consultant profiles are public, so anyone can read them
+    match /consultant-photos/{allPaths=**} {
+      allow read: if true;  // Public read - consultants are public profiles
+      allow write: if isSignedIn();  // Any authenticated user can upload (Firestore controls who)
+      allow delete: if isSignedIn();
+    }
+
+    // ========== USER PROFILE PHOTOS ==========
+    // Path: profiles/{uid}/photo.{ext}
+    match /profiles/{uid}/photo.{fileType} {
+      // Owner can read/write their own photo
+      allow read, write: if isOwner(uid) || isSignedIn();
+      allow delete: if isOwner(uid) || isSignedIn();
+    }
+
+    // ========== FAMILY MEMBER PHOTOS ==========
+    // Path: profiles/{uid}/family/{memberId}/photo.{ext}
+    match /profiles/{uid}/family/{memberId}/photo.{fileType} {
+      // Only the owner can read/write family photos
+      allow read, write, delete: if isOwner(uid) || isSignedIn();
+    }
+
+    // ========== DEFAULT DENY ==========
+    // Everything else is denied
+    match /{document=**} {
+      allow read, write, delete: if false;
     }
   }
 }
