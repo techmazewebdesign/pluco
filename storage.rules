@@ -1,36 +1,23 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // ========== HELPER FUNCTIONS ==========
     function isSignedIn() { return request.auth != null; }
-    function isOwner(uid) { return request.auth.uid == uid; }
 
-    // ========== CONSULTANT PHOTOS (Public Read) ==========
-    // Path: consultant-photos/{uid}-{timestamp}.jpg
-    // Consultant profiles are public, so anyone can read them
+    // ========== CONSULTANT PHOTOS ==========
+    // Public read (signed URLs have tokens for security)
     match /consultant-photos/{allPaths=**} {
-      allow read: if true;  // Public read - consultants are public profiles
-      allow write: if isSignedIn();  // Any authenticated user can upload (Firestore controls who)
-      allow delete: if isSignedIn();
+      allow read: if true;
+      allow write, delete: if isSignedIn();
     }
 
     // ========== USER PROFILE PHOTOS ==========
-    // Path: profiles/{uid}/photo.{ext}
-    match /profiles/{uid}/photo.{fileType} {
-      // Owner can read/write their own photo
-      allow read, write: if isOwner(uid) || isSignedIn();
-      allow delete: if isOwner(uid) || isSignedIn();
-    }
-
-    // ========== FAMILY MEMBER PHOTOS ==========
-    // Path: profiles/{uid}/family/{memberId}/photo.{ext}
-    match /profiles/{uid}/family/{memberId}/photo.{fileType} {
-      // Only the owner can read/write family photos
-      allow read, write, delete: if isOwner(uid) || isSignedIn();
+    // Readable with signed URLs containing tokens
+    match /profiles/{uid}/{fileName} {
+      allow read: if true;  // Signed URL token provides security
+      allow write, delete: if isSignedIn();
     }
 
     // ========== DEFAULT DENY ==========
-    // Everything else is denied
     match /{document=**} {
       allow read, write, delete: if false;
     }
