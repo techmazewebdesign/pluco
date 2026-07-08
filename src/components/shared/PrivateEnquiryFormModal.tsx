@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, CheckCircle, ArrowRight, Lock } from 'lucide-react';
 
@@ -9,6 +9,8 @@ interface PrivateEnquiryFormModalProps {
   onClose: () => void;
   consultantId?: string;
   consultantName?: string;
+  defaultService?: string;
+  defaultMessage?: string;
 }
 
 type FormData = {
@@ -34,6 +36,8 @@ export default function PrivateEnquiryFormModal({
   onClose,
   consultantId,
   consultantName,
+  defaultService,
+  defaultMessage,
 }: PrivateEnquiryFormModalProps) {
   const [form, setForm] = useState<FormData>({
     firstName: '',
@@ -41,8 +45,8 @@ export default function PrivateEnquiryFormModal({
     email: '',
     phone: '',
     company: '',
-    service: '',
-    message: '',
+    service: defaultService || '',
+    message: defaultMessage || '',
     nationality: '',
     currentCountry: '',
     language: 'English',
@@ -50,6 +54,16 @@ export default function PrivateEnquiryFormModal({
     preferredContact: '',
     consent: false,
   });
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setForm(prev => ({
+      ...prev,
+      service: prev.service || defaultService || '',
+      message: defaultMessage && !prev.message ? defaultMessage : prev.message,
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, defaultService, defaultMessage]);
 
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -274,6 +288,7 @@ export default function PrivateEnquiryFormModal({
                           <option value="">Select a service</option>
                           <option>New Identity / Second Citizenship</option>
                           <option>EU Residency</option>
+                          <option>Spain Digital Nomad Visa / Remote Residency Support</option>
                           <option>EU Property Purchase</option>
                           <option>US Green Card / EB-5</option>
                           <option>Banking & Compliance</option>

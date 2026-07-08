@@ -27,6 +27,7 @@ export default function Header() {
     { key: 'nav.newIdentity' as const,             href: '/new-identity' },
     { key: 'nav.euPropertyPurchase' as const,      href: '/eu-property-purchase' },
     { key: 'nav.euResidency' as const,             href: '/eu-residency' },
+    { key: 'nav.spainDigitalNomad' as const,       href: '/spain-digital-nomad-visa' },
     { key: 'nav.usGreenCard' as const,             href: '/us-green-card' },
     { key: 'nav.banking' as const,                 href: '/banking' },
     { key: 'nav.disputeResolution' as const,       href: '/dispute-resolution' },

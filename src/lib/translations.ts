@@ -14,6 +14,7 @@ export const translations = {
   'nav.newIdentity':            { en: 'New Identity',                 fa: 'هویت جدید' },
   'nav.euPropertyPurchase':     { en: 'EU Property Purchase',         fa: 'خرید ملک در اروپا' },
   'nav.euResidency':            { en: 'EU Residency',                 fa: 'اقامت اروپا' },
+  'nav.spainDigitalNomad':      { en: 'Spain Digital Nomad Visa',     fa: 'ویزای نومد دیجیتال اسپانیا' },
   'nav.usGreenCard':            { en: 'US Green Card',                fa: 'گرین کارت آمریکا' },
   'nav.banking':                { en: 'Banking',                      fa: 'بانکداری' },
   'nav.disputeResolution':      { en: 'Dispute Resolution',           fa: 'حل و فصل اختلافات' },

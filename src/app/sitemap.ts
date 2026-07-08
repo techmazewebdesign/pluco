@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: '/new-identity',            priority: 0.9,  changeFrequency: 'monthly' },
     { url: '/eu-property-purchase',    priority: 0.9,  changeFrequency: 'monthly' },
     { url: '/eu-residency',            priority: 0.9,  changeFrequency: 'monthly' },
+    { url: '/spain-digital-nomad-visa', priority: 0.9,  changeFrequency: 'monthly' },
     { url: '/us-green-card',           priority: 0.9,  changeFrequency: 'monthly' },
     { url: '/banking',                 priority: 0.8,  changeFrequency: 'monthly' },
     { url: '/dispute-resolution',      priority: 0.8,  changeFrequency: 'monthly' },

@@ -548,6 +548,7 @@ export const MEETING_PLATFORM_LABELS: Record<MeetingPlatform, { en: string; fa: 
 
 export const PRODUCT_TYPES: Record<string, { en: string; fa: string; icon: string }> = {
   'eu-residency':       { en: 'EU Residency',        fa: 'اقامت اروپا',          icon: '🇪🇺' },
+  'spain-digital-nomad': { en: 'Spain Digital Nomad Visa / Remote Residency Support', fa: 'ویزای نومد دیجیتال اسپانیا', icon: '🇪🇸' },
   'eu-property':        { en: 'EU Property Purchase', fa: 'خرید ملک اروپا',       icon: '🏠' },
   'us-green-card':      { en: 'US Green Card',       fa: 'کارت سبز آمریکا',      icon: '🇺🇸' },
   'banking':            { en: 'Banking Solutions',   fa: 'خدمات بانکی',          icon: '🏦' },

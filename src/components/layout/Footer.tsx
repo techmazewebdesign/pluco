@@ -11,6 +11,7 @@ export default function Footer() {
   const services = [
     [t('nav.newIdentity'),            '/new-identity'],
     [t('nav.euResidency'),            '/eu-residency'],
+    [t('nav.spainDigitalNomad'),      '/spain-digital-nomad-visa'],
     [t('nav.euPropertyPurchase'),     '/eu-property-purchase'],
     [t('nav.usGreenCard'),            '/us-green-card'],
     [t('nav.banking'),                '/banking'],
