@@ -7,12 +7,16 @@ import RTLWrapper from "@/components/shared/RTLWrapper";
 import SiteShell from "@/components/layout/SiteShell";
 import ChatbotWidget from "@/components/chatbot/ChatbotWidget";
 
+const SITE_TITLE = "PLUCO GROUP – European Immigration Law & Private Client Advisory";
+const SITE_DESCRIPTION = "Discreet legal and strategic advisory for internationally mobile individuals and families.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL("https://plucogroup.com"),
   title: {
-    default: "PLUCO GROUP – European Immigration Law & Private Client Advisory",
+    default: SITE_TITLE,
     template: "%s | PLUCO GROUP",
   },
-  description: "PLUCO GROUP provides discreet legal and strategic advisory services for high-net-worth individuals, families, investors and entrepreneurs seeking European residency, second citizenship, property acquisition, banking support and cross-border legal protection.",
+  description: SITE_DESCRIPTION,
   keywords: [
     "European immigration law", "private client advisory", "EU residency", "second citizenship",
     "EU property purchase", "banking compliance", "dispute resolution", "international contracts",
@@ -25,11 +29,18 @@ export const metadata: Metadata = {
     apple: "/favicon.svg",
   },
   openGraph: {
-    title: "PLUCO GROUP – European Immigration Law & Private Client Advisory",
-    description: "Discreet legal and strategic advisory for internationally mobile individuals and families.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     type: "website",
     locale: "en_US",
     siteName: "PLUCO GROUP",
+    images: [{ url: "/favicon.svg" }],
+  },
+  twitter: {
+    card: "summary",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: ["/favicon.svg"],
   },
 };
 
