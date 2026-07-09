@@ -94,13 +94,19 @@ export default function SpainHero({ isRTL, onRequestAssessment, onViewPackages }
       style={{ background: `radial-gradient(120% 100% at 15% 0%, ${NAVY} 0%, ${NAVY_DEEP} 65%, #030d24 100%)` }}
     >
       {/* Image layer — full-bleed, starts around mid-frame and fades into the navy background.
-          No border, no card: the PNG's own alpha cutout plus these gradients do the blending. */}
+          No border, no card: the PNG's own alpha cutout plus these gradients do the blending.
+          Mirrored for RTL: image visual focus moves to the left, text stays on the right, so
+          the fade still runs from the image toward the text side in both directions. */}
       <div
         aria-hidden
-        className="absolute inset-y-0 right-0 w-full lg:w-[64%] overflow-hidden"
+        className={`absolute inset-y-0 w-full lg:w-[64%] overflow-hidden ${isRTL ? 'left-0' : 'right-0'}`}
         style={{
-          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 16%, black 40%, black 100%)',
-          maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 16%, black 40%, black 100%)',
+          WebkitMaskImage: isRTL
+            ? 'linear-gradient(to left, transparent 0%, rgba(0,0,0,0.4) 16%, black 40%, black 100%)'
+            : 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 16%, black 40%, black 100%)',
+          maskImage: isRTL
+            ? 'linear-gradient(to left, transparent 0%, rgba(0,0,0,0.4) 16%, black 40%, black 100%)'
+            : 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 16%, black 40%, black 100%)',
         }}
       >
         <motion.div
@@ -124,16 +130,16 @@ export default function SpainHero({ isRTL, onRequestAssessment, onViewPackages }
             alt="Remote work setup on a Spanish balcony overlooking the city at sunset"
             fill
             priority
-            className="object-cover object-right"
+            className={`object-cover ${isRTL ? 'object-left' : 'object-right'}`}
           />
         </motion.div>
 
-        {/* Left-to-right navy fade — guarantees text contrast regardless of crop */}
-        <div className="absolute inset-0" style={{ background: `linear-gradient(90deg, ${NAVY} 0%, rgba(7,28,60,0.85) 20%, rgba(7,28,60,0.35) 45%, transparent 68%)` }} />
+        {/* Navy fade from the text side into the image — direction mirrors for RTL */}
+        <div className="absolute inset-0" style={{ background: `linear-gradient(${isRTL ? 270 : 90}deg, ${NAVY} 0%, rgba(7,28,60,0.85) 20%, rgba(7,28,60,0.35) 45%, transparent 68%)` }} />
         {/* Top/bottom fade into the section background */}
         <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(7,28,60,0.35) 0%, transparent 22%, transparent 78%, ${NAVY} 100%)` }} />
-        {/* Radial vignette for focus + extra text-side legibility */}
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 72% 45%, transparent 0%, rgba(7,24,47,0.18) 45%, rgba(7,24,47,0.7) 100%)' }} />
+        {/* Radial vignette for focus + extra text-side legibility — mirrored for RTL */}
+        <div className="absolute inset-0" style={{ background: `radial-gradient(circle at ${isRTL ? 28 : 72}% 45%, transparent 0%, rgba(7,24,47,0.18) 45%, rgba(7,24,47,0.7) 100%)` }} />
         {/* Stronger scrim on small screens, where the image sits behind the full-width copy */}
         <div className="absolute inset-0 lg:hidden" style={{ backgroundColor: 'rgba(5,21,48,0.62)' }} />
       </div>
@@ -145,7 +151,7 @@ export default function SpainHero({ isRTL, onRequestAssessment, onViewPackages }
           initial="hidden"
           animate="visible"
           variants={prefersReducedMotion ? containerVariantsReduced : containerVariants}
-          className="max-w-2xl"
+          className={`max-w-2xl ${isRTL ? 'ml-auto' : ''}`}
         >
           <motion.p
             variants={itemVariants}
