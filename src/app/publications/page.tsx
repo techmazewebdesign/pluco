@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { BookOpen, ExternalLink, ArrowRight, Clock } from 'lucide-react';
+import { ExternalLink, ArrowRight, Clock } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import PageHero from '@/components/shared/PageHero';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,9 +15,9 @@ const publicationsByCategory = {
         author: 'Reza Ostad',
         role: 'International Banking, Compliance and Human Rights Lawyer',
         desc: 'Examines financial discrimination, banking exclusion and the legal challenges faced by individuals from sanctioned jurisdictions. The book explores how banking compliance, nationality, human rights and access to financial services increasingly intersect in the modern world.',
-        details: ['English language', 'Paperback', '274 pages', 'Price: 29 EUR'],
+        details: ['English language', 'Paperback', '297 pages', 'Price: 29 EUR'],
         status: 'available',
-        amazonLink: 'https://www.amazon.com/Second-Class-Citizen-Financial-Discrimination/s?k=second+class+citizen+reza+ostad',
+        buyLink: 'https://secondclasscitizenbook.com',
       },
       {
         title: 'Banking Discrimination and Financial Exclusion',
@@ -71,9 +72,9 @@ const publicationsByCategory = {
         author: 'رضا استاد',
         role: 'وکیل بین‌المللی بانکداری، انطباق و حقوق بشر',
         desc: 'تبعیض مالی، محرومیت بانکی و چالش‌های حقوقی افراد از حوزه‌های قضایی تحریم‌شده را بررسی می‌کند. این کتاب نشان می‌دهد چگونه انطباق بانکی، ملیت، حقوق بشر و دسترسی به خدمات مالی در جهان مدرن به طور فزاینده‌ای با هم تلاقی می‌یابند.',
-        details: ['زبان انگلیسی', 'جلد کاغذی', '۲۷۴ صفحه', 'قیمت: ۲۹ یورو'],
+        details: ['زبان انگلیسی', 'جلد کاغذی', '۲۹۷ صفحه', 'قیمت: ۲۹ یورو'],
         status: 'available',
-        amazonLink: 'https://www.amazon.com/Second-Class-Citizen-Financial-Discrimination/s?k=second+class+citizen+reza+ostad',
+        buyLink: 'https://secondclasscitizenbook.com',
       },
       {
         title: 'تبعیض بانکی و محرومیت مالی',
@@ -150,7 +151,7 @@ export default function Publications() {
       />
 
       {/* Featured Publication */}
-      {featuredPub && 'amazonLink' in featuredPub && (
+      {featuredPub && 'buyLink' in featuredPub && (
         <section className="py-20 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="mb-16">
@@ -158,13 +159,14 @@ export default function Publications() {
                 {isRTL ? 'انتشار ویژه' : 'FEATURED PUBLICATION'}
               </p>
               <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-10 border border-gray-200 rounded-xl p-8">
-                <div className="rounded-xl flex flex-col items-center justify-center p-8 text-center aspect-[3/4]" style={{ backgroundColor: '#071C3C' }}>
-                  <BookOpen className="w-10 h-10 mb-4" style={{ color: '#C9A35A' }} strokeWidth={1} />
-                  <p className="text-xl font-serif font-bold text-white leading-tight mb-2">{isRTL ? 'شهروند درجه دوم' : 'SECOND CLASS CITIZEN'}</p>
-                  <div className="w-12 h-px my-3" style={{ backgroundColor: '#C9A35A' }} />
-                  <p className="text-xs" style={{ color: '#C9A35A' }}>
-                    {isRTL ? (featuredPub as any).author || 'REZA OSTAD' : 'REZA OSTAD'}
-                  </p>
+                <div className="relative rounded-xl overflow-hidden aspect-[3/4] border border-gray-200">
+                  <Image
+                    src="/images/second-class-citizen-book-cover.jpeg"
+                    alt={isRTL ? 'شهروند درجه دوم' : 'Second Class Citizen — book cover'}
+                    fill
+                    sizes="280px"
+                    className="object-cover"
+                  />
                 </div>
 
                 <div className="flex flex-col justify-between">
@@ -192,12 +194,12 @@ export default function Publications() {
                     )}
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <a href={(featuredPub as any).amazonLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-lg transition-all hover:brightness-110" style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>
-                      <span style={{ fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'خرید از آمازون' : 'Buy on Amazon'}</span>
+                    <a href={(featuredPub as any).buyLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-lg transition-all hover:brightness-110" style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>
+                      <span style={{ fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'خرید کتاب' : 'Buy the Book'}</span>
                       <ExternalLink className="w-4 h-4" />
                     </a>
-                    <a href="mailto:info@plucogroup.com?subject=Second Class Citizen Book Order" className="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-medium rounded-lg border transition-all hover:bg-gray-50" style={{ borderColor: '#071C3C', color: '#071C3C' }}>
-                      <span style={{ fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'سفارش از طریق PLUCO GROUP' : 'Order via PLUCO GROUP'}</span>
+                    <a href={(featuredPub as any).buyLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-medium rounded-lg border transition-all hover:bg-gray-50" style={{ borderColor: '#071C3C', color: '#071C3C' }}>
+                      <span style={{ fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'اطلاعات بیشتر' : 'Learn More'}</span>
                     </a>
                   </div>
                 </div>
