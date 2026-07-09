@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Check, Users, Briefcase, Building2, Home, MapPin, Landmark, Shield } from 'lucide-react';
-import PageHero from '@/components/shared/PageHero';
+import SpainHero from '@/components/spain/SpainHero';
 import LegalDisclaimer from '@/components/shared/LegalDisclaimer';
 import PrivateEnquiryFormModal from '@/components/shared/PrivateEnquiryFormModal';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -236,18 +236,25 @@ export default function SpainDigitalNomadVisaPage() {
     setIsModalOpen(true);
   };
 
+  const scrollToPackages = () => {
+    document.getElementById('packages')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
     <div className="min-h-screen bg-white">
-      <PageHero
-        eyebrow={isRTL ? 'اسپانیا · ویزای نومد دیجیتال' : 'SPAIN · DIGITAL NOMAD VISA'}
-        title={isRTL ? 'بسته‌های پشتیبانی ویزای نومد دیجیتال اسپانیا' : 'Spain Digital Nomad Visa Support Packages'}
-        subtitle={isRTL
-          ? 'PLUCO GROUP آماده‌سازی ساختاریافته، هماهنگی مستندات و انتقال به همکاران حقوقی را برای کارمندان، فریلنسرها، صاحبان کسب‌وکار و خانواده‌هایی که مسیر اقامت دورکاری اسپانیا را در نظر دارند ارائه می‌دهد. ما تأیید ویزا را تضمین نمی‌کنیم — هر پرونده مشمول بررسی واجد شرایط بودن، قوانین اسپانیا و صلاحدید مقامات ذی‌صلاح است.'
-          : "PLUCO GROUP provides structured preparation, documentation coordination and legal partner handoff for employees, freelancers, business owners and families considering Spain's remote-work residence route. We do not guarantee visa approval — every case is subject to eligibility review, applicable Spanish law and the discretion of the competent authorities."}
+      <SpainHero
+        isRTL={isRTL}
+        onRequestAssessment={() => openEnquiry()}
+        onViewPackages={scrollToPackages}
       />
 
+      {/* Elegant section divider */}
+      <div className="flex justify-center bg-white pt-14">
+        <div className="w-16 h-px" style={{ background: `linear-gradient(90deg, transparent, ${GOLD}, transparent)` }} />
+      </div>
+
       {/* Who this is for */}
-      <section className="py-20 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+      <section className="py-14 md:py-20 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="mb-12 max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: GOLD, fontFamily: isRTL ? ff : undefined, letterSpacing: isRTL ? 'normal' : undefined }}>{isRTL ? 'چه کسانی مخاطب این خدمت هستند' : 'WHO THIS IS FOR'}</p>
@@ -304,7 +311,7 @@ export default function SpainDigitalNomadVisaPage() {
       </section>
 
       {/* Package comparison */}
-      <section className="py-20 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+      <section id="packages" className="py-20 md:py-24 bg-white scroll-mt-20" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="mb-12 max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: GOLD, fontFamily: isRTL ? ff : undefined, letterSpacing: isRTL ? 'normal' : undefined }}>{isRTL ? 'مقایسه بسته‌ها' : 'PACKAGE COMPARISON'}</p>
@@ -319,9 +326,10 @@ export default function SpainDigitalNomadVisaPage() {
                   key={pkg.tier}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
+                  whileHover={{ y: -4 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className="rounded-xl p-8 flex flex-col"
+                  className="rounded-xl p-8 flex flex-col transition-shadow duration-300 hover:shadow-xl"
                   style={{
                     border: pkg.featured ? `2px solid ${GOLD}` : '1px solid #E5E7EB',
                     backgroundColor: pkg.featured ? '#FFFDF8' : '#FFFFFF',
@@ -446,23 +454,32 @@ export default function SpainDigitalNomadVisaPage() {
       </section>
 
       {/* CTA form */}
-      <section className="py-20" style={{ backgroundColor: NAVY }} dir={isRTL ? 'rtl' : 'ltr'}>
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="relative overflow-hidden py-20 md:py-24" style={{ backgroundColor: NAVY }} dir={isRTL ? 'rtl' : 'ltr'}>
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(60% 80% at 50% 0%, rgba(201,163,90,0.14) 0%, transparent 70%)' }}
+        />
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <div className="w-10 h-px mx-auto mb-6" style={{ backgroundColor: GOLD }} />
             <h2 className="text-2xl md:text-3xl font-serif text-white mb-4" style={{ fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'شروع بررسی محرمانه واجد شرایط بودن' : 'Start a confidential eligibility review'}</h2>
             <p className="text-sm max-w-xl mx-auto mb-8 leading-relaxed" style={{ color: '#CBD5E0', fontFamily: isRTL ? ff : undefined }}>
               {isRTL
                 ? 'شرایط خود را با ما در میان بگذارید و تیم ما وضعیت شما را در مقابل الزامات فعلی ویزای نومد دیجیتال اسپانیا بررسی می‌کند، پیش از توصیه یک بسته و مسیر مناسب.'
                 : 'Share your situation and our team will review your circumstances against current Spanish Digital Nomad Visa requirements before recommending a package and route.'}
             </p>
-            <button
+            <motion.button
               onClick={() => openEnquiry()}
-              className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-lg transition-all hover:brightness-110"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-lg transition-colors hover:brightness-110"
               style={{ backgroundColor: GOLD, color: NAVY, fontFamily: isRTL ? ff : undefined }}
             >
               {isRTL ? 'درخواست بررسی واجد شرایط بودن' : 'Request Eligibility Review'}
               <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
-            </button>
+            </motion.button>
             <p className="text-xs mt-6" style={{ color: '#94A3B8', fontFamily: isRTL ? ff : undefined }}>
               {isRTL ? 'ایمیل: ' : 'Email: '}<a href="mailto:info@plucogroup.com" className="hover:text-white transition-colors">info@plucogroup.com</a> · Ksawerów 3, Warsaw, 02-656, Poland
             </p>
