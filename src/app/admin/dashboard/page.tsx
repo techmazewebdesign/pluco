@@ -6,8 +6,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { LogOut, Users, FileText, MessageSquare, BarChart3, Bot, Zap, Shield, Menu, X, BookOpen, Calendar } from 'lucide-react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { isAdminUser } from '@/lib/utils/adminUtils';
 import Link from 'next/link';
 import NotificationDropdown from '@/components/admin/NotificationDropdown';
 import RoleBadge from '@/components/shared/RoleBadge';
@@ -29,12 +30,51 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showHelpPanel, setShowHelpPanel] = useState(false);
   const [tourCompleted, setTourCompleted] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [checkingAdmin, setCheckingAdmin] = useState(true);
 
-  // Check if admin
+  // Check if user is logged in and is admin
   useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
+    if (loading) {
+      return;
     }
+
+    if (!user) {
+      console.log('[AdminGuard] No user, redirecting to login');
+      router.push('/login');
+      return;
+    }
+
+    const checkAdminAccess = async () => {
+      try {
+        console.log('[AdminGuard] user:', user.email);
+
+        // Get user profile from Firestore
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        const userProfile = userDocSnap.exists() ? userDocSnap.data() : null;
+
+        console.log('[AdminGuard] profile:', userProfile);
+
+        // Check if admin
+        const adminStatus = isAdminUser(userProfile);
+        console.log('[AdminGuard] isAdmin:', adminStatus);
+
+        if (!adminStatus) {
+          console.log('[AdminGuard] User is not admin, redirecting to /dashboard');
+          router.push('/dashboard');
+          return;
+        }
+
+        setIsAdmin(true);
+        setCheckingAdmin(false);
+      } catch (error) {
+        console.error('[AdminGuard] Error checking admin status:', error);
+        router.push('/dashboard');
+      }
+    };
+
+    checkAdminAccess();
   }, [user, loading, router]);
 
   // Load admin stats
@@ -70,7 +110,7 @@ export default function AdminDashboard() {
     }
   };
 
-  if (loading) {
+  if (loading || checkingAdmin || !isAdmin) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">

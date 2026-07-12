@@ -68,6 +68,7 @@ export default function EnquirePage() {
           numFamilyMembers: form.numFamilyMembers,
           urgency: form.urgency,
           preferredContact: form.preferredContact,
+          consent: form.consent,
         }),
       });
 

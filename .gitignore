@@ -41,3 +41,13 @@ yarn-error.log*
 next-env.d.ts
 serviceAccountKey.json
 public/pluco-group-firebase-adminsdk-fbsvc-5c5bc4d1f3.json
+
+# Firebase/Admin secrets
+serviceAccountKey.json
+*firebaseadminsdk*.json
+*firebase-adminsdk*.json
+private-keys-backup/
+*.pem
+*.key
+.env
+.env.local

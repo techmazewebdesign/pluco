@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getAdminDb } from '@/lib/firebase-admin';
 
 async function sendToGoogleSheets(data: any) {
   try {
@@ -51,33 +50,35 @@ async function sendToGoogleSheets(data: any) {
 
 export async function POST(req: NextRequest) {
   try {
-    const resend = new Resend(process.env.RESEND_API_KEY);
     const body = await req.json();
     const {
       fullName, email, phone, nationality, country,
       familyMembers, numFamilyMembers, service, language, description, urgency, preferredContact,
       consultantId, consultantName, status, firstName, lastName, preferredDate, preferredTime,
+      consent, packageInterest, locale, sourcePage,
     } = body;
-
-    // Initialize Firebase
-    const firebaseConfig = {
-      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-    };
-
-    const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-    const db = getFirestore(app);
 
     // Extract first and last name if not provided separately
     const names = fullName ? fullName.split(' ') : [];
     const firstNameValue = firstName || (names[0] || '');
     const lastNameValue = lastName || (names.slice(1).join(' ') || '');
 
-    // Save enquiry to Firestore
+    // Required-field validation
+    const missing: string[] = [];
+    if (!firstNameValue) missing.push('firstName');
+    if (!lastNameValue) missing.push('lastName');
+    if (!email) missing.push('email');
+    if (!service) missing.push('service');
+    if (!description) missing.push('description');
+    if (!consent) missing.push('consent');
+    if (missing.length) {
+      return NextResponse.json(
+        { success: false, error: `Missing required field(s): ${missing.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    // Save enquiry to Firestore via Admin SDK (server-side credentials, bypasses client security rules)
     const enquiryData = {
       firstName: firstNameValue,
       lastName: lastNameValue,
@@ -86,6 +87,7 @@ export async function POST(req: NextRequest) {
       company: body.company || '',
       service,
       description,
+      packageInterest: packageInterest || null,
       nationality,
       country,
       language,
@@ -95,6 +97,9 @@ export async function POST(req: NextRequest) {
       preferredContactMethod: preferredContact,
       preferredDate,
       preferredTime,
+      consent: !!consent,
+      locale: locale || null,
+      sourcePage: sourcePage || null,
       consultantId: consultantId || null,
       consultantName: consultantName || null,
       status: status || (consultantId ? 'assigned' : 'pending'),
@@ -102,23 +107,48 @@ export async function POST(req: NextRequest) {
       updatedAt: new Date().toISOString(),
     };
 
-    // Save to 'bookings' collection (used by consultant dashboard)
-    const bookingRef = await addDoc(collection(db, 'bookings'), {
-      ...enquiryData,
-      clientName: `${firstNameValue} ${lastNameValue}`,
-      clientEmail: email,
-      clientPhone: phone,
-      countryOfResidence: country,
-      message: description,
-      preferredLanguage: language,
-      preferredContactMethod: preferredContact,
-      source: consultantId ? 'consultant_book_now' : 'private_enquiry',
-    });
-    console.log('✓ Booking saved to Firestore:', bookingRef.id);
+    try {
+      const db = getAdminDb();
+      const bookingRef = await db.collection('bookings').add({
+        ...enquiryData,
+        clientName: `${firstNameValue} ${lastNameValue}`,
+        clientEmail: email,
+        clientPhone: phone,
+        countryOfResidence: country,
+        message: description,
+        preferredLanguage: language,
+        preferredContactMethod: preferredContact,
+        source: consultantId ? 'consultant_book_now' : 'private_enquiry',
+      });
+      console.log('✓ Booking saved to Firestore:', bookingRef.id);
+    } catch (dbErr) {
+      console.error('✗ Error saving booking to Firestore:', dbErr);
+      if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json(
+          { success: false, error: 'Server misconfiguration: unable to save enquiry.' },
+          { status: 500 }
+        );
+      }
+      console.log('[dev] Enquiry (not persisted, Firestore unavailable):', enquiryData);
+    }
 
-    const isFarsi = language === 'Farsi / Persian' || language === 'فارسی';
+    const isFarsi = language === 'Farsi / Persian' || language === 'فارسی' || locale === 'fa';
     const timestamp = new Date().toLocaleString('en-GB', { timeZone: 'Europe/Warsaw' });
     const fromAddress = process.env.RESEND_FROM || 'PLUCO GROUP <noreply@plucogroup.com>';
+    const toAddress = process.env.PRIVATE_ENQUIRY_TO_EMAIL || 'info@plucogroup.com';
+
+    if (!process.env.RESEND_API_KEY) {
+      console.log('Resend API key not configured — enquiry logged instead of emailed:', enquiryData);
+      if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json(
+          { success: false, error: 'Server misconfiguration: email service not configured.' },
+          { status: 500 }
+        );
+      }
+      return NextResponse.json({ success: true, dev: true });
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     // ── 0. Send to Google Sheets ────────────────────────────────────
     await sendToGoogleSheets({
@@ -129,8 +159,8 @@ export async function POST(req: NextRequest) {
     // ── 1. Notification to PLUCO GROUP ──────────────────────────────
     await resend.emails.send({
       from: fromAddress,
-      to: 'info@plucogroup.com',
-      subject: `New Client Enquiry – ${fullName} – ${service || 'General'}`,
+      to: toAddress,
+      subject: `New Private Enquiry — ${service || 'General'}`,
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <div style="background:#071C3C;padding:24px 32px;border-bottom:3px solid #C9A35A">
@@ -147,7 +177,12 @@ export async function POST(req: NextRequest) {
                 ['Country of Residence', country || '—'],
                 ['Family Members', familyMembers || '—'],
                 ['Preferred Service', service || '—'],
+                ['Package Interest', packageInterest || '—'],
                 ['Preferred Language', language || '—'],
+                ['Urgency', urgency || '—'],
+                ['Preferred Contact Method', preferredContact || '—'],
+                ['Locale', locale || '—'],
+                ['Source Page', sourcePage || '—'],
               ].map(([l, v]) => `
                 <tr>
                   <td style="padding:10px 0;border-bottom:1px solid #F1F5F9;color:#64748B;width:40%">${l}</td>

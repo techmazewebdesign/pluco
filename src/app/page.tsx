@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Hero from "@/components/sections/Hero";
+import FeaturedResidencyService from "@/components/sections/FeaturedResidencyService";
 import Services from "@/components/sections/Services";
 import Trust from "@/components/sections/Trust";
 import ConsultationProcess from "@/components/sections/ConsultationProcess";
@@ -17,6 +18,7 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <Hero />
+      <FeaturedResidencyService />
       <Services />
       <Trust />
       <ConsultationProcess />

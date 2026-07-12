@@ -12,6 +12,7 @@ interface PrivateEnquiryFormModalProps {
   consultantName?: string;
   defaultService?: string;
   defaultMessage?: string;
+  packageInterest?: string;
 }
 
 type FormData = {
@@ -79,6 +80,7 @@ export default function PrivateEnquiryFormModal({
   consultantName,
   defaultService,
   defaultMessage,
+  packageInterest,
 }: PrivateEnquiryFormModalProps) {
   const { isRTL } = useLanguage();
   const [form, setForm] = useState<FormData>({
@@ -148,6 +150,10 @@ export default function PrivateEnquiryFormModal({
           language: form.language,
           urgency: form.urgency,
           preferredContact: form.preferredContact,
+          consent: form.consent,
+          packageInterest: packageInterest || undefined,
+          locale: isRTL ? 'fa' : 'en',
+          sourcePage: typeof window !== 'undefined' ? window.location.pathname : undefined,
           // Consultant-specific fields
           ...(consultantId && {
             consultantId,

@@ -504,7 +504,8 @@ export default function SpainDigitalNomadVisaPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         defaultService={SERVICE_NAME}
-        defaultMessage={selectedTier ? `Package interest: ${selectedTier}` : undefined}
+        defaultMessage={selectedTier ? `Package interest: ${selectedTier}. ` : undefined}
+        packageInterest={selectedTier || undefined}
       />
     </div>
   );
