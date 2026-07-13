@@ -9,7 +9,7 @@ export default function DiscreetFirstContact() {
   const { isRTL } = useLanguage();
   const ff = "'Vazirmatn', Tahoma, Arial, sans-serif";
 
-  const whatsappLink = `https://wa.me/?text=${encodeURIComponent(
+  const whatsappLink = `https://wa.me/48730962085?text=${encodeURIComponent(
     'I would like to request a discreet WhatsApp consultation with PLUCO GROUP regarding a private client matter.'
   )}`;
 
