@@ -123,13 +123,9 @@ export async function POST(req: NextRequest) {
       console.log('✓ Booking saved to Firestore:', bookingRef.id);
     } catch (dbErr) {
       console.error('✗ Error saving booking to Firestore:', dbErr);
-      if (process.env.NODE_ENV === 'production') {
-        return NextResponse.json(
-          { success: false, error: 'Server misconfiguration: unable to save enquiry.' },
-          { status: 500 }
-        );
-      }
-      console.log('[dev] Enquiry (not persisted, Firestore unavailable):', enquiryData);
+      // Email delivery is the critical path for private enquiries. A Firestore
+      // outage must not prevent PLUCO from receiving the client's message.
+      console.log('Enquiry will continue to email without Firestore persistence.');
     }
 
     const isFarsi = language === 'Farsi / Persian' || language === 'فارسی' || locale === 'fa';
