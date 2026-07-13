@@ -17,22 +17,22 @@ const audiences = [
   {
     Icon: Briefcase,
     en: { title: 'Remote Employees', description: 'Salaried professionals employed by a non-Spanish company who wish to relocate to Spain while continuing their employment remotely.' },
-    fa: { title: 'کارمندان دورکار', description: 'متخصصان حقوق‌بگیر شاغل در شرکت‌های غیر اسپانیایی که مایل‌اند با ادامه اشتغال دورکاری خود به اسپانیا نقل مکان کنند.' },
+    fa: { title: 'کارمندان دورکار', description: 'متخصصانی که برای شرکتی خارج از اسپانیا کار می‌کنند و می‌خواهند بدون توقف مسیر حرفه‌ای خود، زندگی در اسپانیا را آغاز کنند.' },
   },
   {
     Icon: Users,
     en: { title: 'Freelancers & Consultants', description: 'Independent professionals with a portfolio of clients based predominantly outside Spain who bill internationally.' },
-    fa: { title: 'فریلنسرها و مشاوران', description: 'متخصصان مستقل با مجموعه‌ای از مشتریان که عمدتاً خارج از اسپانیا مستقر هستند و به‌صورت بین‌المللی صورتحساب صادر می‌کنند.' },
+    fa: { title: 'فریلنسرها و مشاوران', description: 'متخصصان مستقلی که عمده خدمات خود را از راه دور به مشتریان خارج از اسپانیا ارائه می‌دهند و درآمد بین‌المللی قابل‌مستند دارند.' },
   },
   {
     Icon: Building2,
     en: { title: 'Business Owners', description: 'Directors and shareholders of foreign companies whose management or advisory activity can be carried out remotely.' },
-    fa: { title: 'صاحبان کسب‌وکار', description: 'مدیران و سهامداران شرکت‌های خارجی که فعالیت مدیریتی یا مشاوره‌ای آن‌ها می‌تواند به‌صورت دورکاری انجام شود.' },
+    fa: { title: 'صاحبان کسب‌وکار', description: 'مدیران و سهامداران شرکت‌های خارجی که فعالیت مدیریتی یا مشاوره‌ای آن‌ها از راه دور قابل انجام و مستندسازی است.' },
   },
   {
     Icon: Home,
     en: { title: 'Families', description: 'Principal applicants seeking to relocate with a spouse or partner and dependent children under a single application strategy.' },
-    fa: { title: 'خانواده‌ها', description: 'متقاضیان اصلی که به‌دنبال نقل مکان همراه با همسر یا شریک زندگی و فرزندان تحت تکفل، در قالب یک استراتژی واحد درخواست هستند.' },
+    fa: { title: 'خانواده‌ها', description: 'متقاضیانی که می‌خواهند امکان همراهی اعضای واجد شرایط خانواده را از ابتدا در یک برنامه منسجم اقامتی بررسی کنند.' },
   },
 ];
 
@@ -47,9 +47,9 @@ const routes = [
     },
     fa: {
       eyebrow: 'مسیر ۰۱',
-      title: 'درخواست از طریق کنسولگری (خارج از اسپانیا)',
-      description: 'درخواستی که در کنسولگری صلاحیت‌دار اسپانیا در کشور محل اقامت متقاضی پیش از سفر ثبت می‌شود و در صورت تأیید، ویزای ملی که امکان ورود و اقامت اولیه را فراهم می‌کند صادر می‌شود.',
-      points: ['ثبت پیش از نقل مکان', 'پردازش توسط بخش کنسولی', 'صدور ویزای ملی اولیه در صورت تأیید', 'عموماً مناسب متقاضیانی که از پیش برنامه‌ریزی می‌کنند'],
+      title: 'درخواست کنسولی پیش از ورود به اسپانیا',
+      description: 'این مسیر برای متقاضیانی است که می‌خواهند پیش از نقل مکان، درخواست خود را در کنسولگری صلاحیت‌دار اسپانیا در کشور محل اقامتشان ثبت کنند. در صورت موافقت، ویزای ملی برای ورود و اقامت اولیه صادر می‌شود.',
+      points: ['ثبت پرونده پیش از نقل مکان', 'رسیدگی توسط بخش کنسولی مربوط', 'صدور ویزای ملی در صورت موافقت', 'مناسب برای برنامه‌ریزی دقیق پیش از جابه‌جایی'],
     },
   },
   {
@@ -62,9 +62,9 @@ const routes = [
     },
     fa: {
       eyebrow: 'مسیر ۰۲',
-      title: 'درخواست داخل اسپانیا',
-      description: 'درخواستی که به واحد تجارت بزرگ و گروه‌های استراتژیک اسپانیا (UGE) ارائه می‌شود، در حالی که متقاضی به‌صورت قانونی در اسپانیا حضور دارد، مانند اقامت توریستی.',
-      points: ['ثبت پس از ورود، مشروط به اقامت قانونی', 'پردازش متمرکز توسط UGE', 'در موارد واجد شرایط ممکن است جدول زمانی اداری سریع‌تری ارائه دهد', 'نیازمند بررسی دقیق حقوقی وضعیت ورود و زمان‌بندی'],
+      title: 'درخواست اقامت از داخل اسپانیا',
+      description: 'اگر متقاضی هنگام ثبت درخواست به‌صورت قانونی در اسپانیا حضور داشته باشد، ممکن است بتواند پرونده اقامت را مستقیماً به واحد شرکت‌های بزرگ و گروه‌های راهبردی اسپانیا (UGE) ارائه کند.',
+      points: ['ثبت در مدت حضور قانونی در اسپانیا', 'رسیدگی متمرکز توسط UGE', 'امکان زمان‌بندی اداری متفاوت در پرونده‌های واجد شرایط', 'نیازمند بررسی دقیق وضعیت ورود و مهلت قانونی اقامت'],
     },
   },
   {
@@ -77,9 +77,9 @@ const routes = [
     },
     fa: {
       eyebrow: 'مسیر ۰۳',
-      title: 'درخواست‌های تمدید خانوادگی',
-      description: 'درخواست‌های وابسته برای همسران، شرکای زندگی و فرزندان صغیر مرتبط با متقاضی اصلی که شرایط درآمد و مستندات لازم را دارا باشد.',
-      points: ['ثبت هم‌زمان با یا پس از درخواست اصلی', 'مشمول بررسی وابستگی و کفایت درآمد', 'استراتژی هماهنگ مستندسازی و ترجمه', 'ارزیابی مورد به مورد بر اساس الزامات فعلی'],
+      title: 'درخواست اعضای واجد شرایط خانواده',
+      description: 'همسر یا شریک زندگی، فرزندان وابسته و در موارد واجد شرایط، والدین وابسته می‌توانند همراه با متقاضی اصلی یا پس از او درخواست دهند؛ مشروط به احراز رابطه، وابستگی و توان مالی لازم.',
+      points: ['امکان ثبت هم‌زمان یا پس از متقاضی اصلی', 'بررسی رابطه خانوادگی، وابستگی و توان مالی', 'هماهنگی مدارک، ترجمه و تأییدات', 'ارزیابی جداگانه هر عضو بر اساس الزامات جاری'],
     },
   },
 ];
@@ -102,15 +102,15 @@ const packages = [
       ],
     },
     fa: {
-      tagline: 'بررسی واجد شرایط بودن و آماده‌سازی',
+      tagline: 'ارزیابی اولیه و نقشه راه پرونده',
       price: 'متقاضی اصلی: ۳٬۱۵۰ یورو',
       familyPricing: ['اولین عضو خانواده: ۱٬۲۰۰ یورو', 'هر عضو خانواده اضافی: ۵۲۵ یورو'],
       features: [
-        'بررسی اولیه واجد شرایط بودن',
-        'مقایسه مسیر (کنسولگری در مقابل داخل اسپانیا)',
+        'ارزیابی اولیه شرایط و ریسک‌های پرونده',
+        'مقایسه مسیر کنسولی و درخواست داخل اسپانیا',
         'چک‌لیست شخصی‌سازی‌شده مدارک',
-        'راهنمایی مستندسازی درآمد و قرارداد',
-        'یک تماس هماهنگی با تیم ما',
+        'راهنمایی برای مستندسازی درآمد و قراردادها',
+        'یک جلسه هماهنگی مستقیم با تیم ما',
       ],
     },
   },
@@ -133,16 +133,16 @@ const packages = [
       ],
     },
     fa: {
-      tagline: 'پشتیبانی هدایت‌شده درخواست',
+      tagline: 'آماده‌سازی و همراهی کامل پرونده',
       price: 'متقاضی اصلی: ۷٬۱۷۵ یورو',
       familyPricing: ['اولین عضو خانواده: ۱٬۹۰۰ یورو', 'هر عضو خانواده اضافی: ۹۷۵ یورو'],
       features: [
         'همه موارد بسته برنز',
-        'بررسی کامل مدارک و آماده‌سازی پرونده',
-        'هماهنگی ترجمه و تأییدیه',
-        'پشتیبانی آماده‌سازی فرم درخواست',
+        'بازبینی کامل مدارک و سازمان‌دهی پرونده',
+        'هماهنگی ترجمه و تأییدات مورد نیاز',
+        'پشتیبانی در آماده‌سازی فرم‌های درخواست',
         'هماهنگی بیمه درمانی',
-        'به‌روزرسانی مستقیم روند پرونده',
+        'اطلاع‌رسانی مستقیم درباره روند پرونده',
       ],
     },
   },
@@ -164,16 +164,16 @@ const packages = [
       ],
     },
     fa: {
-      tagline: 'هماهنگی کامل خانوادگی',
+      tagline: 'هماهنگی اختصاصی برای شما و خانواده',
       price: 'متقاضی اصلی: ۸٬۰۵۰ یورو',
       familyPricing: ['اولین عضو خانواده: بر اساس تعهد', 'هر عضو خانواده اضافی: بر اساس تعهد'],
       features: [
         'همه موارد بسته نقره‌ای',
-        'هماهنگی درخواست‌های اعضای خانواده به‌صورت یکپارچه',
-        'پشتیبانی مستندسازی منبع وجوه و مسیر پرداخت',
-        'انتقال به همکار حقوقی برای ثبت درخواست و نمایندگی',
+        'هماهنگی یکپارچه پرونده اعضای واجد شرایط خانواده',
+        'پشتیبانی در مستندسازی منبع وجوه و مسیر پرداخت',
+        'ارجاع به همکار حقوقی برای ثبت و نمایندگی، در صورت نیاز',
         'زمان‌بندی اولویت‌دار و هماهنگ‌کننده اختصاصی پرونده',
-        'راهنمایی استقرار پس از تأیید',
+        'راهنمایی مراحل استقرار پس از موافقت',
       ],
     },
   },
@@ -198,7 +198,7 @@ const comparisonRows = [
   },
   {
     en: ['Outcome on approval', 'National visa, exchanged for residence card in Spain', 'Residence authorisation processed directly in Spain'],
-    fa: ['نتیجه در صورت تأیید', 'ویزای ملی، قابل تبدیل به کارت اقامت در اسپانیا', 'مجوز اقامت مستقیماً در اسپانیا پردازش می‌شود'],
+    fa: ['نتیجه در صورت موافقت', 'ویزای ملی برای ورود و اقامت اولیه؛ مراحل کارت اقامت در اسپانیا انجام می‌شود', 'مجوز اقامت مستقیماً در اسپانیا بررسی می‌شود'],
   },
   {
     en: ['Entry status risk', 'Lower — application precedes travel', 'Requires careful review of visa-free stay and status'],
@@ -257,8 +257,8 @@ export default function SpainDigitalNomadVisaPage() {
       <section className="py-14 md:py-20 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="mb-12 max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: GOLD, fontFamily: isRTL ? ff : undefined, letterSpacing: isRTL ? 'normal' : undefined }}>{isRTL ? 'چه کسانی مخاطب این خدمت هستند' : 'WHO THIS IS FOR'}</p>
-            <h2 className="text-2xl md:text-3xl font-serif font-bold" style={{ color: INK, fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'طراحی‌شده برای متخصصان و خانواده‌های بین‌المللی متحرک' : 'Built for internationally mobile professionals and families'}</h2>
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: GOLD, fontFamily: isRTL ? ff : undefined, letterSpacing: isRTL ? 'normal' : undefined }}>{isRTL ? 'آیا این مسیر برای شما مناسب است؟' : 'WHO THIS IS FOR'}</p>
+            <h2 className="text-2xl md:text-3xl font-serif font-bold" style={{ color: INK, fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'برای حرفه‌ای‌هایی که کارشان مرز جغرافیایی ندارد' : 'Built for internationally mobile professionals and families'}</h2>
           </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {audiences.map((a, i) => {
@@ -281,9 +281,9 @@ export default function SpainDigitalNomadVisaPage() {
       <section className="py-20" style={{ backgroundColor: '#F8F9FA' }} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="mb-12 max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: GOLD, fontFamily: isRTL ? ff : undefined, letterSpacing: isRTL ? 'normal' : undefined }}>{isRTL ? 'سه مسیر درخواست' : 'THREE APPLICATION ROUTES'}</p>
-            <h2 className="text-2xl md:text-3xl font-serif font-bold" style={{ color: INK, fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'انتخاب مسیر مناسب برای شرایط شما' : 'Choosing the right pathway for your circumstances'}</h2>
-            <p className="text-sm leading-relaxed mt-4" style={{ color: BODY, fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'مناسب‌ترین مسیر به موقعیت فعلی، جدول زمانی و شرایط شخصی شما بستگی دارد. تیم ما هر پرونده را به‌صورت جداگانه بررسی می‌کند پیش از توصیه یک استراتژی.' : 'The most suitable route depends on your current location, timeline and personal circumstances. Our team reviews each case individually before recommending a strategy.'}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: GOLD, fontFamily: isRTL ? ff : undefined, letterSpacing: isRTL ? 'normal' : undefined }}>{isRTL ? 'سه مسیر برای شرایط متفاوت' : 'THREE APPLICATION ROUTES'}</p>
+            <h2 className="text-2xl md:text-3xl font-serif font-bold" style={{ color: INK, fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'مسیر درست، پیش از صرف زمان و هزینه مشخص می‌شود' : 'Choosing the right pathway for your circumstances'}</h2>
+            <p className="text-sm leading-relaxed mt-4" style={{ color: BODY, fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'محل حضور فعلی، ملیت، وضعیت ورود، نوع فعالیت حرفه‌ای و شرایط خانواده بر انتخاب مسیر اثر می‌گذارند. پیش از هر توصیه، پرونده شما به‌صورت فردی بررسی می‌شود تا گزینه مناسب با ریسک‌های روشن مشخص شود.' : 'The most suitable route depends on your current location, timeline and personal circumstances. Our team reviews each case individually before recommending a strategy.'}</p>
           </motion.div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {routes.map((r, i) => {
@@ -314,9 +314,9 @@ export default function SpainDigitalNomadVisaPage() {
       <section id="packages" className="py-20 md:py-24 bg-white scroll-mt-20" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="mb-12 max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: GOLD, fontFamily: isRTL ? ff : undefined, letterSpacing: isRTL ? 'normal' : undefined }}>{isRTL ? 'مقایسه بسته‌ها' : 'PACKAGE COMPARISON'}</p>
-            <h2 className="text-2xl md:text-3xl font-serif font-bold" style={{ color: INK, fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'بسته‌های پشتیبانی برنز، نقره‌ای و طلایی' : 'Bronze, Silver and Gold support packages'}</h2>
-            <p className="text-sm leading-relaxed mt-4" style={{ color: BODY, fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'بسته‌ها دامنه آماده‌سازی و پشتیبانی هماهنگی ارائه‌شده توسط PLUCO GROUP را توصیف می‌کنند. آن‌ها به معنای تضمین هیچ نتیجه ویزا، اقامت یا دولتی نیستند.' : 'Packages describe the scope of preparation and coordination support provided by PLUCO GROUP. They do not represent a guarantee of any visa, residence or government outcome.'}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: GOLD, fontFamily: isRTL ? ff : undefined, letterSpacing: isRTL ? 'normal' : undefined }}>{isRTL ? 'سطح همراهی متناسب با نیاز شما' : 'PACKAGE COMPARISON'}</p>
+            <h2 className="text-2xl md:text-3xl font-serif font-bold" style={{ color: INK, fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'از ارزیابی اولیه تا هماهنگی کامل خانوادگی' : 'Bronze, Silver and Gold support packages'}</h2>
+            <p className="text-sm leading-relaxed mt-4" style={{ color: BODY, fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'هر بسته دامنه مشخصی از ارزیابی، آماده‌سازی و هماهنگی را پوشش می‌دهد تا متناسب با پیچیدگی پرونده خود انتخاب کنید. هزینه خدمات به معنای تضمین موافقت با ویزا یا اقامت نیست.' : 'Packages describe the scope of preparation and coordination support provided by PLUCO GROUP. They do not represent a guarantee of any visa, residence or government outcome.'}</p>
           </motion.div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
             {packages.map((pkg, i) => {
@@ -364,7 +364,7 @@ export default function SpainDigitalNomadVisaPage() {
                       fontFamily: isRTL ? ff : undefined,
                     }}
                   >
-                    {isRTL ? `درخواست درباره بسته ${pkg.faTier}` : `Enquire About ${pkg.tier}`}
+                    {isRTL ? `بررسی بسته ${pkg.faTier} برای پرونده من` : `Enquire About ${pkg.tier}`}
                     <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
                   </button>
                 </motion.div>
@@ -372,9 +372,9 @@ export default function SpainDigitalNomadVisaPage() {
             })}
           </div>
           <p className="text-xs leading-relaxed mt-8 p-4 rounded-lg" style={{ backgroundColor: '#F1F5F9', color: '#64748B', fontFamily: isRTL ? ff : undefined }}>
-            <strong>{isRTL ? 'سلب مسئولیت هزینه‌ها: ' : 'Fee Disclaimer: '}</strong>
+            <strong>{isRTL ? 'توضیح مهم درباره هزینه‌ها: ' : 'Fee Disclaimer: '}</strong>
             {isRTL
-              ? 'کلیه حق‌الوکاله، هزینه‌های دولتی، هزینه‌های ترجمه، هزینه‌های محضر، هزینه‌های بیمه، کارمزد بانکی، هزینه‌های وکیل محلی و هزینه‌های جانبی به هزینه‌های استاندارد خدمات PLUCO GROUP برای هر بسته اضافه می‌شوند.'
+              ? 'حق‌الوکاله، هزینه‌های دولتی، ترجمه، دفتر اسناد رسمی، بیمه، کارمزد بانکی، وکیل محلی و سایر مخارج جانبی در قیمت استاندارد بسته‌های PLUCO GROUP منظور نشده‌اند و جداگانه محاسبه می‌شوند.'
               : 'All legal fees, government fees, translation fees, notary fees, insurance costs, bank charges, local counsel fees and out-of-pocket expenses are added to the standard PLUCO GROUP service fees for each package.'}
           </p>
         </div>
@@ -386,15 +386,15 @@ export default function SpainDigitalNomadVisaPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <div className="flex items-center gap-3 mb-3">
               <Shield className="w-5 h-5" style={{ color: GOLD }} strokeWidth={1.5} />
-              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: GOLD, fontFamily: isRTL ? ff : undefined, letterSpacing: isRTL ? 'normal' : undefined }}>{isRTL ? 'پشتیبانی مسیر پرداخت و منبع وجوه' : 'PAYMENT-TRAIL & SOURCE-OF-FUNDS SUPPORT'}</p>
+              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: GOLD, fontFamily: isRTL ? ff : undefined, letterSpacing: isRTL ? 'normal' : undefined }}>{isRTL ? 'شفافیت مالی پیش از ثبت پرونده' : 'PAYMENT-TRAIL & SOURCE-OF-FUNDS SUPPORT'}</p>
             </div>
-            <h2 className="text-2xl md:text-3xl font-serif font-bold mb-4" style={{ color: INK, fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'پشتیبانی مسیر پرداخت ایران و بین‌المللی' : 'Iran and international payment-trail support'}</h2>
+            <h2 className="text-2xl md:text-3xl font-serif font-bold mb-4" style={{ color: INK, fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'مسیر درآمد و وجوه شما باید روشن، منسجم و قابل‌اثبات باشد' : 'Iran and international payment-trail support'}</h2>
             <div className="space-y-4 text-sm leading-relaxed" style={{ color: '#374151', fontFamily: isRTL ? ff : undefined }}>
               {isRTL ? (
                 <>
-                  <p>متقاضیانی که درآمد، پس‌انداز یا روابط تجاری مرتبط با ایران یا سایر حوزه‌های قضایی مشمول بررسی دقیق‌تر دارند، اغلب هنگام اثبات درآمد قانونی و منبع وجوه نزد مقامات اسپانیایی و مؤسسات مالی با الزامات مستندسازی بیشتری مواجه می‌شوند.</p>
-                  <p>PLUCO GROUP به موکلین در سازماندهی یک مسیر پرداخت منسجم و قابل تأیید — شامل صورت‌حساب‌های درآمد، سوابق بانکی، مستندات شرکتی و سوابق انتقال — کمک می‌کند تا توسط تیم ما بررسی شده و در صورت نیاز به متخصصان حقوقی و مالیاتی مستقل اسپانیایی و متخصصان انطباق تحریم‌ها منتقل شود.</p>
-                  <p>این پشتیبانی ماهیتی مقدماتی و مشاوره‌ای دارد. این امر هیچ رژیم تحریمی، الزام انطباق بانکی یا غربالگری نظارتی قابل اجرا را حذف یا نادیده نمی‌گیرد. هر پرونده مشمول غربالگری مستقل تحریم‌ها، بررسی انطباق و قوانین قابل اجرای مؤسسات مالی و مقامات ذی‌ربط است، و PLUCO GROUP نمی‌تواند تضمین کند که هر بانک، مقام یا نهادی یک پرونده منبع وجوه مشخص را می‌پذیرد.</p>
+                  <p>برای متقاضیانی که درآمد، پس‌انداز یا فعالیت تجاری مرتبط با ایران یا حوزه‌های قضایی تحت بررسی مضاعف دارند، اثبات درآمد قانونی و منبع وجوه معمولاً به مدارک دقیق‌تر و یک روایت مالی منسجم نیاز دارد.</p>
+                  <p>PLUCO GROUP به شما کمک می‌کند سوابق درآمد، اسناد بانکی، مدارک شرکتی و انتقالات را به شکلی منظم و قابل‌پیگیری آماده کنید. پرونده در صورت نیاز برای بررسی تخصصی به مشاوران مستقل حقوقی، مالیاتی یا انطباق تحریم‌ها ارجاع می‌شود.</p>
+                  <p>این خدمت مقدماتی و مشاوره‌ای است و هیچ تحریم، الزام بانکی یا بررسی نظارتی را حذف نمی‌کند. پذیرش مدارک منبع وجوه همواره به تصمیم بانک‌ها، نهادها و مقامات ذی‌صلاح بستگی دارد و قابل تضمین نیست.</p>
                 </>
               ) : (
                 <>
@@ -463,10 +463,10 @@ export default function SpainDigitalNomadVisaPage() {
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <div className="w-10 h-px mx-auto mb-6" style={{ backgroundColor: GOLD }} />
-            <h2 className="text-2xl md:text-3xl font-serif text-white mb-4" style={{ fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'شروع بررسی محرمانه واجد شرایط بودن' : 'Start a confidential eligibility review'}</h2>
+            <h2 className="text-2xl md:text-3xl font-serif text-white mb-4" style={{ fontFamily: isRTL ? ff : undefined }}>{isRTL ? 'آینده‌تان را به حدس و آزمون‌وخطا نسپارید' : 'Start a confidential eligibility review'}</h2>
             <p className="text-sm max-w-xl mx-auto mb-8 leading-relaxed" style={{ color: '#CBD5E0', fontFamily: isRTL ? ff : undefined }}>
               {isRTL
-                ? 'شرایط خود را با ما در میان بگذارید و تیم ما وضعیت شما را در مقابل الزامات فعلی ویزای نومد دیجیتال اسپانیا بررسی می‌کند، پیش از توصیه یک بسته و مسیر مناسب.'
+                ? 'هر پرونده مهاجرتی جزئیات و ریسک‌های خاص خود را دارد. شرایطتان را محرمانه با ما در میان بگذارید تا پیش از انتخاب بسته یا شروع هزینه‌ها، تناسب ویزای دیجیتال نومد و مسیر مناسب برای شما بررسی شود.'
                 : 'Share your situation and our team will review your circumstances against current Spanish Digital Nomad Visa requirements before recommending a package and route.'}
             </p>
             <motion.button
@@ -477,7 +477,7 @@ export default function SpainDigitalNomadVisaPage() {
               className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-lg transition-colors hover:brightness-110"
               style={{ backgroundColor: GOLD, color: NAVY, fontFamily: isRTL ? ff : undefined }}
             >
-              {isRTL ? 'درخواست بررسی واجد شرایط بودن' : 'Request Eligibility Review'}
+              {isRTL ? 'درخواست ارزیابی محرمانه پرونده' : 'Request Eligibility Review'}
               <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
             </motion.button>
             <p className="text-xs mt-6" style={{ color: '#94A3B8', fontFamily: isRTL ? ff : undefined }}>
@@ -492,9 +492,9 @@ export default function SpainDigitalNomadVisaPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           <LegalDisclaimer />
           <p className="text-xs leading-relaxed p-4 rounded-lg" style={{ backgroundColor: '#F1F5F9', color: '#64748B', fontFamily: isRTL ? ff : undefined }}>
-            <strong>{isRTL ? 'سلب مسئولیت نتیجه ویزا: ' : 'Visa Outcome Disclaimer: '}</strong>
+            <strong>{isRTL ? 'توضیح حقوقی درباره نتیجه پرونده: ' : 'Visa Outcome Disclaimer: '}</strong>
             {isRTL
-              ? 'PLUCO GROUP خدمات آماده‌سازی، هماهنگی و انتقال به همکار حقوقی را در ارتباط با ویزای نومد دیجیتال اسپانیا ارائه می‌دهد. ما تأیید ویزا، اقامت، شمول خانواده یا هرگونه تصمیم کنسولگری اسپانیا، UGE یا هر مقام دولتی دیگر را تضمین نمی‌کنیم. تمام درخواست‌ها مشمول بررسی واجد شرایط بودن، قوانین مهاجرتی فعلی اسپانیا، غربالگری تحریم‌ها و انطباق، و صلاحدید کامل مقامات ذی‌صلاح هستند. پیامدهای مالیاتی اقامت اسپانیا باید به‌طور مستقل با مشاوران مالیاتی واجد شرایط اسپانیایی بررسی شود.'
+              ? 'PLUCO GROUP در ارتباط با ویزای دیجیتال نومد اسپانیا خدمات آماده‌سازی، هماهنگی و ارجاع به همکار حقوقی ارائه می‌دهد. تأیید ویزا یا اقامت، پذیرش اعضای خانواده و تصمیم کنسولگری اسپانیا، UGE یا هر مرجع دولتی دیگری قابل تضمین نیست. همه درخواست‌ها تابع ارزیابی شرایط، قوانین جاری مهاجرت اسپانیا، بررسی‌های تحریمی و انطباق و تصمیم نهایی مراجع ذی‌صلاح هستند. آثار مالیاتی اقامت در اسپانیا نیز باید جداگانه با مشاور مالیاتی واجد صلاحیت در اسپانیا بررسی شود.'
               : 'PLUCO GROUP provides preparation, coordination and legal partner handoff services in connection with the Spain Digital Nomad Visa. We do not guarantee visa approval, residence, family inclusion, or any decision of the Spanish Consulate, the UGE, or any other government authority. All applications are subject to eligibility review, current Spanish immigration law, sanctions and compliance screening, and the sole discretion of the competent authorities. Tax implications of Spanish residence should be reviewed independently with qualified Spanish tax advisers.'}
           </p>
         </div>

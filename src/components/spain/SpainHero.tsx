@@ -51,17 +51,17 @@ const steps = [
   {
     Icon: SearchCheck,
     en: { title: 'Eligibility check', description: 'Initial review of your situation against current requirements.' },
-    fa: { title: 'بررسی واجد شرایط بودن', description: 'بررسی اولیه شرایط شما بر اساس الزامات فعلی.' },
+    fa: { title: 'ارزیابی مسیر مناسب', description: 'بررسی اولیه شرایط شما بر اساس الزامات روز.' },
   },
   {
     Icon: FileText,
     en: { title: 'Document preparation', description: 'Structured coordination of the file you will need.' },
-    fa: { title: 'آماده‌سازی مدارک', description: 'هماهنگی ساختاریافته پرونده مورد نیاز شما.' },
+    fa: { title: 'آماده‌سازی دقیق پرونده', description: 'هماهنگی منظم مدارک متناسب با شرایط شما.' },
   },
   {
     Icon: UserCheck,
     en: { title: 'Advisor review', description: 'Legal partner handoff before any application is filed.' },
-    fa: { title: 'بررسی مشاور', description: 'انتقال به همکار حقوقی پیش از ثبت هرگونه درخواست.' },
+    fa: { title: 'بازبینی حقوقی', description: 'ارجاع به همکار حقوقی پیش از ثبت درخواست.' },
   },
 ];
 
@@ -70,13 +70,13 @@ export default function SpainHero({ isRTL, onRequestAssessment, onViewPackages }
 
   const copy = isRTL
     ? {
-        beat: 'اقامت دورکاری اسپانیا',
-        headline: 'اقامت اسپانیا، برنامه‌ریزی‌شده با احتیاط و شفافیت حقوقی.',
-        sub: 'PLUCO GROUP از افراد و خانواده‌های بین‌المللی متحرک، کارآفرینان، متخصصان دورکار و صاحبان کسب‌وکار در برنامه‌ریزی ساختاریافته ویزای نومد دیجیتال و اقامت اسپانیا پشتیبانی می‌کند.',
-        trust: 'حقوق مهاجرت اروپا و مشاوره موکلین خصوصی.',
-        primary: 'درخواست ارزیابی خصوصی',
+        beat: 'اقامت قانونی اسپانیا برای متخصصان دورکار',
+        headline: 'آینده حرفه‌ای‌تان را در اسپانیا، با مسیری روشن و حساب‌شده آغاز کنید.',
+        sub: 'اگر فعالیت حرفه‌ای شما از راه دور و عمدتاً برای شرکت‌ها یا مشتریان خارج از اسپانیا انجام می‌شود، ممکن است ویزای دیجیتال نومد مسیر مناسبی برای زندگی قانونی شما و خانواده‌تان در اسپانیا باشد. PLUCO GROUP پرونده را از ارزیابی اولیه تا آماده‌سازی مدارک و هماهنگی حقوقی، محرمانه و ساختاریافته پیش می‌برد.',
+        trust: 'مشاوره خصوصی، محرمانگی و هماهنگی حقوقی در هر مرحله.',
+        primary: 'درخواست ارزیابی محرمانه',
         secondary: 'مشاهده بسته‌های خدمات',
-        disclaimer: 'مشمول بررسی واجد شرایط بودن طبق قوانین فعلی اسپانیا — تضمین تأیید ویزا نیست.',
+        disclaimer: 'هر پرونده بر اساس شرایط فردی و قوانین جاری اسپانیا ارزیابی می‌شود؛ نتیجه ویزا قابل تضمین نیست.',
       }
     : {
         beat: 'SPAIN REMOTE-WORK RESIDENCY',
