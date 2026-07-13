@@ -157,9 +157,10 @@ export async function POST(req: NextRequest) {
     });
 
     // ── 1. Notification to PLUCO GROUP ──────────────────────────────
-    await resend.emails.send({
+    const { data: notificationEmail, error: notificationError } = await resend.emails.send({
       from: fromAddress,
       to: toAddress,
+      replyTo: email,
       subject: `New Private Enquiry — ${service || 'General'}`,
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
@@ -199,7 +200,20 @@ export async function POST(req: NextRequest) {
     });
 
     // ── 2. Confirmation to client ────────────────────────────────────
-    await resend.emails.send({
+    if (notificationError) {
+      console.error('✗ Resend rejected the PLUCO enquiry notification:', {
+        name: notificationError.name,
+        message: notificationError.message,
+      });
+      return NextResponse.json(
+        { success: false, error: 'Unable to deliver the enquiry notification.' },
+        { status: 502 }
+      );
+    }
+
+    console.log('✓ Enquiry notification accepted by Resend:', notificationEmail?.id);
+
+    const { data: confirmationEmail, error: confirmationError } = await resend.emails.send({
       from: fromAddress,
       to: email,
       subject: isFarsi
@@ -251,6 +265,17 @@ export async function POST(req: NextRequest) {
           </div>
         </div>`,
     });
+
+    if (confirmationError) {
+      // The PLUCO notification is the critical delivery. Do not make the user
+      // resubmit and create a duplicate lead if only their receipt fails.
+      console.error('✗ Resend rejected the client confirmation:', {
+        name: confirmationError.name,
+        message: confirmationError.message,
+      });
+    } else {
+      console.log('✓ Client confirmation accepted by Resend:', confirmationEmail?.id);
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {
