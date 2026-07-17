@@ -1,9 +1,11 @@
 import { Metadata } from 'next';
+import { createPageMetadata } from '@/lib/siteMetadata';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: 'Disclaimer - PLUCO GROUP SP. Z O.O.',
   description: 'Legal disclaimer for PLUCO GROUP SP. Z O.O. commercial and legal consultancy services.',
-};
+  path: '/disclaimer',
+});
 
 export default function Disclaimer() {
   return (

@@ -8,15 +8,19 @@ import DiscreetContact from "@/components/sections/DiscreetContact";
 import Position from "@/components/sections/Position";
 import DiscreetFirstContact from "@/components/sections/DiscreetFirstContact";
 import ContactCTA from "@/components/sections/ContactCTA";
+import { createPageMetadata } from "@/lib/siteMetadata";
+import OrganizationStructuredData from "@/components/seo/OrganizationStructuredData";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: "PLUCO GROUP – European Immigration Law & Private Client Advisory",
   description: "PLUCO GROUP assists high-net-worth individuals, families, investors and entrepreneurs with European residency, second citizenship, property acquisition, banking support and cross-border legal protection.",
-};
+  path: "/",
+});
 
 export default function Home() {
   return (
     <div className="min-h-screen">
+      <OrganizationStructuredData />
       <Hero />
       <FeaturedResidencyService />
       <Services />

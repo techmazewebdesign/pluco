@@ -10,6 +10,7 @@ import {
 import Link from 'next/link';
 import Image from 'next/image';
 import { PRODUCT_TYPES } from '@/lib/types';
+import { useParams } from 'next/navigation';
 
 interface ConsultantProfile {
   uid: string;
@@ -29,11 +30,8 @@ interface ConsultantProfile {
   active: boolean;
 }
 
-export default function ConsultantProfilePage({
-  params,
-}: {
-  params: { email: string };
-}) {
+export default function ConsultantProfilePage() {
+  const params = useParams<{ email: string }>();
   const [consultant, setConsultant] = useState<ConsultantProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

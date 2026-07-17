@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { MapPin, Mail, FileText } from 'lucide-react';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { OPEN_COOKIE_SETTINGS_EVENT } from '@/components/privacy/ConsentManager';
 
 export default function Footer() {
   const { t, isRTL } = useLanguage();
@@ -128,6 +129,8 @@ export default function Footer() {
             <Link href="/privacy-policy" className="hover:text-white transition-colors" style={{ color: '#64748B' }}>{t('footer.privacyPolicy')}</Link>
             &nbsp;·&nbsp;
             <Link href="/disclaimer" className="hover:text-white transition-colors" style={{ color: '#64748B' }}>{t('footer.legalDisclaimer')}</Link>
+            &nbsp;·&nbsp;
+            <button type="button" onClick={() => window.dispatchEvent(new Event(OPEN_COOKIE_SETTINGS_EVENT))} className="hover:text-white transition-colors" style={{ padding: 0, border: 0, background: 'transparent', color: '#64748B', cursor: 'pointer' }}>{t('footer.cookieSettings')}</button>
           </p>
         </div>
       </div>

@@ -1,9 +1,11 @@
 import { Metadata } from 'next';
+import { createPageMetadata } from '@/lib/siteMetadata';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: 'Privacy Policy - PLUCO GROUP SP. Z O.O.',
   description: 'Privacy policy for PLUCO GROUP SP. Z O.O. commercial and legal consultancy services.',
-};
+  path: '/privacy-policy',
+});
 
 export default function PrivacyPolicy() {
   return (

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import "./globals.css";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -7,12 +6,19 @@ import { AgentProvider } from "@/contexts/AgentContext";
 import RTLWrapper from "@/components/shared/RTLWrapper";
 import SiteShell from "@/components/layout/SiteShell";
 import ChatbotWidget from "@/components/chatbot/ChatbotWidget";
+import ConsentManager from "@/components/privacy/ConsentManager";
+import {
+  createPageMetadata,
+  SITE_DESCRIPTION,
+  SITE_TITLE,
+  SITE_URL,
+} from "@/lib/siteMetadata";
 
-const SITE_TITLE = "PLUCO GROUP – European Immigration Law & Private Client Advisory";
-const SITE_DESCRIPTION = "Discreet legal and strategic advisory for internationally mobile individuals and families.";
+const defaultPageMetadata = createPageMetadata();
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://plucogroup.com"),
+  ...defaultPageMetadata,
+  metadataBase: new URL(SITE_URL),
   title: {
     default: SITE_TITLE,
     template: "%s | PLUCO GROUP",
@@ -25,23 +31,18 @@ export const metadata: Metadata = {
     "high net worth immigration", "Pluco Group",
   ],
   authors: [{ name: "PLUCO GROUP Sp. z o.o." }],
+  manifest: "/site.webmanifest",
   icons: {
-    icon: "/favicon.svg",
-    apple: "/favicon.svg",
-  },
-  openGraph: {
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    type: "website",
-    locale: "en_US",
-    siteName: "PLUCO GROUP",
-    images: [{ url: "/favicon.svg" }],
-  },
-  twitter: {
-    card: "summary",
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    images: ["/favicon.svg"],
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-48x48.png", type: "image/png", sizes: "48x48" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
+    ],
+    shortcut: ["/favicon.ico"],
+    apple: [
+      { url: "/apple-touch-icon.png", type: "image/png", sizes: "180x180" },
+    ],
   },
 };
 
@@ -49,18 +50,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <body className="min-h-full">
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-56MTBRMS79"
-          strategy="afterInteractive"
-        />
-        <Script id="ga-gtag" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-56MTBRMS79');
-          `}
-        </Script>
         <AuthProvider>
           <AgentProvider>
             <LanguageProvider>
@@ -68,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <SiteShell>
                   {children}
                 </SiteShell>
+                <ConsentManager />
               </RTLWrapper>
             </LanguageProvider>
           </AgentProvider>

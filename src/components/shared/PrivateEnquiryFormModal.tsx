@@ -101,12 +101,18 @@ export default function PrivateEnquiryFormModal({
 
   useEffect(() => {
     if (!isOpen) return;
-    setForm(prev => ({
-      ...prev,
-      service: prev.service || defaultService || '',
-      message: defaultMessage && !prev.message ? defaultMessage : prev.message,
-    }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setForm(prev => ({
+        ...prev,
+        service: prev.service || defaultService || '',
+        message: defaultMessage && !prev.message ? defaultMessage : prev.message,
+      }));
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [isOpen, defaultService, defaultMessage]);
 
   const [submitted, setSubmitted] = useState(false);
@@ -169,6 +175,14 @@ export default function PrivateEnquiryFormModal({
 
       const data = await response.json();
       if (data.success) {
+        const analyticsWindow = window as Window & {
+          gtag?: (...args: unknown[]) => void;
+        };
+        analyticsWindow.gtag?.('event', 'generate_lead', {
+          method: 'private_enquiry',
+          service: form.service,
+          page_path: window.location.pathname,
+        });
         setSubmitted(true);
         setTimeout(() => {
           setSubmitted(false);

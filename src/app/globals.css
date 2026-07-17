@@ -37,6 +37,16 @@ body {
   line-height: 1.6;
 }
 
+/* Editorial privacy card: restrained PLUCO navy, legal-document rule, gold seal. */
+.pluco-consent { position: fixed; left: clamp(16px, 3vw, 32px); bottom: clamp(16px, 3vw, 32px); z-index: 2147483647; width: min(500px, calc(100vw - 32px)); padding: 22px; display: grid; grid-template-columns: 9px minmax(0, 1fr); gap: 0 18px; border: 1px solid rgba(201,163,90,.45); border-radius: 4px 18px 18px 18px; background: rgba(7,28,60,.98); color: #fff; box-shadow: 0 26px 78px rgba(5,21,48,.46); backdrop-filter: blur(18px); animation: pluco-consent-in .42s cubic-bezier(.2,.8,.2,1) both; }
+.pluco-consent__rule { width: 9px; min-height: 94px; border-left: 1px solid rgba(201,163,90,.7); border-right: 1px solid rgba(201,163,90,.22); display: flex; align-items: flex-start; justify-content: center; }.pluco-consent__rule span { width: 7px; height: 7px; margin-top: 5px; border: 1px solid #c9a35a; border-radius: 50%; background: #071c3c; box-shadow: 0 0 0 3px rgba(201,163,90,.12); }
+.pluco-consent__copy { min-width: 0; }.pluco-consent__label { display: block; margin: 0 0 5px; color: #d8b46a; font-size: 10px; font-weight: 700; letter-spacing: .17em; text-transform: uppercase; }.pluco-consent strong { display: block; font: 600 20px/1.2 'Playfair Display', serif; letter-spacing: -.015em; }.pluco-consent p { margin: 9px 0 6px; color: #cbd5e1; font-size: 13px; line-height: 1.55; }.pluco-consent a { color: #fae2a4; font-size: 11px; font-weight: 650; text-decoration: underline; text-underline-offset: 3px; }
+.pluco-consent__actions { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 18px; }.pluco-consent button { min-height: 44px; border: 1px solid rgba(216,180,106,.5); border-radius: 5px; background: transparent; color: #e2e8f0; font: 700 12px/1 'Inter', system-ui, sans-serif; cursor: pointer; }.pluco-consent .pluco-consent__accept { border-color: #c9a35a; background: #c9a35a; color: #071c3c; box-shadow: 0 10px 28px rgba(201,163,90,.2); }
+.pluco-consent[dir="rtl"] { font-family: 'Vazirmatn', Tahoma, Arial, sans-serif; border-radius: 18px 4px 18px 18px; }.pluco-consent[dir="rtl"] strong,.pluco-consent[dir="rtl"] button { font-family: 'Vazirmatn', Tahoma, Arial, sans-serif; }.pluco-consent[dir="rtl"] .pluco-consent__label { letter-spacing: 0; }
+@keyframes pluco-consent-in { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
+@media (max-width: 480px) { .pluco-consent { grid-template-columns: 7px minmax(0,1fr); gap: 0 13px; padding: 18px; }.pluco-consent strong { font-size: 18px; }.pluco-consent__actions { grid-template-columns: 1fr; }.pluco-consent button { min-height: 46px; } }
+@media (prefers-reduced-motion: reduce) { .pluco-consent { animation: none; } }
+
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Playfair Display', serif;
   font-weight: 600;
