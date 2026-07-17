@@ -6,7 +6,21 @@ import { Resend } from 'resend';
 
 export const runtime = 'nodejs';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
+
+type WeeklySummaryData = {
+  highPriorityLeads: Lead[];
+  stalLeads: Lead[];
+  totalLeads: number;
+  conversions: number;
+  weekSummary: {
+    newLeads: number;
+    contacted: number;
+    converted: number;
+  };
+};
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,14 +34,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    if (!resend) {
+      return NextResponse.json(
+        { error: 'Email service is not configured.' },
+        { status: 503 }
+      );
+    }
+
     // Get admin emails (send to both)
     const adminEmails = ['info@plucogroup.com', 'desivo.de@gmail.com'];
 
     // Get all leads
     const leadsSnap = await getDocs(collection(db, 'leads'));
-    const allLeads: (Lead & { id: string })[] = leadsSnap.docs.map(doc => ({
+    const allLeads: Lead[] = leadsSnap.docs.map(doc => ({
+      ...(doc.data() as Lead),
       id: doc.id,
-      ...doc.data() as any
     }));
 
     // Filter high-priority leads not yet contacted
@@ -101,8 +122,8 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function generateEmailHTML(data: any): string {
-  const { highPriorityLeads, stalLeads, totalLeads, conversions, weekSummary } = data;
+function generateEmailHTML(data: WeeklySummaryData): string {
+  const { highPriorityLeads, stalLeads, totalLeads, weekSummary } = data;
 
   return `
     <!DOCTYPE html>

@@ -4,7 +4,21 @@ import { Lead } from '@/lib/types';
 
 export const runtime = 'nodejs';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
+
+type WeeklySummaryData = {
+  highPriorityLeads: Lead[];
+  stalLeads: Lead[];
+  totalLeads: number;
+  conversions: number;
+  weekSummary: {
+    newLeads: number;
+    contacted: number;
+    converted: number;
+  };
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,18 +27,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    if (!resend) {
+      return NextResponse.json(
+        { error: 'Email service is not configured.' },
+        { status: 503 }
+      );
+    }
+
     const { summaryData, recipientEmail } = await request.json() as {
-      summaryData: {
-        highPriorityLeads: Lead[];
-        stalLeads: Lead[];
-        totalLeads: number;
-        conversions: number;
-        weekSummary: {
-          newLeads: number;
-          contacted: number;
-          converted: number;
-        };
-      };
+      summaryData: WeeklySummaryData;
       recipientEmail: string;
     };
 
@@ -51,8 +62,8 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function generateEmailHTML(data: any): string {
-  const { highPriorityLeads, stalLeads, totalLeads, conversions, weekSummary } = data;
+function generateEmailHTML(data: WeeklySummaryData): string {
+  const { highPriorityLeads, stalLeads, totalLeads, weekSummary } = data;
 
   return `
     <!DOCTYPE html>
