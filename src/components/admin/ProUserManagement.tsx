@@ -228,9 +228,13 @@ export default function ProUserManagement() {
 
       // Send invitation email
       try {
+        const idToken = await auth.currentUser?.getIdToken();
         await fetch('/api/auth/send-invitation', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+          },
           body: JSON.stringify({
             email: userEmail,
             name: newUserName || userEmail.split('@')[0],

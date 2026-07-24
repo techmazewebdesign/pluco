@@ -1,0 +1,109 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { isPersianGuideSlug, PERSIAN_GUIDES } from '@/lib/plucoPersianGuides';
+import { SITE_URL } from '@/lib/siteMetadata';
+
+type Props = { params: Promise<{ slug: string }> };
+
+export function generateStaticParams() {
+  return Object.keys(PERSIAN_GUIDES).map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  if (!isPersianGuideSlug(slug)) return {};
+  const guide = PERSIAN_GUIDES[slug];
+  const url = `${SITE_URL}/fa/guides/${slug}`;
+  return {
+    title: guide.title,
+    description: guide.description,
+    keywords: [guide.searchIntent],
+    alternates: { canonical: url, languages: { fa: url } },
+    openGraph: { title: guide.title, description: guide.description, url, locale: 'fa_IR', type: 'article' },
+  };
+}
+
+export default async function PersianGuidePage({ params }: Props) {
+  const { slug } = await params;
+  if (!isPersianGuideSlug(slug)) notFound();
+  const guide = PERSIAN_GUIDES[slug];
+  const url = `${SITE_URL}/fa/guides/${slug}`;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: guide.title,
+    description: guide.description,
+    inLanguage: 'fa',
+    datePublished: guide.reviewedOn,
+    dateModified: guide.reviewedOn,
+    mainEntityOfPage: url,
+    author: { '@type': 'Organization', '@id': `${SITE_URL}/#organization`, name: 'PLUCO GROUP' },
+    publisher: { '@id': `${SITE_URL}/#organization` },
+  };
+
+  return (
+    <main className="bg-[#F7F5EF] text-[#172033]">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
+      <article>
+        <header className="bg-[#071C3C] text-white">
+          <div className="mx-auto max-w-4xl px-5 py-16 sm:px-8 lg:py-24">
+            <nav className="text-sm text-slate-300">
+              <Link href="/fa">صفحه فارسی</Link><span className="px-2">/</span>
+              <Link href="/fa/guides">راهنماها</Link>
+            </nav>
+            <div className="mt-8 flex flex-wrap gap-3 text-sm font-bold text-[#E3C783]">
+              <span>{guide.readTime}</span><span>·</span><span>آخرین بازبینی: {guide.reviewedOn}</span>
+            </div>
+            <h1 className="mt-5 text-4xl font-black leading-[1.55] sm:text-5xl">{guide.title}</h1>
+            <p className="mt-6 text-lg leading-9 text-slate-200">{guide.description}</p>
+          </div>
+        </header>
+        <div className="mx-auto max-w-4xl px-5 py-14 sm:px-8">
+          <div className="rounded-2xl border border-[#D9C79D] bg-[#FFF9E9] p-5 text-sm leading-8 text-slate-700">
+            این مطلب اطلاعات عمومی است و جایگزین بررسی حقوقی یا مهاجرتی متناسب با پرونده شما نیست. مقررات و رویه‌ها را هنگام اقدام از مرجع رسمی کنترل کنید.
+          </div>
+          <div className="mt-10 grid gap-12">
+            {guide.sections.map((section) => (
+              <section key={section.heading}>
+                <h2 className="text-2xl font-black leading-10">{section.heading}</h2>
+                <div className="mt-4 grid gap-4 text-base leading-9 text-slate-700">
+                  {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                </div>
+                {'bullets' in section && section.bullets ? (
+                  <ul className="mt-5 grid gap-3 rounded-2xl bg-white p-6">
+                    {section.bullets.map((bullet) => (
+                      <li key={bullet} className="flex gap-3 leading-8">
+                        <span className="font-black text-[#8B6A23]">✓</span><span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </section>
+            ))}
+          </div>
+          <section className="mt-14 rounded-2xl bg-white p-7">
+            <h2 className="text-xl font-black">منابع رسمی برای کنترل اطلاعات روز</h2>
+            <ul className="mt-5 grid gap-3">
+              {guide.sources.map((source) => (
+                <li key={source.url}>
+                  <a href={source.url} target="_blank" rel="noopener noreferrer" className="font-bold leading-8 text-[#71551d] underline">
+                    {source.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section className="mt-10 rounded-3xl bg-[#071C3C] p-8 text-white">
+            <p className="text-sm font-bold text-[#E3C783]">مرحله بعد</p>
+            <h2 className="mt-3 text-2xl font-black leading-10">این موضوع را با شرایط واقعی خود بررسی کنید</h2>
+            <p className="mt-3 leading-8 text-slate-200">پیش از پرداخت، ترجمه گسترده مدارک یا تعهد مالی، تناسب مسیر و ریسک‌های اصلی را روشن کنید.</p>
+            <Link href={`/fa/services/${guide.relatedServiceSlug}#service-enquiry`} className="mt-6 inline-block rounded-full bg-[#C9A35A] px-6 py-3 font-bold text-[#071C3C]">
+              {guide.relatedServiceLabel}
+            </Link>
+          </section>
+        </div>
+      </article>
+    </main>
+  );
+}

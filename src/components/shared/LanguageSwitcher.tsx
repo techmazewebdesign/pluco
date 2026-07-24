@@ -1,18 +1,26 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
+import {
+  ENGLISH_TO_PERSIAN_PATH,
+  PERSIAN_TO_ENGLISH_PATH,
+} from '@/lib/plucoPersianServices';
 
 export default function LanguageSwitcher() {
   const { lang, setLang } = useLanguage();
-  const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+  const isFa = lang === 'fa';
 
-  // Only render interactively after client hydration
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const isFa = mounted ? lang === 'fa' : false;
+  function switchLanguage(next: 'en' | 'fa') {
+    setLang(next);
+    if (next === 'fa') {
+      router.push(ENGLISH_TO_PERSIAN_PATH[pathname] || '/fa');
+      return;
+    }
+    router.push(PERSIAN_TO_ENGLISH_PATH[pathname] || '/');
+  }
 
   return (
     <div
@@ -21,15 +29,14 @@ export default function LanguageSwitcher() {
     >
       <button
         type="button"
-        disabled={!mounted}
-        onClick={() => setLang('en')}
+        onClick={() => switchLanguage('en')}
         aria-label="Switch to English"
         style={{
           padding: '3px 10px',
           backgroundColor: !isFa ? '#C9A35A' : 'transparent',
           color: !isFa ? '#071C3C' : '#64748B',
           fontWeight: !isFa ? 700 : 400,
-          cursor: mounted ? 'pointer' : 'default',
+          cursor: 'pointer',
           transition: 'background-color 0.2s, color 0.2s',
           border: 'none',
           outline: 'none',
@@ -40,8 +47,7 @@ export default function LanguageSwitcher() {
       </button>
       <button
         type="button"
-        disabled={!mounted}
-        onClick={() => setLang('fa')}
+        onClick={() => switchLanguage('fa')}
         aria-label="Switch to Persian / فارسی"
         style={{
           padding: '3px 10px',
@@ -49,7 +55,7 @@ export default function LanguageSwitcher() {
           color: isFa ? '#071C3C' : '#64748B',
           fontWeight: isFa ? 700 : 400,
           fontFamily: "'Vazirmatn', 'Tahoma', 'Arial', sans-serif",
-          cursor: mounted ? 'pointer' : 'default',
+          cursor: 'pointer',
           transition: 'background-color 0.2s, color 0.2s',
           border: 'none',
           outline: 'none',

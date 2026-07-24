@@ -6,7 +6,8 @@ export async function POST(req: NextRequest) {
     const { uid, adminSecret } = await req.json();
 
     // Security check
-    if (adminSecret !== process.env.ADMIN_SECRET) {
+    const expectedSecret = process.env.ADMIN_SECRET;
+    if (!expectedSecret || typeof adminSecret !== 'string' || adminSecret !== expectedSecret) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }

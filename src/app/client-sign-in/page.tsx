@@ -5,6 +5,7 @@ import { Lock, FileText, MessageSquare, DollarSign, ArrowRight, Shield } from 'l
 import PageHero from '@/components/shared/PageHero';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Link from 'next/link';
+import PortalGoogleSignIn from '@/components/auth/PortalGoogleSignIn';
 
 const features = [
   {
@@ -78,9 +79,10 @@ export default function ClientSignIn() {
                 ? 'درگاه موکل امن PLUCO GROUP اکنون برای موکلین فعلی در دسترس است. درگاه از به‌روزرسانی‌های وضعیت پرونده، تبادل اسناد، دسترسی به فاکتورها، اطلاعات قرارملاقات و ارتباط محرمانه با تیم پرونده پشتیبانی می‌کند.'
                 : 'PLUCO GROUP\'s secure client portal is now available for existing clients. The portal supports case status updates, document exchange, invoice access, appointment information, and confidential communication with your case team.'}
             </p>
+            <PortalGoogleSignIn />
 
             {/* Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link
                   href="/contact"

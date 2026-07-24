@@ -3,11 +3,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Save, Camera, Loader2, CheckCircle, Eye, EyeOff, KeyRound, User, ShieldCheck,
+  Save, Camera, Loader2, CheckCircle, ShieldCheck,
 } from 'lucide-react';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import { updateProfile } from 'firebase/auth';
 import { db, storage, auth } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAgent } from '@/contexts/AgentContext';
@@ -35,23 +35,14 @@ export default function AgentProfilePage() {
   const [photoError, setPhotoError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Password change
-  const [currentPw, setCurrentPw] = useState('');
-  const [newPw, setNewPw] = useState('');
-  const [confirmPw, setConfirmPw] = useState('');
-  const [showPw, setShowPw] = useState(false);
-  const [pwSaving, setPwSaving] = useState(false);
-  const [pwSaved, setPwSaved] = useState(false);
-  const [pwError, setPwError] = useState('');
-
   useEffect(() => {
     if (!user || !agent) return;
-    setName(agent.name || '');
-    setEmail(user.email || '');
     // Load extended profile from Firestore
     const load = async () => {
       try {
         const snap = await getDoc(doc(db, 'agents', user.uid));
+        setName(agent.name || '');
+        setEmail(user.email || '');
         if (snap.exists()) {
           const d = snap.data();
           setPhone(d.phone || '');
@@ -59,7 +50,11 @@ export default function AgentProfilePage() {
           setLanguages(d.languages || '');
           setPhoto(d.photo || user.photoURL || '');
         }
-      } catch (e) { console.error(e); }
+      } catch (e) {
+        setName(agent.name || '');
+        setEmail(user.email || '');
+        console.error(e);
+      }
     };
     load();
   }, [user, agent]);
@@ -129,32 +124,6 @@ export default function AgentProfilePage() {
     } finally { setSaving(false); }
   };
 
-  const handlePasswordChange = async () => {
-    setPwError(''); setPwSaved(false);
-    if (!currentPw) { setPwError('Please enter your current password.'); return; }
-    if (newPw.length < 6) { setPwError('New password must be at least 6 characters.'); return; }
-    if (newPw !== confirmPw) { setPwError('Passwords do not match.'); return; }
-    if (!user?.email) { setPwError('No email found.'); return; }
-    setPwSaving(true);
-    try {
-      const cred = EmailAuthProvider.credential(user.email, currentPw);
-      if (auth.currentUser) {
-        await reauthenticateWithCredential(auth.currentUser, cred);
-        await updatePassword(auth.currentUser, newPw);
-      }
-      setPwSaved(true);
-      setCurrentPw(''); setNewPw(''); setConfirmPw('');
-      setTimeout(() => setPwSaved(false), 3000);
-    } catch (e: unknown) {
-      const code = (e as { code?: string })?.code || '';
-      if (code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
-        setPwError('Current password is incorrect.');
-      } else {
-        setPwError(`Password change failed: ${code || String(e)}`);
-      }
-    } finally { setPwSaving(false); }
-  };
-
   const role = agent?.role as AgentRole | undefined;
   const roleLabel = role ? AGENT_ROLE_LABELS[role] : null;
   const permissions = role ? ROLE_PERMISSIONS[role] : null;
@@ -166,7 +135,7 @@ export default function AgentProfilePage() {
         <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
           <div>
             <h1 className="text-2xl font-serif font-bold" style={{ color: '#1E2430' }}>My Profile</h1>
-            <p className="text-sm mt-1" style={{ color: '#5E6470' }}>Manage your agent profile, photo and password</p>
+            <p className="text-sm mt-1" style={{ color: '#5E6470' }}>Manage your agent profile and photo</p>
           </div>
           <AnimatePresence>
             {saved && (
@@ -194,7 +163,7 @@ export default function AgentProfilePage() {
                   onClick={() => fileInputRef.current?.click()}
                 >
                   {photo ? (
-                    <img src={photo} alt={name} className="absolute inset-0 w-full h-full object-cover" />
+                    <Image src={photo} alt={name} fill sizes="96px" unoptimized className="object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-3xl font-bold" style={{ backgroundColor: '#071C3C', color: '#C9A35A' }}>
                       {name.charAt(0).toUpperCase() || 'A'}
@@ -276,42 +245,6 @@ export default function AgentProfilePage() {
               </div>
             </div>
 
-            {/* Password change */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <KeyRound className="w-4 h-4" style={{ color: '#C9A35A' }} strokeWidth={1.5} />
-                <h2 className="text-sm font-serif font-bold" style={{ color: '#1E2430' }}>Change Password</h2>
-              </div>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#1E2430' }}>Current Password</label>
-                  <div className="relative">
-                    <input type={showPw ? 'text' : 'password'} value={currentPw} onChange={e => setCurrentPw(e.target.value)} className={`${inp} pr-10`} dir="ltr" />
-                    <button type="button" onClick={() => setShowPw(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: '#94A3B8' }}>
-                      {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#1E2430' }}>New Password</label>
-                    <input type="password" value={newPw} onChange={e => setNewPw(e.target.value)} className={inp} dir="ltr" placeholder="Min 6 characters" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#1E2430' }}>Confirm New Password</label>
-                    <input type="password" value={confirmPw} onChange={e => setConfirmPw(e.target.value)} className={`${inp} ${confirmPw && newPw !== confirmPw ? 'border-red-400' : ''}`} dir="ltr" />
-                  </div>
-                </div>
-                {pwError && <p className="text-xs p-2.5 rounded-lg" style={{ backgroundColor: '#FEE2E2', color: '#DC2626' }}>{pwError}</p>}
-                {pwSaved && <p className="text-xs p-2.5 rounded-lg flex items-center gap-1.5" style={{ backgroundColor: '#DCFCE7', color: '#15803D' }}><CheckCircle className="w-3.5 h-3.5" />Password changed successfully.</p>}
-                <div className="flex justify-end">
-                  <button onClick={handlePasswordChange} disabled={pwSaving} className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg hover:brightness-110 disabled:opacity-60 transition-all" style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>
-                    {pwSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <KeyRound className="w-4 h-4" />}
-                    {pwSaving ? 'Updating…' : 'Update Password'}
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

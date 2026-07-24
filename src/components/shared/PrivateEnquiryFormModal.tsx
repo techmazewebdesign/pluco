@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, CheckCircle, ArrowRight, Lock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { readSalesAttribution } from '@/lib/salesAttribution';
 
 interface PrivateEnquiryFormModalProps {
   isOpen: boolean;
@@ -160,6 +161,7 @@ export default function PrivateEnquiryFormModal({
           packageInterest: packageInterest || undefined,
           locale: isRTL ? 'fa' : 'en',
           sourcePage: typeof window !== 'undefined' ? window.location.pathname : undefined,
+          attribution: readSalesAttribution(),
           // Consultant-specific fields
           ...(consultantId && {
             consultantId,

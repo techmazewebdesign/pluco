@@ -7,7 +7,8 @@ export async function POST(req: NextRequest) {
     const { email, newRole, adminSecret } = await req.json();
 
     // Security: Require admin secret
-    if (adminSecret !== process.env.ADMIN_SECRET) {
+    const expectedSecret = process.env.ADMIN_SECRET;
+    if (!expectedSecret || typeof adminSecret !== 'string' || adminSecret !== expectedSecret) {
       return NextResponse.json(
         { error: 'Unauthorized: Invalid admin secret' },
         { status: 401 }

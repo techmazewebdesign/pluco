@@ -32,3 +32,8 @@ export function getAdminDb() {
   const app = initializeAdmin();
   return app.firestore();
 }
+
+export function getAdminAuth() {
+  const app = initializeAdmin();
+  return app.auth();
+}

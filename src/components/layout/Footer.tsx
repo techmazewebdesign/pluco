@@ -10,21 +10,20 @@ export default function Footer() {
   const { t, isRTL } = useLanguage();
 
   const services = [
-    [t('nav.newIdentity'),            '/new-identity'],
-    [t('nav.euResidency'),            '/eu-residency'],
-    [t('nav.spainDigitalNomad'),      '/spain-digital-nomad-visa'],
-    [t('nav.euPropertyPurchase'),     '/eu-property-purchase'],
-    [t('nav.usGreenCard'),            '/us-green-card'],
-    [t('nav.banking'),                '/banking'],
-    [t('nav.disputeResolution'),      '/dispute-resolution'],
-    [t('nav.internationalContracts'), '/international-contracts'],
-    [t('nav.businessSolutions'),      '/business-solutions'],
-    [t('nav.euCompanyRegistration'),  '/eu-company-registration'],
+    [t('nav.newIdentity'),            isRTL ? '/fa/services/second-citizenship' : '/new-identity'],
+    [t('nav.euResidency'),            isRTL ? '/fa/services/eu-residency' : '/eu-residency'],
+    [t('nav.spainDigitalNomad'),      isRTL ? '/fa/services/spain-digital-nomad-visa' : '/spain-digital-nomad-visa'],
+    [t('nav.euPropertyPurchase'),     isRTL ? '/fa/services/eu-property-purchase' : '/eu-property-purchase'],
+    [t('nav.banking'),                isRTL ? '/fa/services/banking' : '/banking'],
+    [t('nav.disputeResolution'),      isRTL ? '/fa/services/dispute-resolution' : '/dispute-resolution'],
+    [t('nav.internationalContracts'), isRTL ? '/fa/services/international-contracts' : '/international-contracts'],
+    [t('nav.euCompanyRegistration'),  isRTL ? '/fa/services/eu-company-registration' : '/eu-company-registration'],
   ];
 
   const quickLinks = [
-    [t('nav.ourPeople'),          '/our-people'],
-    [t('nav.publications'),       '/publications'],
+    [isRTL ? 'صفحه فارسی' : t('nav.ourPeople'), isRTL ? '/fa' : '/our-people'],
+    ...(isRTL ? [['راهنماهای فارسی', '/fa/guides']] : []),
+    ...(!isRTL ? [[t('nav.publications'), '/publications']] : []),
     [t('nav.clientSignIn'),       '/client-sign-in'],
     ['Contact',                   '/contact'],
     [t('footer.privacyPolicy'),   '/privacy-policy'],

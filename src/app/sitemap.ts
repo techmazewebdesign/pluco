@@ -1,4 +1,9 @@
 import { MetadataRoute } from 'next';
+import {
+  ENGLISH_TO_PERSIAN_PATH,
+  PERSIAN_SERVICES,
+} from '@/lib/plucoPersianServices';
+import { PERSIAN_GUIDES } from '@/lib/plucoPersianGuides';
 
 const BASE_URL = 'https://www.plucogroup.com';
 
@@ -28,9 +33,70 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: '/disclaimer',              priority: 0.3,  changeFrequency: 'yearly'  },
   ] as const;
 
-  return publicPages.map(({ url, priority, changeFrequency }) => ({
-    url: `${BASE_URL}${url}`,
-    changeFrequency,
-    priority,
-  }));
+  const englishPages: MetadataRoute.Sitemap = publicPages.map(
+    ({ url, priority, changeFrequency }) => {
+      const persianPath = url === '/' ? '/fa' : ENGLISH_TO_PERSIAN_PATH[url];
+      const canonicalUrl = `${BASE_URL}${url}`;
+
+      return {
+        url: canonicalUrl,
+        changeFrequency,
+        priority,
+        ...(persianPath
+          ? {
+              alternates: {
+                languages: {
+                  en: canonicalUrl,
+                  fa: `${BASE_URL}${persianPath}`,
+                  'x-default': canonicalUrl,
+                },
+              },
+            }
+          : {}),
+      };
+    },
+  );
+
+  const persianPages: MetadataRoute.Sitemap = [
+    {
+      url: `${BASE_URL}/fa`,
+      changeFrequency: 'weekly',
+      priority: 1,
+      alternates: {
+        languages: {
+          en: BASE_URL,
+          fa: `${BASE_URL}/fa`,
+          'x-default': BASE_URL,
+        },
+      },
+    },
+    ...Object.entries(PERSIAN_SERVICES).map(([slug, service]) => ({
+      url: `${BASE_URL}/fa/services/${slug}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.9,
+      alternates: {
+        languages: {
+          en: `${BASE_URL}${service.englishPath}`,
+          fa: `${BASE_URL}/fa/services/${slug}`,
+          'x-default': `${BASE_URL}${service.englishPath}`,
+        },
+      },
+    })),
+    {
+      url: `${BASE_URL}/fa/guides`,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+      alternates: { languages: { fa: `${BASE_URL}/fa/guides` } },
+    },
+    ...Object.keys(PERSIAN_GUIDES).map((slug) => ({
+      url: `${BASE_URL}/fa/guides/${slug}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.75,
+      alternates: {
+        languages: { fa: `${BASE_URL}/fa/guides/${slug}` },
+      },
+    })),
+  ];
+
+  return [...englishPages, ...persianPages];
 }

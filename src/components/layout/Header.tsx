@@ -24,23 +24,22 @@ export default function Header() {
   };
 
   const services = [
-    { key: 'nav.newIdentity' as const,             href: '/new-identity' },
-    { key: 'nav.euPropertyPurchase' as const,      href: '/eu-property-purchase' },
-    { key: 'nav.euResidency' as const,             href: '/eu-residency' },
-    { key: 'nav.spainDigitalNomad' as const,       href: '/spain-digital-nomad-visa' },
-    { key: 'nav.usGreenCard' as const,             href: '/us-green-card' },
-    { key: 'nav.banking' as const,                 href: '/banking' },
-    { key: 'nav.disputeResolution' as const,       href: '/dispute-resolution' },
-    { key: 'nav.internationalContracts' as const,  href: '/international-contracts' },
-    { key: 'nav.businessSolutions' as const,       href: '/business-solutions' },
-    { key: 'nav.euCompanyRegistration' as const,   href: '/eu-company-registration' },
+    { key: 'nav.newIdentity' as const,             href: isRTL ? '/fa/services/second-citizenship' : '/new-identity' },
+    { key: 'nav.euPropertyPurchase' as const,      href: isRTL ? '/fa/services/eu-property-purchase' : '/eu-property-purchase' },
+    { key: 'nav.euResidency' as const,             href: isRTL ? '/fa/services/eu-residency' : '/eu-residency' },
+    { key: 'nav.spainDigitalNomad' as const,       href: isRTL ? '/fa/services/spain-digital-nomad-visa' : '/spain-digital-nomad-visa' },
+    { key: 'nav.banking' as const,                 href: isRTL ? '/fa/services/banking' : '/banking' },
+    { key: 'nav.disputeResolution' as const,       href: isRTL ? '/fa/services/dispute-resolution' : '/dispute-resolution' },
+    { key: 'nav.internationalContracts' as const,  href: isRTL ? '/fa/services/international-contracts' : '/international-contracts' },
+    { key: 'nav.euCompanyRegistration' as const,   href: isRTL ? '/fa/services/eu-company-registration' : '/eu-company-registration' },
   ];
 
   const mobileBase = [
-    { key: 'nav.home' as const,                    href: '/' },
-    { key: 'nav.ourPeople' as const,               href: '/our-people' },
+    { key: 'nav.home' as const,                    href: isRTL ? '/fa' : '/' },
+    ...(!isRTL ? [{ key: 'nav.ourPeople' as const, href: '/our-people' }] : []),
     ...services,
-    { key: 'nav.publications' as const,            href: '/publications' },
+    ...(isRTL ? [{ key: 'nav.publications' as const, href: '/fa/guides', label: 'راهنماها' }] : []),
+    ...(!isRTL ? [{ key: 'nav.publications' as const, href: '/publications' }] : []),
   ];
 
   const mobileAll = [...mobileBase];
@@ -77,7 +76,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center flex-shrink-0">
+          <Link href={isRTL ? '/fa' : '/'} className="flex items-center flex-shrink-0">
             <Image
               src="/images/logo-pluco.png"
               alt="Pluco Group Sp. z o.o."
@@ -91,7 +90,7 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-5 xl:gap-6" dir={isRTL ? 'rtl' : 'ltr'}>
             {/* Home */}
-            <Link href="/" className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
+            <Link href={isRTL ? '/fa' : '/'} className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
               {t('nav.home')}
               <span
                 className={`absolute bottom-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${isRTL ? 'right-0' : 'left-0'}`}
@@ -100,13 +99,23 @@ export default function Header() {
             </Link>
 
             {/* Our People */}
-            <Link href="/our-people" className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
-              {t('nav.ourPeople')}
-              <span
-                className={`absolute bottom-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${isRTL ? 'right-0' : 'left-0'}`}
-                style={{ backgroundColor: '#C9A35A' }}
-              />
-            </Link>
+            {!isRTL ? (
+              <Link href="/our-people" className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
+                {t('nav.ourPeople')}
+                <span
+                  className="absolute bottom-0 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
+                  style={{ backgroundColor: '#C9A35A' }}
+                />
+              </Link>
+            ) : (
+              <Link href="/fa/guides" className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
+                راهنماها
+                <span
+                  className="absolute bottom-0 right-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
+                  style={{ backgroundColor: '#C9A35A' }}
+                />
+              </Link>
+            )}
 
             {/* Services Dropdown */}
             <div className="relative" ref={dropdownRef}>
@@ -151,32 +160,25 @@ export default function Header() {
             </div>
 
             {/* Publications */}
-            <Link href="/publications" className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
-              {t('nav.publications')}
-              <span
-                className={`absolute bottom-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${isRTL ? 'right-0' : 'left-0'}`}
-                style={{ backgroundColor: '#C9A35A' }}
-              />
-            </Link>
+            {!isRTL ? (
+              <Link href="/publications" className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
+                {t('nav.publications')}
+                <span
+                  className="absolute bottom-0 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
+                  style={{ backgroundColor: '#C9A35A' }}
+                />
+              </Link>
+            ) : null}
 
             {/* Auth Links */}
             {!loading && !user ? (
-              <>
-                <Link
-                  href="/login"
-                  className="px-5 py-1.5 text-xs font-semibold rounded border transition-colors whitespace-nowrap"
-                  style={{ borderColor: '#C9A35A', color: '#C9A35A' }}
-                >
-                  {isRTL ? 'ورود' : 'Login'}
-                </Link>
-                <Link
-                  href="/signup"
-                  className="px-5 py-1.5 text-xs font-semibold rounded transition-colors whitespace-nowrap text-white"
-                  style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
-                >
-                  {isRTL ? 'ثبت نام' : 'Sign up'}
-                </Link>
-              </>
+              <Link
+                href="/client-sign-in"
+                className="px-5 py-1.5 text-xs font-semibold rounded border transition-colors whitespace-nowrap"
+                style={{ borderColor: '#C9A35A', color: '#C9A35A' }}
+              >
+                {isRTL ? 'درگاه موکل' : 'Client portal'}
+              </Link>
             ) : (
               <>
                 <Link
@@ -234,31 +236,21 @@ export default function Header() {
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A35A')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#CBD5E0')}
                 >
-                  {t(item.key)}
+                  {'label' in item && item.label ? item.label : t(item.key)}
                 </Link>
               ))}
 
               {/* Auth Links */}
               <div className="border-t border-gray-700 pt-3 mt-3">
                 {!loading && !user ? (
-                  <>
-                    <Link
-                      href="/login"
-                      className="block px-3 py-2.5 text-sm font-medium rounded transition-colors"
-                      style={{ color: '#C9A35A' }}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {isRTL ? 'ورود' : 'Login'}
-                    </Link>
-                    <Link
-                      href="/signup"
-                      className="block px-3 py-2.5 text-sm font-medium rounded transition-colors text-white"
-                      style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {isRTL ? 'ثبت نام' : 'Sign up'}
-                    </Link>
-                  </>
+                  <Link
+                    href="/client-sign-in"
+                    className="block px-3 py-2.5 text-sm font-medium rounded transition-colors"
+                    style={{ color: '#C9A35A' }}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {isRTL ? 'درگاه موکل' : 'Client portal'}
+                  </Link>
                 ) : (
                   <>
                     <Link

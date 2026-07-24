@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import { type Lang, type TranslationKey, t as translate } from '@/lib/translations';
 
 interface LanguageContextValue {
@@ -18,19 +19,9 @@ const LanguageContext = createContext<LanguageContextValue>({
 });
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>('en');
-
-  // Read persisted preference on mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('pluco_lang') as Lang | null;
-      if (stored === 'en' || stored === 'fa') {
-        setLangState(stored);
-      }
-    } catch {
-      // localStorage unavailable (private mode etc.)
-    }
-  }, []);
+  const pathname = usePathname();
+  const routeLanguage: Lang = pathname === '/fa' || pathname.startsWith('/fa/') ? 'fa' : 'en';
+  const lang = routeLanguage;
 
   const setLang = useCallback((next: Lang) => {
     try {
@@ -38,7 +29,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // ignore
     }
-    setLangState(next);
   }, []);
 
   const t = useCallback((key: TranslationKey) => translate(key, lang), [lang]);

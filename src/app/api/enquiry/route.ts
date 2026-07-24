@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { getAdminDb } from '@/lib/firebase-admin';
+import { normalizeSalesAttribution } from '@/lib/salesAttribution';
 
-async function sendToGoogleSheets(data: any) {
+async function sendToGoogleSheets(data: Record<string, unknown>) {
   try {
     if (!process.env.GOOGLE_LEADS_WEB_APP_URL) {
       console.log('Google Leads Web App URL not configured');
@@ -10,7 +11,8 @@ async function sendToGoogleSheets(data: any) {
     }
 
     // Send data without requiring secret first
-    const payload = {
+    const attribution = normalizeSalesAttribution(data.attribution);
+    const payload: Record<string, unknown> = {
       fullName: data.fullName || '',
       email: data.email || '',
       phone: data.phone || '',
@@ -23,12 +25,18 @@ async function sendToGoogleSheets(data: any) {
       urgency: data.urgency || '',
       preferredContact: data.preferredContact || '',
       description: data.description || '',
+      sourcePage: data.sourcePage || '',
+      landingPage: attribution.landingPage,
+      utmSource: attribution.utmSource,
+      utmMedium: attribution.utmMedium,
+      utmCampaign: attribution.utmCampaign,
+      utmTerm: attribution.utmTerm,
       timestamp: new Date().toLocaleString('en-GB', { timeZone: 'Europe/Warsaw' }),
     };
 
     // Include secret if configured
     if (process.env.GOOGLE_LEADS_SECRET) {
-      (payload as any).secret = process.env.GOOGLE_LEADS_SECRET;
+      payload.secret = process.env.GOOGLE_LEADS_SECRET;
     }
 
     const response = await fetch(process.env.GOOGLE_LEADS_WEB_APP_URL, {
@@ -55,8 +63,9 @@ export async function POST(req: NextRequest) {
       fullName, email, phone, nationality, country,
       familyMembers, numFamilyMembers, service, language, description, urgency, preferredContact,
       consultantId, consultantName, status, firstName, lastName, preferredDate, preferredTime,
-      consent, packageInterest, locale, sourcePage,
+      consent, packageInterest, locale, sourcePage, attribution,
     } = body;
+    const salesAttribution = normalizeSalesAttribution(attribution);
 
     // Extract first and last name if not provided separately
     const names = fullName ? fullName.split(' ') : [];
@@ -100,6 +109,7 @@ export async function POST(req: NextRequest) {
       consent: !!consent,
       locale: locale || null,
       sourcePage: sourcePage || null,
+      attribution: salesAttribution,
       consultantId: consultantId || null,
       consultantName: consultantName || null,
       status: status || (consultantId ? 'assigned' : 'pending'),
@@ -150,6 +160,7 @@ export async function POST(req: NextRequest) {
     await sendToGoogleSheets({
       fullName, email, phone, nationality, country, familyMembers, numFamilyMembers,
       service, language, description, urgency, preferredContact,
+      sourcePage, attribution: salesAttribution,
     });
 
     // ── 1. Notification to PLUCO GROUP ──────────────────────────────
@@ -180,6 +191,10 @@ export async function POST(req: NextRequest) {
                 ['Preferred Contact Method', preferredContact || '—'],
                 ['Locale', locale || '—'],
                 ['Source Page', sourcePage || '—'],
+                ['Landing Page', salesAttribution.landingPage || '—'],
+                ['UTM Source', salesAttribution.utmSource || '—'],
+                ['UTM Medium', salesAttribution.utmMedium || '—'],
+                ['UTM Campaign', salesAttribution.utmCampaign || '—'],
               ].map(([l, v]) => `
                 <tr>
                   <td style="padding:10px 0;border-bottom:1px solid #F1F5F9;color:#64748B;width:40%">${l}</td>

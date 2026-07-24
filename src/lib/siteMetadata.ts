@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ENGLISH_TO_PERSIAN_PATH } from "@/lib/plucoPersianServices";
 
 export const SITE_URL = "https://www.plucogroup.com";
 export const SITE_NAME = "PLUCO GROUP";
@@ -32,12 +33,21 @@ export function createPageMetadata({
 }: PageMetadataOptions = {}): Metadata {
   const canonicalUrl = new URL(path, SITE_URL).toString();
   const socialImageUrl = new URL(image, SITE_URL).toString();
+  const persianPath = path === "/" ? "/fa" : ENGLISH_TO_PERSIAN_PATH[path];
+  const languages = persianPath
+    ? {
+        en: canonicalUrl,
+        fa: new URL(persianPath, SITE_URL).toString(),
+        "x-default": canonicalUrl,
+      }
+    : undefined;
 
   return {
     title: { absolute: title },
     description,
     alternates: {
       canonical: canonicalUrl,
+      languages,
     },
     robots,
     openGraph: {

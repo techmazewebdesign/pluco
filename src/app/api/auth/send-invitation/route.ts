@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { getAdminAuth, getAdminDb } from '@/lib/firebase-admin';
 
 // Initialize Resend if API key is available
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -22,6 +23,41 @@ const getRoleDisplay = (role: string): string => {
 
 export async function POST(req: NextRequest) {
   try {
+    const authorization = req.headers.get('authorization');
+    if (!authorization?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const decoded = await getAdminAuth().verifyIdToken(authorization.slice(7));
+    const db = getAdminDb();
+    const normalizedEmail = decoded.email?.toLowerCase();
+    const profileRefs = [
+      db.collection('agents').doc(decoded.uid),
+      db.collection('users').doc(decoded.uid),
+      ...(normalizedEmail
+        ? [
+            db.collection('agents').doc(normalizedEmail),
+            db.collection('users').doc(normalizedEmail),
+          ]
+        : []),
+    ];
+
+    let isAdmin = decoded.admin === true;
+    for (const profileRef of profileRefs) {
+      if (isAdmin) break;
+      const profile = await profileRef.get();
+      const data = profile.data();
+      isAdmin = profile.exists && (
+        data?.role === 'admin' ||
+        data?.isAdmin === true ||
+        data?.is_admin === true
+      );
+    }
+
+    if (!isAdmin) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const { email, name, role, invitedBy } = await req.json();
 
     if (!email) {
@@ -58,17 +94,16 @@ export async function POST(req: NextRequest) {
 
       <p>You have been invited by <strong>${invitedBy}</strong> to join PLUCO GROUP as a <span class="highlight">${roleDisplay}</span>.</p>
 
-      <p>To get started, please create your account by clicking the button below:</p>
+      <p>To get started, sign in with the invited Google account by clicking the button below:</p>
 
-      <a href="${SIGNUP_URL}/signup" class="button">Create Your Account</a>
+      <a href="${SIGNUP_URL}/client-sign-in" class="button">Open Secure Client Portal</a>
 
       <p style="margin-top: 30px; font-size: 14px;">
         <strong>Next Steps:</strong><br>
-        1. Click the button above or visit: <br><code>${SIGNUP_URL}/signup</code><br>
-        2. Sign up with your email: <strong>${email}</strong><br>
-        3. Select <strong>${roleDisplay}</strong> as your role<br>
-        4. Verify your email address<br>
-        5. Start using your ${roleDisplay} dashboard!
+        1. Click the button above or visit: <br><code>${SIGNUP_URL}/client-sign-in</code><br>
+        2. Choose secure Google sign-in<br>
+        3. Use the invited email: <strong>${email}</strong><br>
+        4. Start using your ${roleDisplay} dashboard
       </p>
 
       ${role === 'consultant' ? `
@@ -102,13 +137,13 @@ Hello ${name},
 
 You have been invited by ${invitedBy} to join PLUCO GROUP as a ${roleDisplay}.
 
-To get started, please create your account:
+To get started, open the secure client portal:
 
-Visit: ${SIGNUP_URL}/signup
+Visit: ${SIGNUP_URL}/client-sign-in
 Email: ${email}
 Role: ${roleDisplay}
 
-After you verify your email, you'll have access to your dashboard.
+Sign in with the invited Google account to access your dashboard.
 
 If you have any questions, contact: support@plucogroup.com
 
