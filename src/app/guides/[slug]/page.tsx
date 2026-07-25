@@ -158,6 +158,30 @@ export default async function EnglishGuidePage({ params }: Props) {
             ))}
           </div>
 
+          {slug === 'source-of-funds-file' ? (
+            <section className="mt-12 rounded-2xl border border-[#D9C79D] bg-[#FFF9E9] p-7">
+              <p className="text-sm font-bold uppercase tracking-widest text-[#8B6A23]">
+                Free working resource
+              </p>
+              <h2 className="mt-3 text-2xl font-black">
+                Use the printable source-of-funds evidence checklist
+              </h2>
+              <p className="mt-4 leading-8 text-slate-700">
+                Organise the request, generating event, movement-of-money trail, consistency
+                checks, and secure submission pack in one document.
+              </p>
+              <TrackedGuideLink
+                href="/resources/source-of-funds-checklist"
+                className="mt-6 inline-block rounded-full bg-[#071C3C] px-6 py-3 font-bold text-white"
+                guideSlug={slug}
+                locale="en"
+                action="resource_cta"
+              >
+                Open the free checklist
+              </TrackedGuideLink>
+            </section>
+          ) : null}
+
           <section className="mt-14 rounded-2xl bg-white p-7">
             <h2 className="text-2xl font-black">Official sources</h2>
             <ul className="mt-5 grid gap-3">
