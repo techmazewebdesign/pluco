@@ -4,6 +4,7 @@ import {
   PERSIAN_SERVICES,
 } from '@/lib/plucoPersianServices';
 import { PERSIAN_GUIDES } from '@/lib/plucoPersianGuides';
+import { ENGLISH_GUIDES } from '@/lib/plucoEnglishGuides';
 
 const BASE_URL = 'https://www.plucogroup.com';
 
@@ -31,6 +32,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: '/enquire',                 priority: 0.7,  changeFrequency: 'monthly' },
     { url: '/privacy-policy',          priority: 0.3,  changeFrequency: 'yearly'  },
     { url: '/disclaimer',              priority: 0.3,  changeFrequency: 'yearly'  },
+    { url: '/guides',                  priority: 0.8,  changeFrequency: 'weekly'  },
     { url: '/guides/bank-account-closure-iranian-nationals-europe', priority: 0.85, changeFrequency: 'monthly' },
   ] as const;
 
@@ -39,9 +41,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       const persianPath =
         url === '/'
           ? '/fa'
-          : url === '/guides/bank-account-closure-iranian-nationals-europe'
-            ? '/fa/guides/bank-account-closure-iranians-europe'
-            : ENGLISH_TO_PERSIAN_PATH[url];
+          : url === '/guides'
+            ? '/fa/guides'
+            : url === '/guides/bank-account-closure-iranian-nationals-europe'
+              ? '/fa/guides/bank-account-closure-iranians-europe'
+              : ENGLISH_TO_PERSIAN_PATH[url];
       const canonicalUrl = `${BASE_URL}${url}`;
 
       return {
@@ -59,6 +63,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
               },
             }
           : {}),
+      };
+    },
+  );
+
+  const englishGuidePages: MetadataRoute.Sitemap = Object.entries(ENGLISH_GUIDES).map(
+    ([slug, guide]) => {
+      const englishUrl = `${BASE_URL}/guides/${slug}`;
+      const persianUrl = `${BASE_URL}${guide.persianPath}`;
+
+      return {
+        url: englishUrl,
+        lastModified: guide.reviewedOn,
+        changeFrequency: 'monthly',
+        priority: 0.8,
+        alternates: {
+          languages: {
+            en: englishUrl,
+            fa: persianUrl,
+            'x-default': englishUrl,
+          },
+        },
       };
     },
   );
@@ -92,7 +117,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${BASE_URL}/fa/guides`,
       changeFrequency: 'weekly',
       priority: 0.8,
-      alternates: { languages: { fa: `${BASE_URL}/fa/guides` } },
+      alternates: {
+        languages: {
+          en: `${BASE_URL}/guides`,
+          fa: `${BASE_URL}/fa/guides`,
+          'x-default': `${BASE_URL}/guides`,
+        },
+      },
     },
     ...Object.entries(PERSIAN_GUIDES).map(([slug, guide]) => {
       const persianUrl = `${BASE_URL}/fa/guides/${slug}`;
@@ -115,5 +146,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   ];
 
-  return [...englishPages, ...persianPages];
+  return [...englishPages, ...englishGuidePages, ...persianPages];
 }

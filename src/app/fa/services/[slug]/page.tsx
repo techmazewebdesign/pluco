@@ -89,7 +89,7 @@ export default async function PersianServicePage({ params }: Props) {
   };
 
   return (
-    <main className="bg-[#F7F5EF] text-[#172033]">
+    <main lang="fa" dir="rtl" className="bg-[#F7F5EF] text-[#172033]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
