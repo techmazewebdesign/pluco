@@ -3,7 +3,11 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import TrackedGuideLink from '@/components/seo/TrackedGuideLink';
 import { isPersianGuideSlug, PERSIAN_GUIDES } from '@/lib/plucoPersianGuides';
-import { SITE_URL } from '@/lib/siteMetadata';
+import {
+  DEFAULT_SOCIAL_IMAGE,
+  DEFAULT_SOCIAL_IMAGE_ALT,
+  SITE_URL,
+} from '@/lib/siteMetadata';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -30,7 +34,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         ...(englishUrl ? { en: englishUrl, 'x-default': englishUrl } : {}),
       },
     },
-    openGraph: { title: guide.title, description: guide.description, url, locale: 'fa_IR', type: 'article' },
+    openGraph: {
+      title: guide.title,
+      description: guide.description,
+      url,
+      locale: 'fa_IR',
+      alternateLocale: ['en_US'],
+      type: 'article',
+      images: [{
+        url: `${SITE_URL}${DEFAULT_SOCIAL_IMAGE}`,
+        width: 1200,
+        height: 630,
+        alt: DEFAULT_SOCIAL_IMAGE_ALT,
+      }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: guide.title,
+      description: guide.description,
+      images: [`${SITE_URL}${DEFAULT_SOCIAL_IMAGE}`],
+    },
   };
 }
 
@@ -39,17 +62,43 @@ export default async function PersianGuidePage({ params }: Props) {
   if (!isPersianGuideSlug(slug)) notFound();
   const guide = PERSIAN_GUIDES[slug];
   const url = `${SITE_URL}/fa/guides/${slug}`;
+  const relatedGuides = Object.entries(PERSIAN_GUIDES)
+    .filter(([candidateSlug]) => candidateSlug !== slug)
+    .sort(([, candidateA], [, candidateB]) => {
+      const aMatchesService = candidateA.relatedServiceSlug === guide.relatedServiceSlug ? 1 : 0;
+      const bMatchesService = candidateB.relatedServiceSlug === guide.relatedServiceSlug ? 1 : 0;
+      return bMatchesService - aMatchesService;
+    })
+    .slice(0, 3);
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: guide.title,
-    description: guide.description,
-    inLanguage: 'fa',
-    datePublished: guide.reviewedOn,
-    dateModified: guide.reviewedOn,
-    mainEntityOfPage: url,
-    author: { '@type': 'Organization', '@id': `${SITE_URL}/#organization`, name: 'PLUCO GROUP' },
-    publisher: { '@id': `${SITE_URL}/#organization` },
+    '@graph': [
+      {
+        '@type': 'Article',
+        '@id': `${url}#article`,
+        headline: guide.title,
+        description: guide.description,
+        inLanguage: 'fa',
+        datePublished: guide.reviewedOn,
+        dateModified: guide.reviewedOn,
+        mainEntityOfPage: url,
+        author: {
+          '@type': 'Organization',
+          '@id': `${SITE_URL}/#organization`,
+          name: 'PLUCO GROUP',
+          url: SITE_URL,
+        },
+        publisher: { '@id': `${SITE_URL}/#organization` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'PLUCO GROUP', item: `${SITE_URL}/fa` },
+          { '@type': 'ListItem', position: 2, name: 'راهنماها', item: `${SITE_URL}/fa/guides` },
+          { '@type': 'ListItem', position: 3, name: guide.title, item: url },
+        ],
+      },
+    ],
   };
 
   return (
@@ -58,14 +107,19 @@ export default async function PersianGuidePage({ params }: Props) {
       <article>
         <header className="bg-[#071C3C] text-white">
           <div className="mx-auto max-w-4xl px-5 py-16 sm:px-8 lg:py-24">
-            <nav className="text-sm text-slate-300">
+            <nav aria-label="مسیر صفحه" className="text-sm text-slate-300">
               <Link href="/fa">صفحه فارسی</Link><span className="px-2">/</span>
               <Link href="/fa/guides">راهنماها</Link>
             </nav>
             <div className="mt-8 flex flex-wrap gap-3 text-sm font-bold text-[#E3C783]">
               <span>{guide.readTime}</span>
               <span>·</span>
-              <span>تهیه‌کننده: PLUCO GROUP</span>
+              <span>
+                تهیه‌کننده:{' '}
+                <Link href="/fa/editorial-standards" className="underline underline-offset-4">
+                  PLUCO GROUP
+                </Link>
+              </span>
               <span>·</span>
               <span>آخرین به‌روزرسانی: {guide.reviewedOn}</span>
             </div>
@@ -108,6 +162,24 @@ export default async function PersianGuidePage({ params }: Props) {
               ))}
             </ul>
           </section>
+          <nav aria-label="راهنماهای مرتبط" className="mt-10">
+            <h2 className="text-2xl font-black">راهنماهای عملی مرتبط</h2>
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              {relatedGuides.map(([relatedSlug, relatedGuide]) => (
+                <TrackedGuideLink
+                  key={relatedSlug}
+                  href={`/fa/guides/${relatedSlug}`}
+                  className="rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-[#C9A35A] hover:shadow-md"
+                  guideSlug={slug}
+                  locale="fa"
+                  action="related_guide"
+                >
+                  <span className="text-xs font-bold text-[#8B6A23]">{relatedGuide.readTime}</span>
+                  <span className="mt-2 block font-black leading-8">{relatedGuide.title}</span>
+                </TrackedGuideLink>
+              ))}
+            </div>
+          </nav>
           <section className="mt-10 rounded-3xl bg-[#071C3C] p-8 text-white">
             <p className="text-sm font-bold text-[#E3C783]">مرحله بعد</p>
             <h2 className="mt-3 text-2xl font-black leading-10">این موضوع را با شرایط واقعی خود بررسی کنید</h2>

@@ -3,7 +3,11 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import TrackedGuideLink from '@/components/seo/TrackedGuideLink';
 import { ENGLISH_GUIDES, isEnglishGuideSlug } from '@/lib/plucoEnglishGuides';
-import { SITE_URL } from '@/lib/siteMetadata';
+import {
+  DEFAULT_SOCIAL_IMAGE,
+  DEFAULT_SOCIAL_IMAGE_ALT,
+  SITE_URL,
+} from '@/lib/siteMetadata';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -38,6 +42,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       locale: 'en_US',
       alternateLocale: ['fa_IR'],
       type: 'article',
+      images: [{
+        url: `${SITE_URL}${DEFAULT_SOCIAL_IMAGE}`,
+        width: 1200,
+        height: 630,
+        alt: DEFAULT_SOCIAL_IMAGE_ALT,
+      }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: guide.title,
+      description: guide.description,
+      images: [`${SITE_URL}${DEFAULT_SOCIAL_IMAGE}`],
     },
   };
 }
@@ -48,6 +64,14 @@ export default async function EnglishGuidePage({ params }: Props) {
 
   const guide = ENGLISH_GUIDES[slug];
   const url = `${SITE_URL}/guides/${slug}`;
+  const relatedGuides = Object.entries(ENGLISH_GUIDES)
+    .filter(([candidateSlug]) => candidateSlug !== slug)
+    .sort(([, candidateA], [, candidateB]) => {
+      const aMatchesService = candidateA.relatedServicePath === guide.relatedServicePath ? 1 : 0;
+      const bMatchesService = candidateB.relatedServicePath === guide.relatedServicePath ? 1 : 0;
+      return bMatchesService - aMatchesService;
+    })
+    .slice(0, 3);
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -60,7 +84,12 @@ export default async function EnglishGuidePage({ params }: Props) {
         datePublished: guide.reviewedOn,
         dateModified: guide.reviewedOn,
         mainEntityOfPage: url,
-        author: { '@type': 'Organization', '@id': `${SITE_URL}/#organization`, name: 'PLUCO GROUP' },
+        author: {
+          '@type': 'Organization',
+          '@id': `${SITE_URL}/#organization`,
+          name: 'PLUCO GROUP',
+          url: SITE_URL,
+        },
         publisher: { '@id': `${SITE_URL}/#organization` },
       },
       {
@@ -89,7 +118,12 @@ export default async function EnglishGuidePage({ params }: Props) {
             </nav>
             <div className="mt-8 flex flex-wrap gap-3 text-sm font-bold text-[#E3C783]">
               <span>{guide.readTime}</span><span>·</span>
-              <span>Prepared by PLUCO GROUP</span><span>·</span>
+              <span>
+                Prepared by{' '}
+                <Link href="/editorial-standards" className="underline underline-offset-4">
+                  PLUCO GROUP
+                </Link>
+              </span><span>·</span>
               <span>Updated {guide.reviewedOn}</span>
             </div>
             <h1 className="mt-5 text-4xl font-black leading-tight sm:text-5xl">{guide.title}</h1>
@@ -141,6 +175,25 @@ export default async function EnglishGuidePage({ params }: Props) {
               ))}
             </ul>
           </section>
+
+          <nav aria-label="Related guides" className="mt-10">
+            <h2 className="text-2xl font-black">Related practical guides</h2>
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              {relatedGuides.map(([relatedSlug, relatedGuide]) => (
+                <TrackedGuideLink
+                  key={relatedSlug}
+                  href={`/guides/${relatedSlug}`}
+                  className="rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-[#C9A35A] hover:shadow-md"
+                  guideSlug={slug}
+                  locale="en"
+                  action="related_guide"
+                >
+                  <span className="text-xs font-bold text-[#8B6A23]">{relatedGuide.readTime}</span>
+                  <span className="mt-2 block font-black leading-7">{relatedGuide.title}</span>
+                </TrackedGuideLink>
+              ))}
+            </div>
+          </nav>
 
           <section className="mt-10 rounded-3xl bg-[#071C3C] p-8 text-white">
             <p className="text-sm font-bold uppercase tracking-widest text-[#E3C783]">Next step</p>

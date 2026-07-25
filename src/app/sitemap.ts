@@ -33,6 +33,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: '/privacy-policy',          priority: 0.3,  changeFrequency: 'yearly'  },
     { url: '/disclaimer',              priority: 0.3,  changeFrequency: 'yearly'  },
     { url: '/guides',                  priority: 0.8,  changeFrequency: 'weekly'  },
+    { url: '/editorial-standards',     priority: 0.4,  changeFrequency: 'yearly'  },
     { url: '/guides/bank-account-closure-iranian-nationals-europe', priority: 0.85, changeFrequency: 'monthly' },
   ] as const;
 
@@ -43,10 +44,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
           ? '/fa'
           : url === '/guides'
             ? '/fa/guides'
+            : url === '/editorial-standards'
+              ? '/fa/editorial-standards'
             : url === '/guides/bank-account-closure-iranian-nationals-europe'
               ? '/fa/guides/bank-account-closure-iranians-europe'
               : ENGLISH_TO_PERSIAN_PATH[url];
-      const canonicalUrl = `${BASE_URL}${url}`;
+      const canonicalUrl = url === '/' ? BASE_URL : `${BASE_URL}${url}`;
 
       return {
         url: canonicalUrl,
@@ -122,6 +125,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
           en: `${BASE_URL}/guides`,
           fa: `${BASE_URL}/fa/guides`,
           'x-default': `${BASE_URL}/guides`,
+        },
+      },
+    },
+    {
+      url: `${BASE_URL}/fa/editorial-standards`,
+      changeFrequency: 'yearly',
+      priority: 0.4,
+      alternates: {
+        languages: {
+          en: `${BASE_URL}/editorial-standards`,
+          fa: `${BASE_URL}/fa/editorial-standards`,
+          'x-default': `${BASE_URL}/editorial-standards`,
         },
       },
     },

@@ -7,7 +7,11 @@ import {
   isPersianServiceSlug,
   PERSIAN_SERVICES,
 } from '@/lib/plucoPersianServices';
-import { SITE_URL } from '@/lib/siteMetadata';
+import {
+  DEFAULT_SOCIAL_IMAGE,
+  DEFAULT_SOCIAL_IMAGE_ALT,
+  SITE_URL,
+} from '@/lib/siteMetadata';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -42,6 +46,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       locale: 'fa_IR',
       alternateLocale: ['en_US'],
       type: 'website',
+      images: [{
+        url: `${SITE_URL}${DEFAULT_SOCIAL_IMAGE}`,
+        width: 1200,
+        height: 630,
+        alt: DEFAULT_SOCIAL_IMAGE_ALT,
+      }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: service.title,
+      description: service.description,
+      images: [`${SITE_URL}${DEFAULT_SOCIAL_IMAGE}`],
     },
   };
 }

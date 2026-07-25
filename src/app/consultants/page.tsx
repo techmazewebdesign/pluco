@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { motion } from 'framer-motion';
@@ -24,7 +24,6 @@ interface ConsultantCard {
 
 export default function ConsultantsPage() {
   const [consultants, setConsultants] = useState<ConsultantCard[]>([]);
-  const [filteredConsultants, setFilteredConsultants] = useState<ConsultantCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -52,7 +51,6 @@ export default function ConsultantsPage() {
         } as ConsultantCard));
 
         setConsultants(consultantsList);
-        setFilteredConsultants(consultantsList);
       } catch (err) {
         console.error('Error loading consultants:', err);
         setError('Failed to load consultants');
@@ -64,8 +62,7 @@ export default function ConsultantsPage() {
     loadConsultants();
   }, []);
 
-  // Filter consultants based on search and selected product type
-  useEffect(() => {
+  const filteredConsultants = useMemo(() => {
     let filtered = consultants;
 
     // Filter by search query (name or email)
@@ -84,17 +81,29 @@ export default function ConsultantsPage() {
       );
     }
 
-    setFilteredConsultants(filtered);
+    return filtered;
   }, [searchQuery, selectedProductType, consultants]);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#C9A35A' }} />
-          <p style={{ color: '#5E6470' }}>Loading consultants...</p>
+      <main className="min-h-screen bg-gradient-to-br from-white to-gray-50">
+        <div className="mx-auto max-w-6xl px-4 py-8">
+          <Link href="/" className="mb-8 inline-flex items-center gap-2 text-sm font-semibold" style={{ color: '#C9A35A' }}>
+            <ArrowLeft className="h-4 w-4" />
+            Back to Home
+          </Link>
+          <header className="mb-12">
+            <h1 className="mb-2 text-4xl font-bold" style={{ color: '#071C3C' }}>Our Consultants</h1>
+            <p style={{ color: '#5E6470' }}>
+              Browse PLUCO GROUP consultants and their areas of cross-border professional expertise.
+            </p>
+          </header>
+          <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-6">
+            <Loader2 className="h-6 w-6 animate-spin" style={{ color: '#C9A35A' }} />
+            <p style={{ color: '#5E6470' }}>Loading consultant profiles...</p>
+          </div>
         </div>
-      </div>
+      </main>
     );
   }
 

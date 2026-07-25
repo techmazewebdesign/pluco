@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import TrackedGuideLink from '@/components/seo/TrackedGuideLink';
 import { SITE_URL } from '@/lib/siteMetadata';
 
 const PAGE_PATH = '/guides/bank-account-closure-iranian-nationals-europe';
@@ -72,6 +73,7 @@ const jsonLd = {
         '@type': 'Organization',
         '@id': `${SITE_URL}/#organization`,
         name: 'PLUCO GROUP',
+        url: SITE_URL,
       },
       publisher: { '@id': `${SITE_URL}/#organization` },
       about: [
@@ -144,7 +146,12 @@ export default function BankAccountClosureGuidePage() {
               enquiry from a European financial institution.
             </p>
             <div className="mt-8 flex flex-wrap gap-3 text-sm text-slate-300">
-              <span>Prepared by PLUCO GROUP</span>
+              <span>
+                Prepared by{' '}
+                <Link href="/editorial-standards" className="underline underline-offset-4">
+                  PLUCO GROUP
+                </Link>
+              </span>
               <span>·</span>
               <time dateTime={REVIEWED_ON}>Updated 25 July 2026</time>
             </div>
@@ -290,6 +297,37 @@ export default function BankAccountClosureGuidePage() {
               ))}
             </div>
           </section>
+
+          <nav aria-label="Related guides" className="mt-12">
+            <h2 className="text-2xl font-black">Related practical guides</h2>
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              {[
+                {
+                  href: '/guides/source-of-funds-file',
+                  title: 'How to prepare a source-of-funds file',
+                },
+                {
+                  href: '/guides/eu-bank-account-opening-iranian-nationals',
+                  title: 'Opening an EU bank account as an Iranian national',
+                },
+                {
+                  href: '/guides/eu-company-versus-residency',
+                  title: 'EU company registration versus personal residency',
+                },
+              ].map((relatedGuide) => (
+                <TrackedGuideLink
+                  key={relatedGuide.href}
+                  href={relatedGuide.href}
+                  className="rounded-2xl border border-slate-200 bg-white p-5 font-black leading-7 transition hover:border-[#C9A35A] hover:shadow-md"
+                  guideSlug="bank-account-closure-iranian-nationals-europe"
+                  locale="en"
+                  action="related_guide"
+                >
+                  {relatedGuide.title}
+                </TrackedGuideLink>
+              ))}
+            </div>
+          </nav>
 
           <section className="mt-12 rounded-3xl bg-[#071C3C] p-8 text-white">
             <p className="text-sm font-bold uppercase tracking-widest text-[#E3C783]">Private review</p>
