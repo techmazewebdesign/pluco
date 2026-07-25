@@ -6,12 +6,19 @@ import { SITE_URL } from '@/lib/siteMetadata';
 export const metadata: Metadata = {
   title: 'راهنماهای فارسی اقامت، بانک و کسب‌وکار در اروپا',
   description: 'راهنماهای فارسی و منبع‌محور PLUCO GROUP برای تصمیم‌های اقامتی، بانکی، شرکتی و حقوقی بین‌المللی.',
-  alternates: { canonical: `${SITE_URL}/fa/guides`, languages: { fa: `${SITE_URL}/fa/guides` } },
+  alternates: {
+    canonical: `${SITE_URL}/fa/guides`,
+    languages: {
+      en: `${SITE_URL}/guides`,
+      fa: `${SITE_URL}/fa/guides`,
+      'x-default': `${SITE_URL}/guides`,
+    },
+  },
 };
 
 export default function PersianGuidesPage() {
   return (
-    <main className="min-h-screen bg-[#F7F5EF] text-[#172033]">
+    <main lang="fa" dir="rtl" className="min-h-screen bg-[#F7F5EF] text-[#172033]">
       <section className="bg-[#071C3C] text-white">
         <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8">
           <p className="text-sm font-bold text-[#E3C783]">مرکز دانش فارسی</p>

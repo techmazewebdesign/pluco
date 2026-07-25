@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import TrackedGuideLink from '@/components/seo/TrackedGuideLink';
 import { isPersianGuideSlug, PERSIAN_GUIDES } from '@/lib/plucoPersianGuides';
 import { SITE_URL } from '@/lib/siteMetadata';
 
@@ -52,7 +53,7 @@ export default async function PersianGuidePage({ params }: Props) {
   };
 
   return (
-    <main className="bg-[#F7F5EF] text-[#172033]">
+    <main lang="fa" dir="rtl" className="bg-[#F7F5EF] text-[#172033]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <article>
         <header className="bg-[#071C3C] text-white">
@@ -111,13 +112,25 @@ export default async function PersianGuidePage({ params }: Props) {
             <p className="text-sm font-bold text-[#E3C783]">مرحله بعد</p>
             <h2 className="mt-3 text-2xl font-black leading-10">این موضوع را با شرایط واقعی خود بررسی کنید</h2>
             <p className="mt-3 leading-8 text-slate-200">پیش از پرداخت، ترجمه گسترده مدارک یا تعهد مالی، تناسب مسیر و ریسک‌های اصلی را روشن کنید.</p>
-            <Link href={`/fa/services/${guide.relatedServiceSlug}#service-enquiry`} className="mt-6 inline-block rounded-full bg-[#C9A35A] px-6 py-3 font-bold text-[#071C3C]">
+            <TrackedGuideLink
+              href={`/fa/services/${guide.relatedServiceSlug}#service-enquiry`}
+              className="mt-6 inline-block rounded-full bg-[#C9A35A] px-6 py-3 font-bold text-[#071C3C]"
+              guideSlug={slug}
+              locale="fa"
+              action="service_cta"
+            >
               {guide.relatedServiceLabel}
-            </Link>
+            </TrackedGuideLink>
             {'englishPath' in guide && guide.englishPath ? (
-              <Link href={guide.englishPath} className="mt-6 mr-3 inline-block rounded-full border border-white/40 px-6 py-3 font-bold text-white">
+              <TrackedGuideLink
+                href={guide.englishPath}
+                className="mt-6 mr-3 inline-block rounded-full border border-white/40 px-6 py-3 font-bold text-white"
+                guideSlug={slug}
+                locale="fa"
+                action="language_switch"
+              >
                 English version
-              </Link>
+              </TrackedGuideLink>
             ) : null}
           </section>
         </div>

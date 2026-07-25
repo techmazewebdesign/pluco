@@ -23,6 +23,7 @@ export default function Footer() {
   const quickLinks = [
     [isRTL ? 'صفحه فارسی' : t('nav.ourPeople'), isRTL ? '/fa' : '/our-people'],
     ...(isRTL ? [['راهنماهای فارسی', '/fa/guides']] : []),
+    ...(!isRTL ? [['Guides', '/guides']] : []),
     ...(!isRTL ? [[t('nav.publications'), '/publications']] : []),
     [t('nav.clientSignIn'),       '/client-sign-in'],
     ['Contact',                   '/contact'],
