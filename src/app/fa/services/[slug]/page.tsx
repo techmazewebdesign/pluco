@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import PersianLeadForm from '@/components/persian/PersianLeadForm';
+import { PERSIAN_GUIDES } from '@/lib/plucoPersianGuides';
 import {
   isPersianServiceSlug,
   PERSIAN_SERVICES,
@@ -178,8 +179,26 @@ export default async function PersianServicePage({ params }: Props) {
       </section>
 
       <section className="border-t border-slate-200 bg-white">
-        <nav aria-label="خدمات مرتبط" className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
+        <nav aria-label="راهنماهای مرتبط" className="mx-auto max-w-7xl px-5 pt-14 sm:px-8">
           <h2 className="text-2xl font-black">راهنماهای مرتبط</h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {Object.entries(PERSIAN_GUIDES)
+              .filter(([, guide]) => guide.relatedServiceSlug === slug)
+              .map(([guideSlug, guide]) => (
+                <Link
+                  key={guideSlug}
+                  href={`/fa/guides/${guideSlug}`}
+                  className="rounded-2xl border border-slate-200 p-5 transition hover:border-[#C9A35A] hover:shadow-md"
+                >
+                  <span className="text-xs font-bold text-[#8B6A23]">{guide.readTime}</span>
+                  <h3 className="mt-2 font-black leading-8">{guide.title}</h3>
+                  <p className="mt-2 text-sm leading-7 text-slate-600">{guide.description}</p>
+                </Link>
+              ))}
+          </div>
+        </nav>
+        <nav aria-label="خدمات مرتبط" className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
+          <h2 className="text-2xl font-black">خدمات مرتبط</h2>
           <div className="mt-6 flex flex-wrap gap-3">
             {Object.entries(PERSIAN_SERVICES)
               .filter(([key]) => key !== slug)
