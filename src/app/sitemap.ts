@@ -34,6 +34,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: '/disclaimer',              priority: 0.3,  changeFrequency: 'yearly'  },
     { url: '/guides',                  priority: 0.8,  changeFrequency: 'weekly'  },
     { url: '/editorial-standards',     priority: 0.4,  changeFrequency: 'yearly'  },
+    { url: '/resources/source-of-funds-checklist', priority: 0.85, changeFrequency: 'monthly' },
     { url: '/guides/bank-account-closure-iranian-nationals-europe', priority: 0.85, changeFrequency: 'monthly' },
   ] as const;
 
@@ -46,6 +47,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
             ? '/fa/guides'
             : url === '/editorial-standards'
               ? '/fa/editorial-standards'
+            : url === '/resources/source-of-funds-checklist'
+              ? '/fa/resources/source-of-funds-checklist'
             : url === '/guides/bank-account-closure-iranian-nationals-europe'
               ? '/fa/guides/bank-account-closure-iranians-europe'
               : ENGLISH_TO_PERSIAN_PATH[url];
@@ -137,6 +140,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
           en: `${BASE_URL}/editorial-standards`,
           fa: `${BASE_URL}/fa/editorial-standards`,
           'x-default': `${BASE_URL}/editorial-standards`,
+        },
+      },
+    },
+    {
+      url: `${BASE_URL}/fa/resources/source-of-funds-checklist`,
+      lastModified: '2026-07-26',
+      changeFrequency: 'monthly',
+      priority: 0.85,
+      alternates: {
+        languages: {
+          en: `${BASE_URL}/resources/source-of-funds-checklist`,
+          fa: `${BASE_URL}/fa/resources/source-of-funds-checklist`,
+          'x-default': `${BASE_URL}/resources/source-of-funds-checklist`,
         },
       },
     },

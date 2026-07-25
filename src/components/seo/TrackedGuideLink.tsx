@@ -9,7 +9,7 @@ type Props = {
   children: React.ReactNode;
   guideSlug: string;
   locale: 'en' | 'fa';
-  action: 'service_cta' | 'language_switch' | 'related_guide';
+  action: 'service_cta' | 'language_switch' | 'related_guide' | 'resource_cta';
 };
 
 export default function TrackedGuideLink({
