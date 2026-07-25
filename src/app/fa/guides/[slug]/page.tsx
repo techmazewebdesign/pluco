@@ -15,11 +15,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!isPersianGuideSlug(slug)) return {};
   const guide = PERSIAN_GUIDES[slug];
   const url = `${SITE_URL}/fa/guides/${slug}`;
+  const englishUrl = 'englishPath' in guide && guide.englishPath
+    ? `${SITE_URL}${guide.englishPath}`
+    : undefined;
   return {
     title: guide.title,
     description: guide.description,
-    keywords: [guide.searchIntent],
-    alternates: { canonical: url, languages: { fa: url } },
+    keywords: [guide.searchIntent, ...('keywords' in guide && guide.keywords ? guide.keywords : [])],
+    alternates: {
+      canonical: url,
+      languages: {
+        fa: url,
+        ...(englishUrl ? { en: englishUrl, 'x-default': englishUrl } : {}),
+      },
+    },
     openGraph: { title: guide.title, description: guide.description, url, locale: 'fa_IR', type: 'article' },
   };
 }
@@ -53,7 +62,11 @@ export default async function PersianGuidePage({ params }: Props) {
               <Link href="/fa/guides">راهنماها</Link>
             </nav>
             <div className="mt-8 flex flex-wrap gap-3 text-sm font-bold text-[#E3C783]">
-              <span>{guide.readTime}</span><span>·</span><span>آخرین بازبینی: {guide.reviewedOn}</span>
+              <span>{guide.readTime}</span>
+              <span>·</span>
+              <span>تهیه‌کننده: PLUCO GROUP</span>
+              <span>·</span>
+              <span>آخرین به‌روزرسانی: {guide.reviewedOn}</span>
             </div>
             <h1 className="mt-5 text-4xl font-black leading-[1.55] sm:text-5xl">{guide.title}</h1>
             <p className="mt-6 text-lg leading-9 text-slate-200">{guide.description}</p>
@@ -101,6 +114,11 @@ export default async function PersianGuidePage({ params }: Props) {
             <Link href={`/fa/services/${guide.relatedServiceSlug}#service-enquiry`} className="mt-6 inline-block rounded-full bg-[#C9A35A] px-6 py-3 font-bold text-[#071C3C]">
               {guide.relatedServiceLabel}
             </Link>
+            {'englishPath' in guide && guide.englishPath ? (
+              <Link href={guide.englishPath} className="mt-6 mr-3 inline-block rounded-full border border-white/40 px-6 py-3 font-bold text-white">
+                English version
+              </Link>
+            ) : null}
           </section>
         </div>
       </article>

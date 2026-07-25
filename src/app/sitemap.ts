@@ -31,11 +31,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: '/enquire',                 priority: 0.7,  changeFrequency: 'monthly' },
     { url: '/privacy-policy',          priority: 0.3,  changeFrequency: 'yearly'  },
     { url: '/disclaimer',              priority: 0.3,  changeFrequency: 'yearly'  },
+    { url: '/guides/bank-account-closure-iranian-nationals-europe', priority: 0.85, changeFrequency: 'monthly' },
   ] as const;
 
   const englishPages: MetadataRoute.Sitemap = publicPages.map(
     ({ url, priority, changeFrequency }) => {
-      const persianPath = url === '/' ? '/fa' : ENGLISH_TO_PERSIAN_PATH[url];
+      const persianPath =
+        url === '/'
+          ? '/fa'
+          : url === '/guides/bank-account-closure-iranian-nationals-europe'
+            ? '/fa/guides/bank-account-closure-iranians-europe'
+            : ENGLISH_TO_PERSIAN_PATH[url];
       const canonicalUrl = `${BASE_URL}${url}`;
 
       return {
@@ -88,14 +94,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
       alternates: { languages: { fa: `${BASE_URL}/fa/guides` } },
     },
-    ...Object.keys(PERSIAN_GUIDES).map((slug) => ({
-      url: `${BASE_URL}/fa/guides/${slug}`,
-      changeFrequency: 'monthly' as const,
-      priority: 0.75,
-      alternates: {
-        languages: { fa: `${BASE_URL}/fa/guides/${slug}` },
-      },
-    })),
+    ...Object.entries(PERSIAN_GUIDES).map(([slug, guide]) => {
+      const persianUrl = `${BASE_URL}/fa/guides/${slug}`;
+      const englishUrl = 'englishPath' in guide && guide.englishPath
+        ? `${BASE_URL}${guide.englishPath}`
+        : undefined;
+
+      return {
+        url: persianUrl,
+        lastModified: guide.reviewedOn,
+        changeFrequency: 'monthly' as const,
+        priority: slug === 'bank-account-closure-iranians-europe' ? 0.85 : 0.75,
+        alternates: {
+          languages: {
+            fa: persianUrl,
+            ...(englishUrl ? { en: englishUrl, 'x-default': englishUrl } : {}),
+          },
+        },
+      };
+    }),
   ];
 
   return [...englishPages, ...persianPages];

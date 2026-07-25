@@ -184,6 +184,43 @@ export default function Banking() {
         </div>
       </section>
 
+      <section className="border-y border-[#E8DFC9] bg-[#FFF9E9]" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_auto] lg:items-center lg:px-8">
+          <div>
+            <p
+              className="text-xs font-semibold uppercase tracking-widest"
+              style={{ color: '#8B6A23', fontFamily: isRTL ? ff : undefined }}
+            >
+              {isRTL ? 'راهنمای عملی' : 'PRACTICAL BANKING GUIDE'}
+            </p>
+            <h2
+              className="mt-3 text-2xl font-bold leading-tight md:text-3xl"
+              style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}
+            >
+              {isRTL
+                ? 'اگر بانک اروپایی حساب شما را محدود یا مسدود کرده است'
+                : 'European bank account closure for Iranian nationals'}
+            </h2>
+            <p
+              className="mt-3 max-w-3xl text-sm leading-7"
+              style={{ color: '#5E6470', fontFamily: isRTL ? ff : undefined }}
+            >
+              {isRTL
+                ? 'اقدامات فوری، مدارک منبع وجوه و مسیر مرحله‌ای اعتراض را در راهنمای فارسی بخوانید.'
+                : 'Read the first-response steps, source-of-funds evidence checklist, and staged complaint route.'}
+            </p>
+          </div>
+          <Link
+            href={isRTL
+              ? '/fa/guides/bank-account-closure-iranians-europe'
+              : '/guides/bank-account-closure-iranian-nationals-europe'}
+            className="inline-flex items-center justify-center rounded-full bg-[#071C3C] px-6 py-3 text-sm font-bold text-white"
+          >
+            {isRTL ? 'مطالعه راهنما' : 'Read the guide'}
+          </Link>
+        </div>
+      </section>
+
       {/* How PLUCO GROUP Assists */}
       <section className="py-20" style={{ backgroundColor: '#F8F9FA' }} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
