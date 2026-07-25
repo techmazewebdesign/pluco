@@ -1,24 +1,76 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { PERSIAN_GUIDES } from '@/lib/plucoPersianGuides';
-import { SITE_URL } from '@/lib/siteMetadata';
+import { DEFAULT_SOCIAL_IMAGE, SITE_URL } from '@/lib/siteMetadata';
+
+const PAGE_URL = `${SITE_URL}/fa/guides`;
+const PAGE_DESCRIPTION =
+  'راهنماهای فارسی و منبع‌محور PLUCO GROUP برای تصمیم‌های اقامتی، بانکی، شرکتی و حقوقی بین‌المللی.';
 
 export const metadata: Metadata = {
   title: 'راهنماهای فارسی اقامت، بانک و کسب‌وکار در اروپا',
-  description: 'راهنماهای فارسی و منبع‌محور PLUCO GROUP برای تصمیم‌های اقامتی، بانکی، شرکتی و حقوقی بین‌المللی.',
+  description: PAGE_DESCRIPTION,
   alternates: {
-    canonical: `${SITE_URL}/fa/guides`,
+    canonical: PAGE_URL,
     languages: {
       en: `${SITE_URL}/guides`,
-      fa: `${SITE_URL}/fa/guides`,
+      fa: PAGE_URL,
       'x-default': `${SITE_URL}/guides`,
     },
+  },
+  openGraph: {
+    title: 'راهنماهای فارسی اقامت، بانک و کسب‌وکار در اروپا',
+    description: PAGE_DESCRIPTION,
+    url: PAGE_URL,
+    siteName: 'PLUCO GROUP',
+    locale: 'fa_IR',
+    alternateLocale: ['en_US'],
+    type: 'website',
+    images: [`${SITE_URL}${DEFAULT_SOCIAL_IMAGE}`],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'راهنماهای فارسی اقامت، بانک و کسب‌وکار در اروپا',
+    description: PAGE_DESCRIPTION,
+    images: [`${SITE_URL}${DEFAULT_SOCIAL_IMAGE}`],
   },
 };
 
 export default function PersianGuidesPage() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${PAGE_URL}#collection`,
+        url: PAGE_URL,
+        name: 'راهنماهای فارسی PLUCO GROUP',
+        description: PAGE_DESCRIPTION,
+        inLanguage: 'fa',
+        isPartOf: { '@id': `${SITE_URL}/#website` },
+        hasPart: Object.entries(PERSIAN_GUIDES).map(([slug, guide]) => ({
+          '@type': 'Article',
+          '@id': `${SITE_URL}/fa/guides/${slug}#article`,
+          url: `${SITE_URL}/fa/guides/${slug}`,
+          headline: guide.title,
+        })),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'PLUCO GROUP', item: `${SITE_URL}/fa` },
+          { '@type': 'ListItem', position: 2, name: 'راهنماها', item: PAGE_URL },
+        ],
+      },
+    ],
+  };
+
   return (
     <main lang="fa" dir="rtl" className="min-h-screen bg-[#F7F5EF] text-[#172033]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
       <section className="bg-[#071C3C] text-white">
         <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8">
           <p className="text-sm font-bold text-[#E3C783]">مرکز دانش فارسی</p>
@@ -28,6 +80,9 @@ export default function PersianGuidesPage() {
           <p className="mt-6 max-w-3xl text-lg leading-9 text-slate-200">
             مطالب عمومی و منبع‌محور برای شناخت بهتر مدارک، ریسک‌ها و پرسش‌هایی که باید پیش از اقدام مطرح کنید.
           </p>
+          <Link href="/fa/editorial-standards" className="mt-7 inline-block rounded-full border border-white/40 px-6 py-3 font-bold text-white">
+            روش بازبینی محتوا
+          </Link>
         </div>
       </section>
       <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8">

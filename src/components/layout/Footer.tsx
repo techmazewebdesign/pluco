@@ -24,6 +24,8 @@ export default function Footer() {
     [isRTL ? 'صفحه فارسی' : t('nav.ourPeople'), isRTL ? '/fa' : '/our-people'],
     ...(isRTL ? [['راهنماهای فارسی', '/fa/guides']] : []),
     ...(!isRTL ? [['Guides', '/guides']] : []),
+    ...(isRTL ? [['استانداردهای تحریریه', '/fa/editorial-standards']] : []),
+    ...(!isRTL ? [['Editorial standards', '/editorial-standards']] : []),
     ...(!isRTL ? [[t('nav.publications'), '/publications']] : []),
     [t('nav.clientSignIn'),       '/client-sign-in'],
     ['Contact',                   '/contact'],

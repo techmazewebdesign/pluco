@@ -170,6 +170,16 @@ export default function Header() {
               </Link>
             ) : null}
 
+            {!isRTL ? (
+              <Link href="/guides" className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
+                Guides
+                <span
+                  className="absolute bottom-0 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
+                  style={{ backgroundColor: '#C9A35A' }}
+                />
+              </Link>
+            ) : null}
+
             {/* Auth Links */}
             {!loading && !user ? (
               <Link

@@ -1,19 +1,38 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ENGLISH_GUIDES } from '@/lib/plucoEnglishGuides';
-import { SITE_URL } from '@/lib/siteMetadata';
+import { DEFAULT_SOCIAL_IMAGE, SITE_URL } from '@/lib/siteMetadata';
+
+const PAGE_URL = `${SITE_URL}/guides`;
+const PAGE_DESCRIPTION =
+  'Source-led PLUCO GROUP guides for international banking, European residence, company formation, and property decisions.';
 
 export const metadata: Metadata = {
   title: 'Cross-Border Banking, Residency, Company, and Property Guides',
-  description:
-    'Source-led PLUCO GROUP guides for international banking, European residence, company formation, and property decisions.',
+  description: PAGE_DESCRIPTION,
   alternates: {
-    canonical: `${SITE_URL}/guides`,
+    canonical: PAGE_URL,
     languages: {
-      en: `${SITE_URL}/guides`,
+      en: PAGE_URL,
       fa: `${SITE_URL}/fa/guides`,
-      'x-default': `${SITE_URL}/guides`,
+      'x-default': PAGE_URL,
     },
+  },
+  openGraph: {
+    title: 'Cross-Border Banking, Residency, Company, and Property Guides',
+    description: PAGE_DESCRIPTION,
+    url: PAGE_URL,
+    siteName: 'PLUCO GROUP',
+    locale: 'en_US',
+    alternateLocale: ['fa_IR'],
+    type: 'website',
+    images: [`${SITE_URL}${DEFAULT_SOCIAL_IMAGE}`],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Cross-Border Banking, Residency, Company, and Property Guides',
+    description: PAGE_DESCRIPTION,
+    images: [`${SITE_URL}${DEFAULT_SOCIAL_IMAGE}`],
   },
 };
 
@@ -31,9 +50,40 @@ export default function EnglishGuidesPage() {
     accountClosureGuide,
     ...Object.entries(ENGLISH_GUIDES).map(([slug, guide]) => ({ slug, ...guide })),
   ];
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${PAGE_URL}#collection`,
+        url: PAGE_URL,
+        name: 'PLUCO GROUP Cross-Border Guides',
+        description: PAGE_DESCRIPTION,
+        inLanguage: 'en',
+        isPartOf: { '@id': `${SITE_URL}/#website` },
+        hasPart: guides.map((guide) => ({
+          '@type': 'Article',
+          '@id': `${SITE_URL}/guides/${guide.slug}#article`,
+          url: `${SITE_URL}/guides/${guide.slug}`,
+          headline: guide.title,
+        })),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'PLUCO GROUP', item: SITE_URL },
+          { '@type': 'ListItem', position: 2, name: 'Guides', item: PAGE_URL },
+        ],
+      },
+    ],
+  };
 
   return (
     <main className="min-h-screen bg-[#F7F5EF] text-[#172033]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
       <section className="bg-[#071C3C] text-white">
         <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8">
           <p className="text-sm font-bold uppercase tracking-widest text-[#E3C783]">Knowledge centre</p>
@@ -46,6 +96,9 @@ export default function EnglishGuidesPage() {
           </p>
           <Link href="/fa/guides" className="mt-7 inline-block rounded-full border border-white/40 px-6 py-3 font-bold text-white">
             راهنماهای فارسی
+          </Link>
+          <Link href="/editorial-standards" className="mt-7 ml-3 inline-block rounded-full border border-white/40 px-6 py-3 font-bold text-white">
+            How we review content
           </Link>
         </div>
       </section>
