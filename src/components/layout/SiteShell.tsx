@@ -15,8 +15,7 @@ const PORTAL_PREFIXES = [
   '/document-reviewer',
   '/compliance-officer',
   '/enquiry-handler',
-  '/bookings',
-  '/visasignal'
+  '/bookings'
 ];
 
 export default function SiteShell({ children }: { children: React.ReactNode }) {
