@@ -9,7 +9,6 @@ import Position from "@/components/sections/Position";
 import DiscreetFirstContact from "@/components/sections/DiscreetFirstContact";
 import ContactCTA from "@/components/sections/ContactCTA";
 import { createPageMetadata } from "@/lib/siteMetadata";
-import OrganizationStructuredData from "@/components/seo/OrganizationStructuredData";
 
 export const metadata: Metadata = createPageMetadata({
   title: "PLUCO GROUP – European Immigration Law & Private Client Advisory",
@@ -20,7 +19,6 @@ export const metadata: Metadata = createPageMetadata({
 export default function Home() {
   return (
     <div className="min-h-screen">
-      <OrganizationStructuredData />
       <Hero />
       <FeaturedResidencyService />
       <Services />
