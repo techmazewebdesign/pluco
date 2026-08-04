@@ -12,7 +12,7 @@ import { createPageMetadata } from "@/lib/siteMetadata";
 
 export const metadata: Metadata = createPageMetadata({
   title: "PLUCO GROUP – European Immigration Law & Private Client Advisory",
-  description: "PLUCO GROUP assists high-net-worth individuals, families, investors and entrepreneurs with European residency, second citizenship, property acquisition, banking support and cross-border legal protection.",
+  description: "PLUCO GROUP assists international families and entrepreneurs with European residency, mobility planning, property, banking and cross-border legal matters.",
   path: "/",
 });
 

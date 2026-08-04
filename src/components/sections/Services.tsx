@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const services = [
-  { titleKey: 'nav.newIdentity' as const,             descEn: 'Second citizenship and lawful identity planning for internationally mobile families.', descFa: 'برنامه‌ریزی برای تابعیت دوم و هویت قانونی برای خانواده‌های متحرک بین‌المللی.',      Icon: Key,        href: '/new-identity' },
+  { titleKey: 'nav.newIdentity' as const,             descEn: 'Neutral mobility, nationality, family and compliance planning before selecting a route.', descFa: 'برنامه‌ریزی بی‌طرفانه تحرک، تابعیت، خانواده و انطباق پیش از انتخاب مسیر.',      Icon: Key,        href: '/new-identity' },
   { titleKey: 'nav.euResidency' as const,             descEn: 'European residence solutions through investment, business and professional routes.',         descFa: 'راهکارهای اقامت اروپایی از طریق سرمایه‌گذاری، تجارت و مسیرهای حرفه‌ای.',         Icon: Home,       href: '/eu-residency' },
   { titleKey: 'nav.euPropertyPurchase' as const,      descEn: 'Property acquisition with legal due diligence, fund-transfer documentation and residency strategy.', descFa: 'خرید ملک با بررسی حقوقی دقیق، مستندات انتقال وجه و استراتژی اقامت.',           Icon: Building2,  href: '/eu-property-purchase' },
   { titleKey: 'nav.usGreenCard' as const,             descEn: 'EB-5 investment-based US permanent residence planning for qualified investors.',            descFa: 'برنامه‌ریزی اقامت دائم آمریکا از طریق برنامه سرمایه‌گذاری EB-5.',                Icon: Globe,      href: '/us-green-card' },

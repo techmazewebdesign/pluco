@@ -11,7 +11,7 @@ export const translations = {
   'nav.services':               { en: 'Services',                     fa: 'خدمات' },
   'nav.publications':           { en: 'Publications',                 fa: 'انتشارات' },
   'nav.clientSignIn':           { en: 'Client Sign In',               fa: 'ورود موکل' },
-  'nav.newIdentity':            { en: 'New Identity',                 fa: 'هویت جدید' },
+  'nav.newIdentity':            { en: 'Mobility Planning',            fa: 'برنامه‌ریزی تحرک' },
   'nav.euPropertyPurchase':     { en: 'EU Property Purchase',         fa: 'خرید ملک در اروپا' },
   'nav.euResidency':            { en: 'EU Residency',                 fa: 'اقامت اروپا' },
   'nav.spainDigitalNomad':      { en: 'Spain Digital Nomad Visa',     fa: 'ویزای نومد دیجیتال اسپانیا' },
@@ -57,8 +57,8 @@ export const translations = {
   // ── Hero ─────────────────────────────────────────────────────────────────
   'hero.eyebrow':               { en: 'EUROPEAN IMMIGRATION LAW & PRIVATE CLIENT ADVISORY', fa: 'حقوق مهاجرت اروپایی و مشاوره ویژه موکلین' },
   'hero.title':                 { en: 'European Immigration Law & Private Client Advisory for High-Net-Worth Families, Investors and Entrepreneurs', fa: 'مشاوره حقوقی مهاجرت اروپایی و خدمات ویژه موکلین برای خانواده‌های ثروتمند، سرمایه‌گذاران و کارآفرینان' },
-  'hero.tags':                  { en: 'EU Residency | New Identity | Banking | Dispute Resolution | International Contracts', fa: 'اقامت اروپا | هویت جدید | بانکداری | حل اختلاف | قراردادهای بین‌المللی' },
-  'hero.body':                  { en: 'PLUCO GROUP provides discreet legal and strategic advisory services for internationally mobile clients seeking European residency, second citizenship planning, property acquisition, banking support, company registration, dispute resolution and cross-border legal protection.', fa: 'PLUCO GROUP خدمات مشاوره حقوقی و استراتژیک محرمانه‌ای را برای موکلینی ارائه می‌دهد که به دنبال اقامت اروپایی، برنامه‌ریزی برای تابعیت دوم، خرید ملک، پشتیبانی بانکی، ثبت شرکت، حل اختلاف و حمایت حقوقی بین‌المللی هستند.' },
+  'hero.tags':                  { en: 'EU Residency | Mobility Planning | Banking | Dispute Resolution | International Contracts', fa: 'اقامت اروپا | برنامه‌ریزی تحرک | بانکداری | حل اختلاف | قراردادهای بین‌المللی' },
+  'hero.body':                  { en: 'PLUCO GROUP provides discreet legal and strategic advisory services for internationally mobile clients seeking European residency, mobility planning, property acquisition, banking support, company registration, dispute resolution and cross-border legal protection.', fa: 'PLUCO GROUP خدمات مشاوره حقوقی و استراتژیک محرمانه‌ای را برای موکلینی ارائه می‌دهد که به دنبال اقامت اروپایی، برنامه‌ریزی تحرک، خرید ملک، پشتیبانی بانکی، ثبت شرکت، حل اختلاف و حمایت حقوقی بین‌المللی هستند.' },
 
   // ── Services section ─────────────────────────────────────────────────────
   'services.eyebrow':           { en: 'OUR SERVICES',                 fa: 'خدمات ما' },
@@ -78,7 +78,7 @@ export const translations = {
   'page.ourPeople.subtitle':    { en: 'PLUCO GROUP brings together legal, compliance, documentation, technology and international advisory professionals to support clients with complex cross-border matters.', fa: 'TODO_FA' },
 
   'page.clientSignIn.title':    { en: 'Secure Client Access & Confidential Enquiry Portal', fa: 'TODO_FA' },
-  'page.newIdentity.title':     { en: 'Lawful Identity, Mobility and Second Citizenship Planning for International Families', fa: 'TODO_FA' },
+  'page.newIdentity.title':     { en: 'International Mobility and Nationality Planning for Private Clients and Families', fa: 'TODO_FA' },
   'page.euProperty.title':      { en: 'European Property Acquisition with Legal Precision, Residency Strategy and Private Client Care', fa: 'TODO_FA' },
   'page.euResidency.title':     { en: 'European Residency Solutions for International Families, Investors and Entrepreneurs', fa: 'TODO_FA' },
   'page.usGreenCard.title':     { en: 'US Permanent Residence Planning for Investors, Entrepreneurs and High-Net-Worth Families', fa: 'TODO_FA' },

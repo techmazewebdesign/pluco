@@ -65,8 +65,8 @@ export const seoConfig = {
       guidePaths: ['/guides/spain-property-purchase-iranian-buyers'],
     },
     {
-      name: 'Citizenship and mobility',
-      primaryIntent: 'Lawful second citizenship and family mobility planning',
+      name: 'International mobility planning',
+      primaryIntent: 'Neutral mobility, nationality, family and compliance planning',
       servicePaths: ['/new-identity', '/us-green-card'],
       guidePaths: [],
     },
