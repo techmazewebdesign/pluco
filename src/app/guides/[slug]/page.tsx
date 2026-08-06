@@ -91,6 +91,7 @@ export default async function EnglishGuidePage({ params }: Props) {
           url: SITE_URL,
         },
         publisher: { '@id': `${SITE_URL}/#organization` },
+        citation: guide.sources.map((source) => source.url),
       },
       {
         '@type': 'BreadcrumbList',

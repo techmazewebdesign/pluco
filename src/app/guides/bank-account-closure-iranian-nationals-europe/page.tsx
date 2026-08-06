@@ -7,6 +7,12 @@ const PAGE_PATH = '/guides/bank-account-closure-iranian-nationals-europe';
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 const PERSIAN_URL = `${SITE_URL}/fa/guides/bank-account-closure-iranians-europe`;
 const REVIEWED_ON = '2026-07-25';
+const OFFICIAL_SOURCE_URLS = [
+  'https://europa.eu/youreurope/citizens/consumers/financial-products-and-services/bank-accounts-eu/index_en.htm',
+  'https://www.eba.europa.eu/activities/information-consumers/how-complain',
+  'https://finance.ec.europa.eu/financial-crime/anti-money-laundering-and-countering-financing-terrorism-eu-level_en',
+  'https://finance.ec.europa.eu/eu-and-world/sanctions-restrictive-measures/contacts-eu-sanctions_en',
+];
 
 export const metadata: Metadata = {
   title: 'European Bank Account Closure for Iranian Nationals',
@@ -76,6 +82,7 @@ const jsonLd = {
         url: SITE_URL,
       },
       publisher: { '@id': `${SITE_URL}/#organization` },
+      citation: OFFICIAL_SOURCE_URLS,
       about: [
         'Bank account closure',
         'Source of funds',

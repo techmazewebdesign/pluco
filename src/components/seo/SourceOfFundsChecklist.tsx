@@ -228,6 +228,7 @@ export default function SourceOfFundsChecklist({ locale }: { locale: Locale }) {
         dateModified: '2026-07-26',
         isPartOf: { '@id': `${SITE_URL}/#website` },
         publisher: { '@id': `${SITE_URL}/#organization` },
+        citation: copy.sources.map((source) => source.url),
       },
       {
         '@type': 'BreadcrumbList',
