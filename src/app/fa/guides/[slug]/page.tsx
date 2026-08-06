@@ -62,6 +62,7 @@ export default async function PersianGuidePage({ params }: Props) {
   if (!isPersianGuideSlug(slug)) notFound();
   const guide = PERSIAN_GUIDES[slug];
   const url = `${SITE_URL}/fa/guides/${slug}`;
+  const shortAnswer = guide.sections[0].paragraphs[0];
   const relatedGuides = Object.entries(PERSIAN_GUIDES)
     .filter(([candidateSlug]) => candidateSlug !== slug)
     .sort(([, candidateA], [, candidateB]) => {
@@ -78,6 +79,8 @@ export default async function PersianGuidePage({ params }: Props) {
         '@id': `${url}#article`,
         headline: guide.title,
         description: guide.description,
+        abstract: shortAnswer,
+        keywords: [guide.searchIntent, ...('keywords' in guide && guide.keywords ? guide.keywords : [])],
         inLanguage: 'fa',
         datePublished: guide.reviewedOn,
         dateModified: guide.reviewedOn,
@@ -89,6 +92,7 @@ export default async function PersianGuidePage({ params }: Props) {
           url: SITE_URL,
         },
         publisher: { '@id': `${SITE_URL}/#organization` },
+        isPartOf: { '@id': `${SITE_URL}/#website` },
         citation: guide.sources.map((source) => source.url),
       },
       {
@@ -132,12 +136,32 @@ export default async function PersianGuidePage({ params }: Props) {
           <div className="rounded-2xl border border-[#D9C79D] bg-[#FFF9E9] p-5 text-sm leading-8 text-slate-700">
             این مطلب اطلاعات عمومی است و جایگزین بررسی حقوقی یا مهاجرتی متناسب با پرونده شما نیست. مقررات و رویه‌ها را هنگام اقدام از مرجع رسمی کنترل کنید.
           </div>
+
+          <section
+            aria-labelledby="short-answer"
+            className="mt-8 rounded-3xl border border-[#C9A35A] bg-white p-7 shadow-sm"
+          >
+            <p className="text-sm font-bold text-[#8B6A23]">پاسخ کوتاه</p>
+            <h2 id="short-answer" className="mt-3 text-2xl font-black leading-10">
+              نکته اصلی پیش از اقدام
+            </h2>
+            <p className="mt-4 text-lg leading-9 text-slate-700">{shortAnswer}</p>
+            <a
+              href="#official-sources"
+              className="mt-5 inline-block text-sm font-bold text-[#71551d] underline underline-offset-4"
+            >
+              مشاهده {guide.sources.length} منبع رسمی استفاده‌شده در این راهنما
+            </a>
+          </section>
+
           <div className="mt-10 grid gap-12">
-            {guide.sections.map((section) => (
+            {guide.sections.map((section, sectionIndex) => (
               <section key={section.heading}>
                 <h2 className="text-2xl font-black leading-10">{section.heading}</h2>
                 <div className="mt-4 grid gap-4 text-base leading-9 text-slate-700">
-                  {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                  {section.paragraphs
+                    .filter((_, paragraphIndex) => sectionIndex !== 0 || paragraphIndex !== 0)
+                    .map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
                 </div>
                 {'bullets' in section && section.bullets ? (
                   <ul className="mt-5 grid gap-3 rounded-2xl bg-white p-6">
@@ -171,7 +195,7 @@ export default async function PersianGuidePage({ params }: Props) {
               </TrackedGuideLink>
             </section>
           ) : null}
-          <section className="mt-14 rounded-2xl bg-white p-7">
+          <section id="official-sources" className="mt-14 scroll-mt-24 rounded-2xl bg-white p-7">
             <h2 className="text-xl font-black">منابع رسمی برای کنترل اطلاعات روز</h2>
             <ul className="mt-5 grid gap-3">
               {guide.sources.map((source) => (

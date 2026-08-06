@@ -6,6 +6,7 @@ export type EnglishGuideSection = {
 
 export type EnglishGuide = {
   title: string;
+  metadataTitle: string;
   description: string;
   searchIntent: string;
   keywords: readonly string[];
@@ -21,6 +22,7 @@ export type EnglishGuide = {
 export const ENGLISH_GUIDES = {
   'choose-eu-residency-route': {
     title: 'How to Choose an EU Residency Route for Your Real Circumstances',
+    metadataTitle: 'How to Choose the Right EU Residency Route',
     description:
       'A practical framework for comparing European residence routes by work, family, income, documentation, budget, and long-term obligations.',
     searchIntent: 'how to choose EU residency route',
@@ -73,6 +75,7 @@ export const ENGLISH_GUIDES = {
   },
   'spain-digital-nomad-document-checklist': {
     title: 'Spain Digital Nomad Visa Document Checklist for International Applicants',
+    metadataTitle: 'Spain Digital Nomad Visa Document Checklist',
     description:
       'How to organise remote-work, professional history, income, social-security, insurance, and family evidence before a Spain digital-nomad assessment.',
     searchIntent: 'Spain digital nomad visa document checklist',
@@ -128,6 +131,7 @@ export const ENGLISH_GUIDES = {
   },
   'eu-company-versus-residency': {
     title: 'EU Company Registration Is Not the Same as EU Residency',
+    metadataTitle: 'EU Company Registration vs EU Residency',
     description:
       'The practical difference between owning a European company, managing it, working locally, holding a bank account, and obtaining a personal residence right.',
     searchIntent: 'does EU company registration give residency',
@@ -183,6 +187,7 @@ export const ENGLISH_GUIDES = {
   },
   'source-of-funds-file': {
     title: 'How to Prepare a Source-of-Funds File for a European Bank',
+    metadataTitle: 'Source-of-Funds Documents for European Banks',
     description:
       'A document-led method for explaining where a specific sum came from, who owns it, how it moved, and why the transaction makes economic sense.',
     searchIntent: 'source of funds documents European bank',
@@ -239,6 +244,7 @@ export const ENGLISH_GUIDES = {
   },
   'poland-company-registration-iranian-founders': {
     title: 'Poland Company Registration for Iranian Founders: Structure, Banking, and Residence',
+    metadataTitle: 'Poland Company Registration for Iranian Founders',
     description:
       'A risk-aware preparation guide for Iranian founders considering a Polish company, covering legal form, ownership, activity, tax, banking, and personal immigration status.',
     searchIntent: 'Poland company registration Iranian founders',
@@ -299,6 +305,7 @@ export const ENGLISH_GUIDES = {
   },
   'spain-property-purchase-iranian-buyers': {
     title: 'Buying Property in Spain as an Iranian National: Legal and Banking Checks',
+    metadataTitle: 'Buying Property in Spain as an Iranian National',
     description:
       'A preparation guide for Iranian buyers covering title review, contracts, tax identification, source of funds, payment routes, and the distinction between ownership and residence.',
     searchIntent: 'buy property Spain Iranian national',
@@ -359,6 +366,7 @@ export const ENGLISH_GUIDES = {
   },
   'eu-bank-account-opening-iranian-nationals': {
     title: 'Opening a European Bank Account as an Iranian National: Evidence Checklist',
+    metadataTitle: 'EU Bank Accounts for Iranian Nationals: Evidence Guide',
     description:
       'What Iranian nationals living internationally should prepare for lawful bank onboarding, including residence, tax, activity, source-of-funds, and expected-transaction evidence.',
     searchIntent: 'open European bank account Iranian national',

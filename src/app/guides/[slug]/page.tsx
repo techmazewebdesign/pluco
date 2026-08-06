@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const persianUrl = `${SITE_URL}${guide.persianPath}`;
 
   return {
-    title: guide.title,
+    title: guide.metadataTitle,
     description: guide.description,
     keywords: [guide.searchIntent, ...guide.keywords],
     alternates: {
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: guide.title,
+      title: guide.metadataTitle,
       description: guide.description,
       url,
       locale: 'en_US',
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: guide.title,
+      title: guide.metadataTitle,
       description: guide.description,
       images: [`${SITE_URL}${DEFAULT_SOCIAL_IMAGE}`],
     },
@@ -64,6 +64,7 @@ export default async function EnglishGuidePage({ params }: Props) {
 
   const guide = ENGLISH_GUIDES[slug];
   const url = `${SITE_URL}/guides/${slug}`;
+  const shortAnswer = guide.sections[0].paragraphs[0];
   const relatedGuides = Object.entries(ENGLISH_GUIDES)
     .filter(([candidateSlug]) => candidateSlug !== slug)
     .sort(([, candidateA], [, candidateB]) => {
@@ -80,6 +81,8 @@ export default async function EnglishGuidePage({ params }: Props) {
         '@id': `${url}#article`,
         headline: guide.title,
         description: guide.description,
+        abstract: shortAnswer,
+        keywords: [guide.searchIntent, ...guide.keywords],
         inLanguage: 'en',
         datePublished: guide.reviewedOn,
         dateModified: guide.reviewedOn,
@@ -91,6 +94,7 @@ export default async function EnglishGuidePage({ params }: Props) {
           url: SITE_URL,
         },
         publisher: { '@id': `${SITE_URL}/#organization` },
+        isPartOf: { '@id': `${SITE_URL}/#website` },
         citation: guide.sources.map((source) => source.url),
       },
       {
@@ -139,12 +143,33 @@ export default async function EnglishGuidePage({ params }: Props) {
             filing, paying, signing, or transferring funds.
           </div>
 
+          <section
+            aria-labelledby="short-answer"
+            className="mt-8 rounded-3xl border border-[#C9A35A] bg-white p-7 shadow-sm"
+          >
+            <p className="text-sm font-bold uppercase tracking-widest text-[#8B6A23]">
+              Short answer
+            </p>
+            <h2 id="short-answer" className="mt-3 text-2xl font-black leading-tight">
+              The key point before you act
+            </h2>
+            <p className="mt-4 text-lg leading-8 text-slate-700">{shortAnswer}</p>
+            <a
+              href="#official-sources"
+              className="mt-5 inline-block text-sm font-bold text-[#71551d] underline underline-offset-4"
+            >
+              Check the {guide.sources.length} official {guide.sources.length === 1 ? 'source' : 'sources'} used for this guide
+            </a>
+          </section>
+
           <div className="mt-10 grid gap-12">
-            {guide.sections.map((section) => (
+            {guide.sections.map((section, sectionIndex) => (
               <section key={section.heading}>
                 <h2 className="text-3xl font-black leading-tight">{section.heading}</h2>
                 <div className="mt-5 grid gap-4 text-base leading-8 text-slate-700">
-                  {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                  {section.paragraphs
+                    .filter((_, paragraphIndex) => sectionIndex !== 0 || paragraphIndex !== 0)
+                    .map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
                 </div>
                 {'bullets' in section && section.bullets ? (
                   <ul className="mt-6 grid gap-3 rounded-2xl bg-white p-6">
@@ -183,7 +208,7 @@ export default async function EnglishGuidePage({ params }: Props) {
             </section>
           ) : null}
 
-          <section className="mt-14 rounded-2xl bg-white p-7">
+          <section id="official-sources" className="mt-14 scroll-mt-24 rounded-2xl bg-white p-7">
             <h2 className="text-2xl font-black">Official sources</h2>
             <ul className="mt-5 grid gap-3">
               {guide.sources.map((source) => (
