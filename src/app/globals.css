@@ -5,6 +5,13 @@
 :root {
   --background: #ffffff;
   --foreground: #1e293b;
+  --pluco-ink: #031225;
+  --pluco-ink-soft: #061a33;
+  --pluco-panel: #09223f;
+  --pluco-gold: #d5ad5f;
+  --pluco-gold-soft: #e2c27f;
+  --pluco-ivory: #f4efe5;
+  --pluco-mist: #b8c4d2;
 }
 
 @theme inline {
@@ -35,6 +42,362 @@ body {
   color: var(--foreground);
   font-family: 'Inter', system-ui, sans-serif;
   line-height: 1.6;
+}
+
+/* ── PLUCO editorial dark system ──────────────────────────────────── */
+.pluco-site-header {
+  background: rgba(3, 18, 37, 0.94) !important;
+  border-bottom: 1px solid rgba(213, 173, 95, 0.28) !important;
+  box-shadow: 0 14px 44px rgba(1, 8, 20, 0.22);
+  backdrop-filter: blur(18px) saturate(120%);
+}
+
+.pluco-header-top {
+  min-height: 30px;
+  padding-block: 4px !important;
+  background: rgba(2, 13, 29, 0.78) !important;
+  border-color: rgba(213, 173, 95, 0.16) !important;
+}
+
+.pluco-header-nav {
+  max-width: 1440px;
+}
+
+.pluco-header-logo {
+  position: relative;
+  width: 190px;
+  height: 64px;
+  overflow: hidden;
+}
+
+.pluco-header-logo img {
+  width: 330px !important;
+  max-width: none !important;
+  height: auto !important;
+  transform: translate(-70px, 5px);
+}
+
+.pluco-site-header nav > a,
+.pluco-site-header nav > div > button {
+  letter-spacing: 0.075em;
+}
+
+.pluco-site-footer {
+  position: relative;
+  background: #020e20 !important;
+  border-top: 1px solid rgba(213, 173, 95, 0.38);
+}
+
+.pluco-site-footer::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: '';
+  background: radial-gradient(circle at 12% 10%, rgba(38, 94, 136, 0.15), transparent 34%);
+}
+
+.pluco-dark-home {
+  position: relative;
+  overflow: clip;
+  background: var(--pluco-ink);
+  color: var(--pluco-ivory);
+}
+
+.pluco-dark-home > section,
+.pluco-home-trust-rail {
+  border-bottom: 1px solid rgba(213, 173, 95, 0.24);
+}
+
+.pluco-home-hero {
+  position: relative;
+  background: var(--pluco-ink);
+}
+
+.pluco-home-hero__copy {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 86% 22%, rgba(31, 91, 138, 0.24), transparent 38%),
+    linear-gradient(135deg, #031225 0%, #061b35 68%, #08213d 100%) !important;
+}
+
+.pluco-home-hero__copy::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: '';
+  opacity: 0.2;
+  background-image:
+    linear-gradient(115deg, transparent 0 48%, rgba(213, 173, 95, 0.18) 49%, transparent 50%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+  background-size: 210px 210px, 84px 100%;
+}
+
+.pluco-home-hero__copy h1 {
+  max-width: 760px;
+  color: var(--pluco-ivory) !important;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.pluco-home-hero__copy p:last-of-type {
+  max-width: 680px;
+}
+
+.pluco-home-hero__copy a {
+  min-height: 52px;
+  border-radius: 0 !important;
+  letter-spacing: 0.015em;
+}
+
+.pluco-home-hero__media::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  content: '';
+  background:
+    linear-gradient(90deg, rgba(3, 18, 37, 0.42), transparent 22%),
+    linear-gradient(0deg, rgba(3, 18, 37, 0.28), transparent 45%);
+}
+
+.pluco-home-hero__media img {
+  filter: saturate(0.82) contrast(1.06) brightness(0.82);
+  transform: scale(1.015);
+}
+
+.pluco-home-trust-rail {
+  background: #04162c !important;
+  border-color: rgba(213, 173, 95, 0.24) !important;
+}
+
+.pluco-home-trust-rail > div > div {
+  border-color: rgba(213, 173, 95, 0.18) !important;
+}
+
+.pluco-home-trust-item {
+  min-height: 94px;
+  border-radius: 0 !important;
+}
+
+.pluco-home-trust-item:hover {
+  background: rgba(213, 173, 95, 0.05) !important;
+}
+
+.pluco-home-trust-item img {
+  opacity: 0.86;
+  filter: sepia(1) saturate(0.7) brightness(1.2);
+}
+
+.pluco-home-trust-item span {
+  color: #dce4ed !important;
+  letter-spacing: 0.04em;
+}
+
+.pluco-home-featured {
+  background:
+    radial-gradient(circle at 10% 20%, rgba(33, 91, 133, 0.14), transparent 34%),
+    #03162d !important;
+}
+
+.pluco-home-featured__media {
+  border: 1px solid rgba(213, 173, 95, 0.72);
+  box-shadow: 18px -18px 0 -17px var(--pluco-gold), 0 30px 80px rgba(0, 0, 0, 0.34);
+}
+
+.pluco-home-featured__media::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: linear-gradient(145deg, rgba(3, 18, 37, 0.05), rgba(3, 18, 37, 0.24));
+}
+
+.pluco-home-featured__media img {
+  filter: saturate(0.78) contrast(1.04) brightness(0.88);
+}
+
+.pluco-home-featured a,
+.pluco-home-featured button {
+  border-radius: 0 !important;
+}
+
+.pluco-home-services,
+.pluco-home-trust,
+.pluco-home-process,
+.pluco-home-contact,
+.pluco-home-first-contact {
+  position: relative;
+  background: var(--pluco-ink) !important;
+}
+
+.pluco-home-trust,
+.pluco-home-contact {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(32, 88, 132, 0.13), transparent 28%),
+    #04162c !important;
+}
+
+.pluco-home-services::before,
+.pluco-home-process::before,
+.pluco-home-first-contact::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: '';
+  opacity: 0.2;
+  background-image: linear-gradient(90deg, rgba(213, 173, 95, 0.08) 1px, transparent 1px);
+  background-size: min(12vw, 150px) 100%;
+}
+
+.pluco-home-services > div,
+.pluco-home-trust > div,
+.pluco-home-process > div,
+.pluco-home-contact > div,
+.pluco-home-first-contact > div {
+  position: relative;
+}
+
+.pluco-home-services h2,
+.pluco-home-trust h2,
+.pluco-home-process h2,
+.pluco-home-contact h2,
+.pluco-home-first-contact h2 {
+  color: var(--pluco-ivory) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.015em !important;
+}
+
+.pluco-home-services > div > div:first-child > p:last-child,
+.pluco-home-trust > div > div:first-child > p:last-child,
+.pluco-home-process > div > div:first-child > p:last-child,
+.pluco-home-contact > div > div:first-child > p:last-child,
+.pluco-home-first-contact p {
+  color: var(--pluco-mist) !important;
+}
+
+.pluco-home-services > div > div:first-child,
+.pluco-home-trust > div > div:first-child,
+.pluco-home-process > div > div:first-child,
+.pluco-home-contact > div > div:first-child {
+  text-align: start !important;
+  margin-inline: 0;
+  max-width: 840px;
+}
+
+.pluco-home-services > div > div:first-child > div,
+.pluco-home-trust > div > div:first-child > div,
+.pluco-home-process > div > div:first-child > div,
+.pluco-home-contact > div > div:first-child > div {
+  margin-inline: 0 !important;
+}
+
+.pluco-home-service-card,
+.pluco-home-panel {
+  border-radius: 0 !important;
+  border-color: rgba(213, 173, 95, 0.42) !important;
+  background: linear-gradient(145deg, rgba(8, 34, 62, 0.92), rgba(3, 20, 41, 0.96)) !important;
+  box-shadow: none !important;
+}
+
+.pluco-home-service-card:hover,
+.pluco-home-panel:hover {
+  border-color: rgba(226, 194, 127, 0.88) !important;
+  box-shadow: 0 24px 54px rgba(0, 0, 0, 0.24) !important;
+}
+
+.pluco-home-service-card h3,
+.pluco-home-panel h3 {
+  color: var(--pluco-ivory) !important;
+  font-weight: 500 !important;
+}
+
+.pluco-home-service-card p,
+.pluco-home-panel p {
+  color: var(--pluco-mist) !important;
+}
+
+.pluco-home-service-card > a > div,
+.pluco-home-panel > div:first-child {
+  border-radius: 0 !important;
+}
+
+.pluco-home-position {
+  background: #041a34 !important;
+}
+
+.pluco-home-position__media {
+  border: 1px solid rgba(213, 173, 95, 0.58);
+  border-radius: 0 !important;
+}
+
+.pluco-home-first-contact .pluco-home-panel {
+  border-width: 1px !important;
+}
+
+.pluco-home-first-contact a,
+.pluco-home-process a,
+.pluco-home-cta a {
+  border-radius: 0 !important;
+}
+
+.pluco-home-first-contact a:hover {
+  background-color: rgba(213, 173, 95, 0.09) !important;
+}
+
+.pluco-home-cta {
+  background:
+    linear-gradient(90deg, rgba(213, 173, 95, 0.08), transparent 38%),
+    #020f22 !important;
+}
+
+@media (min-width: 1280px) {
+  .pluco-home-hero__copy > div {
+    padding-inline: clamp(48px, 5.4vw, 104px);
+  }
+
+  .pluco-home-hero__copy h1 {
+    font-size: clamp(46px, 3.6vw, 68px) !important;
+    line-height: 1.08 !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .pluco-home-hero {
+    min-height: auto !important;
+  }
+
+  .pluco-home-hero__media {
+    min-height: 50vh;
+  }
+
+  .pluco-home-featured__media {
+    order: -1;
+  }
+}
+
+@media (max-width: 639px) {
+  .pluco-header-logo {
+    width: 164px;
+  }
+
+  .pluco-home-hero__media {
+    min-height: 46vh;
+  }
+
+  .pluco-home-trust-item {
+    min-height: 88px;
+    padding: 18px 12px !important;
+  }
+
+  .pluco-home-trust-item span {
+    font-size: 11px;
+  }
+
+  .pluco-home-featured__media {
+    box-shadow: 10px -10px 0 -9px var(--pluco-gold);
+  }
 }
 
 /* Editorial privacy card: restrained PLUCO navy, legal-document rule, gold seal. */

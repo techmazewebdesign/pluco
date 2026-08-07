@@ -10,7 +10,7 @@ export default function Position() {
   const { t, isRTL } = useLanguage();
 
   return (
-    <section className="py-20" style={{ backgroundColor: '#071C3C' }} dir={isRTL ? 'rtl' : 'ltr'}>
+    <section className="pluco-home-position py-20" style={{ backgroundColor: '#071C3C' }} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr_auto] gap-10 items-center">
 
@@ -21,7 +21,7 @@ export default function Position() {
             transition={{ duration: 0.8, type: 'spring' as const, stiffness: 100, damping: 15 }}
             className="flex items-center justify-center lg:justify-start"
           >
-            <div className="relative w-full max-w-[320px] aspect-[4/3] rounded-xl overflow-hidden shadow-2xl">
+            <div className="pluco-home-position__media relative w-full max-w-[320px] aspect-[4/3] overflow-hidden shadow-2xl">
               <Image src="/images/position-photo.jpg" alt="Private client legal advisory" fill className="object-cover" />
             </div>
           </motion.div>

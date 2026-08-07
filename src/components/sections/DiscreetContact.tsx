@@ -42,7 +42,7 @@ export default function DiscreetContact() {
   const { isRTL } = useLanguage();
 
   return (
-    <section className="py-24 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+    <section className="pluco-home-contact py-24 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -94,7 +94,7 @@ export default function DiscreetContact() {
               whileInView={{ opacity: 1, y: 0, transition: { delay: index * 0.08, duration: 0.6 } }}
               viewport={{ once: true, margin: '-50px' }}
               whileHover={{ y: -8 }}
-              className="flex flex-col p-8 rounded-lg border border-gray-200 bg-gradient-to-br from-white to-gray-50 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+              className="pluco-home-panel flex flex-col p-8 border border-gray-200 bg-gradient-to-br from-white to-gray-50 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
             >
               <motion.div
                 whileHover={{ rotate: 10, scale: 1.1 }}

@@ -10,6 +10,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ArrowRight, SearchCheck, FileText, UserCheck } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -63,19 +64,21 @@ export default function FeaturedResidencyService() {
       };
 
   return (
-    <section className="relative overflow-hidden py-20 md:py-24" style={{ background: `radial-gradient(120% 100% at 85% 0%, ${NAVY} 0%, ${NAVY_DEEP} 65%, #030d24 100%)` }} dir={isRTL ? 'rtl' : 'ltr'}>
+    <section className="pluco-home-featured relative overflow-hidden py-20 md:py-24" style={{ background: `radial-gradient(120% 100% at 85% 0%, ${NAVY} 0%, ${NAVY_DEEP} 65%, #030d24 100%)` }} dir={isRTL ? 'rtl' : 'ltr'}>
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
         style={{ background: 'radial-gradient(50% 60% at 15% 30%, rgba(201,163,90,0.12) 0%, transparent 70%)' }}
       />
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="grid items-center gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20"
         >
+          <div>
           <p
             className="text-xs font-semibold uppercase tracking-widest mb-4 flex items-center gap-2.5"
             style={{ color: GOLD, fontFamily: isRTL ? ff : undefined, letterSpacing: isRTL ? 'normal' : undefined }}
@@ -98,7 +101,7 @@ export default function FeaturedResidencyService() {
             {copy.sub}
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+          <div className="grid grid-cols-1 gap-5 mb-10">
             {points.map((point, i) => {
               const p = isRTL ? point.fa : point.en;
               return (
@@ -154,6 +157,17 @@ export default function FeaturedResidencyService() {
           <p className="text-xs leading-relaxed max-w-xl" style={{ color: '#64748B', fontFamily: isRTL ? ff : undefined }}>
             {copy.disclaimer}
           </p>
+          </div>
+
+          <div className="pluco-home-featured__media relative aspect-[4/3] overflow-hidden">
+            <Image
+              src="/images/spain-hero-key-visual.jpg"
+              alt=""
+              fill
+              className="object-cover"
+              sizes="(min-width: 1024px) 52vw, 100vw"
+            />
+          </div>
         </motion.div>
       </div>
 

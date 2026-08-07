@@ -62,7 +62,7 @@ export default function Trust() {
   const { isRTL } = useLanguage();
 
   return (
-    <section className="py-24 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+    <section className="pluco-home-trust py-24 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -113,7 +113,7 @@ export default function Trust() {
               whileInView="visible"
               viewport={{ once: true, margin: '-50px' }}
               whileHover={{ y: -6, transition: { type: 'spring', stiffness: 300, damping: 20 } }}
-              className="flex flex-col p-7 rounded-lg border border-gray-200 bg-gradient-to-br from-white to-gray-50 hover:shadow-lg transition-shadow duration-300"
+              className="pluco-home-panel flex flex-col p-7 border border-gray-200 bg-gradient-to-br from-white to-gray-50 hover:shadow-lg transition-shadow duration-300"
             >
               <motion.div
                 whileHover={{ rotate: 10, scale: 1.1 }}

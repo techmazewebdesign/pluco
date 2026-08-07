@@ -5,7 +5,6 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { AgentProvider } from "@/contexts/AgentContext";
 import RTLWrapper from "@/components/shared/RTLWrapper";
 import SiteShell from "@/components/layout/SiteShell";
-import ChatbotWidget from "@/components/chatbot/ChatbotWidget";
 import ConsentManager from "@/components/privacy/ConsentManager";
 import OrganizationStructuredData from "@/components/seo/OrganizationStructuredData";
 import {
@@ -64,7 +63,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </LanguageProvider>
           </AgentProvider>
         </AuthProvider>
-        <ChatbotWidget />
       </body>
     </html>
   );

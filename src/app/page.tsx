@@ -18,7 +18,7 @@ export const metadata: Metadata = createPageMetadata({
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
+    <div className="pluco-dark-home min-h-screen">
       <Hero />
       <FeaturedResidencyService />
       <Services />

@@ -48,7 +48,7 @@ export default function ConsultationProcess() {
   const ff = "'Vazirmatn', Tahoma, Arial, sans-serif";
 
   return (
-    <section className="py-24 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+    <section className="pluco-home-process py-24 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -89,7 +89,7 @@ export default function ConsultationProcess() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ delay: index * 0.08, type: 'spring' as const, stiffness: 100, damping: 15 }}
-              className="flex gap-6 items-start p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 bg-gradient-to-br from-white to-gray-50"
+              className="pluco-home-panel flex gap-6 items-start p-6 border border-gray-200 hover:shadow-lg transition-shadow duration-300 bg-gradient-to-br from-white to-gray-50"
             >
               {/* Step Number */}
               <div

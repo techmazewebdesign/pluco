@@ -35,13 +35,13 @@ export default function Hero() {
 
   return (
     <>
-      <section className="flex flex-col lg:flex-row" style={{ minHeight: '100vh' }}>
+      <section className="pluco-home-hero flex flex-col lg:flex-row" style={{ minHeight: '100vh' }}>
         {/* LEFT: Dark Navy Panel */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full lg:w-1/2 flex items-center"
+          className="pluco-home-hero__copy w-full lg:w-1/2 flex items-center"
           style={{ backgroundColor: '#071C3C' }}
         >
           <motion.div
@@ -136,7 +136,7 @@ export default function Hero() {
           initial={{ opacity: 0, scale: 1.1 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full h-64 lg:h-auto lg:w-1/2 relative order-first lg:order-last overflow-hidden"
+          className="pluco-home-hero__media w-full h-64 lg:h-auto lg:w-1/2 relative order-first lg:order-last overflow-hidden"
         >
           <motion.div
             initial={{ scaleY: 0 }}
@@ -150,7 +150,7 @@ export default function Hero() {
       </section>
 
       {/* Feature Strip */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="pluco-home-trust-rail bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-200">
             {featureItems.map((item, i) => (
@@ -161,7 +161,7 @@ export default function Hero() {
                 viewport={{ once: true, margin: '-50px' }}
                 transition={{ delay: i * 0.1, type: 'spring', stiffness: 100, damping: 12 }}
                 whileHover={{ scale: 1.05, backgroundColor: '#f9fafb' }}
-                className="flex items-center justify-center gap-3 py-6 px-6 rounded-lg cursor-default"
+                className="pluco-home-trust-item flex items-center justify-center gap-3 py-6 px-6 cursor-default"
               >
                 <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.6 }}>
                   <Image src={item.icon} alt={item.labelKey} width={32} height={32} className="flex-shrink-0" />
