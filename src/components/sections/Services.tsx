@@ -30,7 +30,7 @@ export default function Services() {
   const { t, isRTL } = useLanguage();
 
   return (
-    <section className="pluco-home-services py-20 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+    <section className="py-20 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -77,7 +77,7 @@ export default function Services() {
               whileInView="visible"
               viewport={{ once: true, margin: '-50px' }}
               whileHover={{ y: -8, transition: { type: 'spring' as const, stiffness: 300, damping: 20 } }}
-              className="pluco-home-service-card flex flex-col p-6 border border-gray-200 bg-white hover:shadow-xl transition-shadow duration-300 cursor-pointer group"
+              className="flex flex-col p-6 rounded-lg border border-gray-200 bg-white hover:shadow-xl transition-shadow duration-300 cursor-pointer group"
             >
               <Link href={service.href} className="contents">
                 <motion.div

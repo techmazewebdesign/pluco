@@ -20,14 +20,14 @@ export default function DiscreetFirstContact() {
   )}`;
 
   return (
-    <section className="pluco-home-first-contact py-20 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+    <section className="py-20 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.8 }}
-          className="pluco-home-panel bg-gradient-to-br from-gray-50 to-white border border-gray-200 p-8 md:p-12"
+          className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-8 md:p-12"
         >
           {/* Headline */}
           <h2

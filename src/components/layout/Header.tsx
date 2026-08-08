@@ -58,12 +58,12 @@ export default function Header() {
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className="pluco-site-header fixed top-0 left-0 right-0 z-50"
+      className="fixed top-0 left-0 right-0 z-50"
       style={{ backgroundColor: '#071C3C', borderBottom: '1px solid #0B234A' }}
     >
       {/* ── Top bar: language switcher ── */}
       <div
-        className="pluco-header-top border-b px-4 sm:px-6 lg:px-8 py-2 flex items-center"
+        className="border-b px-4 sm:px-6 lg:px-8 py-2 flex items-center"
         style={{ borderColor: '#0B234A', backgroundColor: '#051530', position: 'relative', zIndex: 60 }}
       >
         <div className="max-w-7xl mx-auto w-full flex items-center">
@@ -72,11 +72,11 @@ export default function Header() {
       </div>
 
       {/* ── Main nav row ── */}
-      <div className="pluco-header-nav max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
 
           {/* Logo */}
-          <Link href={isRTL ? '/fa' : '/'} className="pluco-header-logo flex items-center flex-shrink-0">
+          <Link href={isRTL ? '/fa' : '/'} className="flex items-center flex-shrink-0">
             <Image
               src="/images/logo-pluco.png"
               alt="Pluco Group Sp. z o.o."
