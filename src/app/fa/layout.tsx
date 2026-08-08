@@ -7,7 +7,10 @@ export const metadata: Metadata = {
     template: '%s | PLUCO GROUP',
   },
   description:
-    'مشاوره محرمانه اقامت اروپا، امور بانکی، ثبت شرکت، خرید ملک، تابعیت دوم و قراردادهای بین‌المللی برای ایرانیان خارج از کشور.',
+    'مشاوره محرمانه اقامت اروپا، امور بانکی، ثبت شرکت، خرید ملک، تحرک بین‌المللی و قراردادهای فرامرزی برای ایرانیان خارج از کشور.',
+  other: {
+    'content-language': 'fa',
+  },
   alternates: {
     canonical: `${SITE_URL}/fa`,
     languages: {

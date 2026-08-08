@@ -1,3 +1,6 @@
+import { PLUCO_INSIGHTS_EXPANSION_A } from './plucoInsightsExpansionA';
+import { PLUCO_INSIGHTS_EXPANSION_B } from './plucoInsightsExpansionB';
+
 export type InsightLocale = 'en' | 'fa';
 
 export type LocalizedText = Record<InsightLocale, string>;
@@ -776,6 +779,8 @@ export const PLUCO_INSIGHTS: Record<string, PlucoInsight> = {
     serviceLabel: { en: 'Plan a Spanish property purchase', fa: 'برنامه‌ریزی خرید ملک در اسپانیا' },
     relatedSlugs: ['private-side-of-spain-culture-wellness-mediterranean-life', 'spain-digital-nomad-visa-iranian-applicants-2026', 'moving-family-spain-digital-nomad-route'],
   },
+  ...PLUCO_INSIGHTS_EXPANSION_A,
+  ...PLUCO_INSIGHTS_EXPANSION_B,
 };
 
 export const PLUCO_INSIGHT_LIST = Object.values(PLUCO_INSIGHTS);

@@ -9,11 +9,16 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 const content = {
   en: {
+    statusLabel: 'CURRENT POLICY STATUS — REVIEWED 8 AUGUST 2026',
+    statusTitle: 'Visa issuance for Iranian nationals is currently suspended, subject to limited exceptions',
+    status: 'The U.S. Department of State states that, effective 1 January 2026, visa issuance is fully suspended for Iranian nationals across immigrant and nonimmigrant categories, subject to limited exceptions. A petition, investment or EB-5 category does not itself overcome this restriction. Current nationality, passports, residence, existing U.S. status and any possible exception or discretionary waiver must be assessed before any investment or filing decision.',
+    sourceLabel: 'Read the current U.S. Department of State notice',
     programmeLabel: 'EB-5 PROGRAMME',
     programmeTitle: 'EB-5 Immigrant Investor Programme',
-    intro: 'The EB-5 Immigrant Investor Programme is the principal investment-based route to US permanent residence (green card). The programme was created by the United States Congress and is administered by US Citizenship and Immigration Services (USCIS). It allows eligible foreign investors to petition for US permanent residence by making a qualifying investment in a new commercial enterprise and satisfying applicable job-creation requirements under US immigration law.',
+    intro: 'The EB-5 Immigrant Investor Programme remains a statutory investment-based category administered by US Citizenship and Immigration Services (USCIS). It allows qualifying investors to petition through an eligible investment and job-creation framework. For an Iranian national, however, category eligibility, petition processing, visa issuance and admission are separate questions. The current visa-issuance suspension must be analysed first and no investment should be presented as a route around it.',
     featuresTitle: 'Key Features of the EB-5 Programme',
     features: [
+      'Current nationality-based visa-issuance restrictions, exceptions and waiver policy must be reviewed before assessing the practical viability of an EB-5 strategy.',
       'Investment-based route to US permanent residence for qualifying investors and eligible family members.',
       'Investment must be made into a qualifying new commercial enterprise or into an approved USCIS-designated Regional Centre project.',
       'The investment must create or preserve at least 10 full-time jobs for qualifying US workers, either directly or through approved Regional Centre indirect-job methodologies.',
@@ -23,9 +28,10 @@ const content = {
       'No investment outcome, immigration approval, processing timeline or green card result should be guaranteed.',
     ],
     warningTitle: 'Important Notice',
-    warning: 'PLUCO GROUP does not guarantee US immigration approval, investment performance, return of capital or processing timelines. Final advice and filing must be coordinated with licensed US immigration counsel and relevant regulated US professionals. EB-5 investments involve risk and the repayment of capital is not guaranteed.',
+    warning: 'PLUCO GROUP does not guarantee an exception or waiver, visa issuance, admission, immigration approval, investment performance, return of capital or processing timelines. Current policy must be confirmed immediately before action. Final advice and filing must be coordinated with licensed US immigration counsel and relevant regulated US professionals. EB-5 investments involve risk and repayment of capital is not guaranteed.',
     servicesTitle: 'How PLUCO GROUP May Assist',
     services: [
+      'Current nationality-restriction and case-status screening before any pathway discussion',
       'Initial EB-5 suitability review',
       'Source-of-funds and source-of-wealth analysis',
       'Coordination with licensed US immigration counsel',
@@ -40,11 +46,16 @@ const content = {
     globalFee: 'Legal fees, government fees, bank charges, local counsel fees, translation fees, notary fees, taxes, third-party professional fees and out-of-pocket expenses are added to the standard PLUCO GROUP service fees unless expressly agreed otherwise in writing.',
   },
   fa: {
+    statusLabel: 'وضعیت جاری سیاست — بازبینی ۸ اوت ۲۰۲۶',
+    statusTitle: 'صدور ویزا برای اتباع ایرانی در حال حاضر با استثناهای محدود تعلیق است',
+    status: 'وزارت امور خارجه آمریکا اعلام می‌کند از ۱ ژانویه ۲۰۲۶ صدور ویزا برای اتباع ایرانی در گروه‌های مهاجرتی و غیرمهاجرتی، با استثناهای محدود، به‌طور کامل تعلیق است. داشتن دادخواست، سرمایه‌گذاری یا گروه EB-5 به‌خودی‌خود این محدودیت را کنار نمی‌زند. پیش از هر تصمیم برای سرمایه‌گذاری یا درخواست، ملیت فعلی، گذرنامه‌ها، محل اقامت، وضعیت موجود آمریکا و هر استثنا یا معافیت اختیاری احتمالی باید بررسی شود.',
+    sourceLabel: 'مطالعه اطلاعیه جاری وزارت امور خارجه آمریکا',
     programmeLabel: 'برنامه EB-5',
     programmeTitle: 'برنامه سرمایه‌گذار مهاجر EB-5',
-    intro: 'برنامه سرمایه‌گذار مهاجر EB-5 مسیر اصلی مبتنی بر سرمایه‌گذاری برای اقامت دائم آمریکا (گرین کارت) است. این برنامه توسط کنگره ایالات متحده ایجاد شده و توسط اداره خدمات شهروندی و مهاجرت آمریکا (USCIS) اداره می‌شود. این برنامه به سرمایه‌گذاران خارجی واجد شرایط اجازه می‌دهد با انجام سرمایه‌گذاری واجد شرایط در یک شرکت تجاری جدید و رعایت الزامات ایجاد شغل تحت قانون مهاجرت آمریکا، درخواست اقامت دائم آمریکا را بدهند.',
+    intro: 'برنامه سرمایه‌گذار مهاجر EB-5 یک گروه قانونی مبتنی بر سرمایه‌گذاری است که توسط اداره خدمات شهروندی و مهاجرت آمریکا (USCIS) اداره می‌شود. سرمایه‌گذار واجد شرایط می‌تواند در چارچوب سرمایه‌گذاری و ایجاد شغل درخواست بدهد. با این حال، برای تبعه ایرانی، صلاحیت گروه، پردازش دادخواست، صدور ویزا و ورود پرسش‌های جدا هستند. تعلیق جاری صدور ویزا باید ابتدا بررسی شود و هیچ سرمایه‌گذاری نباید به‌عنوان راه دورزدن آن معرفی گردد.',
     featuresTitle: 'ویژگی‌های کلیدی برنامه EB-5',
     features: [
+      'محدودیت‌های جاری صدور ویزا بر اساس ملیت، استثناها و سیاست معافیت باید پیش از بررسی امکان عملی راهبرد EB-5 ارزیابی شود.',
       'مسیر مبتنی بر سرمایه‌گذاری برای اقامت دائم آمریکا برای سرمایه‌گذاران واجد شرایط و اعضای خانواده واجد شرایط.',
       'سرمایه‌گذاری باید در یک شرکت تجاری جدید واجد شرایط یا در یک پروژه مرکز منطقه‌ای مورد تأیید USCIS انجام شود.',
       'سرمایه‌گذاری باید حداقل ۱۰ شغل تمام‌وقت برای کارگران آمریکایی واجد شرایط، به صورت مستقیم یا از طریق روش‌های غیرمستقیم مرکز منطقه‌ای تأیید شده، ایجاد یا حفظ کند.',
@@ -54,9 +65,10 @@ const content = {
       'هیچ نتیجه سرمایه‌گذاری، تأیید مهاجرت، جدول زمانی پردازش یا نتیجه گرین کارت نباید تضمین شود.',
     ],
     warningTitle: 'اطلاعیه مهم',
-    warning: 'PLUCO GROUP تأیید مهاجرت به آمریکا، عملکرد سرمایه‌گذاری، بازگشت سرمایه یا جداول زمانی پردازش را تضمین نمی‌کند. مشاوره نهایی و ثبت باید با وکیل مهاجرتی دارای مجوز آمریکا و متخصصان تنظیم‌شده آمریکایی مربوطه هماهنگ شود. سرمایه‌گذاری‌های EB-5 با ریسک همراه هستند و بازپرداخت سرمایه تضمین نمی‌شود.',
+    warning: 'PLUCO GROUP استثنا یا معافیت، صدور ویزا، ورود، تأیید مهاجرت، عملکرد سرمایه‌گذاری، بازگشت سرمایه یا زمان پردازش را تضمین نمی‌کند. سیاست جاری باید بلافاصله پیش از اقدام دوباره تأیید شود. مشاوره نهایی و ثبت باید با وکیل مهاجرت دارای مجوز آمریکا و متخصصان تحت نظارت هماهنگ شود. سرمایه‌گذاری EB-5 ریسک دارد و بازپرداخت سرمایه تضمین نمی‌شود.',
     servicesTitle: 'روش‌های پشتیبانی PLUCO GROUP',
     services: [
+      'غربالگری محدودیت ملیتی و وضعیت پرونده پیش از هر بحث درباره مسیر',
       'بررسی اولیه تناسب EB-5',
       'تجزیه‌وتحلیل منبع وجوه و منبع ثروت',
       'هماهنگی با وکیل مهاجرتی دارای مجوز آمریکا',
@@ -81,9 +93,18 @@ export default function USGreenCard() {
     <div className="min-h-screen bg-white">
       <PageHero
         eyebrow={isRTL ? 'مهاجرت به آمریکا' : 'US IMMIGRATION'}
-        title={isRTL ? 'برنامه‌ریزی اقامت دائم آمریکا برای سرمایه‌گذاران، کارآفرینان و خانواده‌های ثروتمند' : 'US Permanent Residence Planning for Investors, Entrepreneurs and High-Net-Worth Families'}
-        subtitle={isRTL ? 'PLUCO GROUP هماهنگی حقوقی استراتژیک برای موکلینی که گزینه‌های اقامت دائم آمریکا از جمله مسیرهای مهاجرتی مبتنی بر سرمایه‌گذاری مانند برنامه EB-5 را بررسی می‌کنند، ارائه می‌دهد.' : 'PLUCO GROUP provides strategic legal coordination for clients exploring US permanent residence options, including investment-based immigration pathways such as the EB-5 Immigrant Investor Programme.'}
+        title={isRTL ? 'وضعیت جاری اقامت دائم آمریکا و برنامه EB-5 برای اتباع ایرانی' : 'Current US Permanent Residence and EB-5 Planning for Iranian Nationals'}
+        subtitle={isRTL ? 'هر ارزیابی باید از تعلیق جاری صدور ویزا، استثناهای محدود و وضعیت واقعی پرونده آغاز شود؛ نه از سرمایه‌گذاری یا عنوان یک برنامه.' : 'Every assessment must begin with the current visa-issuance suspension, limited exceptions and the client’s actual case posture—not with an investment or programme label.'}
       />
+
+      <section className="border-y border-amber-300 bg-amber-50 py-10" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <p className="text-xs font-black uppercase tracking-widest text-amber-800" style={{ fontFamily: isRTL ? ff : undefined, letterSpacing: isRTL ? 'normal' : undefined }}>{c.statusLabel}</p>
+          <h2 className="mt-3 font-serif text-2xl font-bold text-slate-900" style={{ fontFamily: isRTL ? ff : undefined }}>{c.statusTitle}</h2>
+          <p className="mt-4 text-sm leading-7 text-slate-700" style={{ fontFamily: isRTL ? ff : undefined }}>{c.status}</p>
+          <a className="mt-5 inline-flex text-sm font-bold text-amber-900 underline underline-offset-4" href="https://travel.state.gov/content/travel/en/News/visas-news/suspension-of-visa-issuance-to-foreign-nationals-to-protect-the-security-of-the-united-states.html" target="_blank" rel="noopener noreferrer">{c.sourceLabel}</a>
+        </div>
+      </section>
 
       <section className="py-20 bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

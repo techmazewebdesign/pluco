@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   keywords: [
     "European immigration law", "private client advisory", "EU residency", "international mobility planning",
     "EU property purchase", "banking compliance", "dispute resolution", "international contracts",
-    "EB-5 investor", "EU company registration", "Warsaw law firm", "cross-border legal advisory",
+    "current US immigration policy", "EU company registration", "Warsaw law firm", "cross-border legal advisory",
     "high net worth immigration", "Pluco Group",
   ],
   authors: [{ name: "PLUCO GROUP Sp. z o.o." }],
