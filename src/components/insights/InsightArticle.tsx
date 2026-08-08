@@ -14,6 +14,8 @@ const copy = {
     disclaimerTitle: 'Important context',
     disclaimer:
       'This article provides general information and editorial analysis. It is not legal, tax, immigration or investment advice and does not guarantee an application outcome. Individual facts, nationality, residence history and current administrative practice must be reviewed separately.',
+    ctaTitle: 'Plan the life, then select the legal tools',
+    ctaBody: 'PLUCO GROUP brings residence, property, banking and cross-border decisions into one private-client plan built around the life you intend to lead.',
     paired: 'مطالعه نسخه فارسی',
   },
   fa: {
@@ -26,9 +28,20 @@ const copy = {
     disclaimerTitle: 'توضیح مهم',
     disclaimer:
       'این مقاله شامل اطلاعات عمومی و تحلیل تحریریه‌ای است و جایگزین مشاوره حقوقی، مالیاتی، مهاجرتی یا سرمایه‌گذاری نیست. نتیجه هیچ درخواستی تضمین نمی‌شود و شرایط شخصی، ملیت، سابقه اقامت و رویه جاری اداری باید جداگانه بررسی شوند.',
+    ctaTitle: 'ابتدا زندگی را تعریف کنید، سپس ابزار حقوقی را انتخاب کنید',
+    ctaBody: 'PLUCO GROUP تصمیم‌های اقامت، ملک، بانکداری و امور فرامرزی را در یک برنامه خصوصی و متناسب با زندگی مورد نظر شما هماهنگ می‌کند.',
     paired: 'Read the English edition',
   },
 } as const;
+
+function formatEditorialDate(date: string, locale: InsightLocale) {
+  return new Intl.DateTimeFormat(locale === 'fa' ? 'fa-IR-u-ca-gregory' : 'en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${date}T00:00:00Z`));
+}
 
 export default function InsightArticle({ article, locale }: { article: PlucoInsight; locale: InsightLocale }) {
   const isFa = locale === 'fa';
@@ -55,8 +68,8 @@ export default function InsightArticle({ article, locale }: { article: PlucoInsi
               <h1 className="mt-5 font-serif text-4xl font-bold leading-tight sm:text-6xl">{article.title[locale]}</h1>
               <p className="mt-6 max-w-4xl text-lg leading-8 text-slate-200">{article.description[locale]}</p>
               <div className="mt-7 flex flex-wrap gap-5 text-sm text-slate-300">
-                <span className="inline-flex items-center gap-2"><CalendarDays className="h-4 w-4 text-[#E3C783]" />{t.published} {article.publishedOn}</span>
-                <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[#E3C783]" />{t.reviewed} {article.reviewedOn}</span>
+                <span className="inline-flex items-center gap-2"><CalendarDays className="h-4 w-4 text-[#E3C783]" />{t.published} {formatEditorialDate(article.publishedOn, locale)}</span>
+                <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[#E3C783]" />{t.reviewed} {formatEditorialDate(article.reviewedOn, locale)}</span>
                 <span className="inline-flex items-center gap-2"><Clock3 className="h-4 w-4 text-[#E3C783]" />{article.readTime[locale]}</span>
               </div>
             </div>
@@ -89,8 +102,8 @@ export default function InsightArticle({ article, locale }: { article: PlucoInsi
 
             <section className="mt-14 rounded-3xl bg-[#071C3C] p-8 text-white">
               <p className="text-sm font-bold uppercase tracking-widest text-[#E3C783]">PLUCO GROUP</p>
-              <h2 className="mt-3 font-serif text-3xl font-bold">{article.serviceLabel[locale]}</h2>
-              <p className="mt-4 leading-7 text-slate-200">{t.disclaimer}</p>
+              <h2 className="mt-3 font-serif text-3xl font-bold">{t.ctaTitle}</h2>
+              <p className="mt-4 leading-7 text-slate-200">{t.ctaBody}</p>
               <Link href={article.servicePath[locale]} className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#C9A35A] px-6 py-3 text-sm font-black text-[#071C3C]">
                 {article.serviceLabel[locale]}<ArrowUpRight className="h-4 w-4" />
               </Link>
@@ -138,4 +151,3 @@ export default function InsightArticle({ article, locale }: { article: PlucoInsi
     </main>
   );
 }
-

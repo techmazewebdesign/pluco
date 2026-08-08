@@ -85,6 +85,54 @@ const spainTourismWellness: InsightSource = {
   url: 'https://www.spain.info/en/top/hotels-wellness-luxury-spain/',
 };
 
+const spanishEmbassyTehranSchengenEn: InsightSource = {
+  title: {
+    en: 'Schengen visas — requirements and current service notices',
+    fa: 'ویزای شنگن — شرایط و اطلاعیه‌های جاری خدمات',
+  },
+  publisher: {
+    en: 'Embassy of Spain in Tehran',
+    fa: 'سفارت اسپانیا در تهران',
+  },
+  url: 'https://www.exteriores.gob.es/Embajadas/teheran/en/ServiciosConsulares/Paginas/Consular/Visados-Schengen.aspx',
+};
+
+const spanishEmbassyTehranSchengenFa: InsightSource = {
+  title: {
+    en: 'Schengen visa information for applicants in Iran',
+    fa: 'اطلاعات ویزای شنگن برای متقاضیان در ایران',
+  },
+  publisher: {
+    en: 'Embassy of Spain in Tehran',
+    fa: 'سفارت اسپانیا در تهران',
+  },
+  url: 'https://www.exteriores.gob.es/Embajadas/teheran/es/ServiciosConsulares/Paginas/index.aspx?scca=Visados&scco=Ir%C3%A1n&scd=275&scs=Visado+de+estancia+%28visado+Schengen%29',
+};
+
+const spanishGoldenVisaLaw: InsightSource = {
+  title: {
+    en: 'Law 14/2013 — consolidated text',
+    fa: 'قانون ۱۴/۲۰۱۳ — متن تلفیقی جاری',
+  },
+  publisher: {
+    en: 'Official State Gazette of Spain (BOE)',
+    fa: 'روزنامه رسمی دولت اسپانیا (BOE)',
+  },
+  url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2013-10074',
+};
+
+const spanishGoldenVisaAnnouncement: InsightSource = {
+  title: {
+    en: 'Spain ends residence visas for investors',
+    fa: 'پایان ویزای اقامت سرمایه‌گذاران در اسپانیا',
+  },
+  publisher: {
+    en: 'Government of Spain — La Moncloa',
+    fa: 'دولت اسپانیا — لامونکلوا',
+  },
+  url: 'https://www.lamoncloa.gob.es/serviciosdeprensa/notasprensa/vivienda-agenda-urbana/Paginas/2025/020425-fin-golden-visa.aspx',
+};
+
 export const PLUCO_INSIGHTS: Record<string, PlucoInsight> = {
   'spain-digital-nomad-visa-iranian-applicants-2026': {
     slug: 'spain-digital-nomad-visa-iranian-applicants-2026',
@@ -197,7 +245,7 @@ export const PLUCO_INSIGHTS: Record<string, PlucoInsight> = {
     sources: [digitalNomadFaq, officialDigitalNomadProcedure],
     servicePath: { en: '/spain-digital-nomad-visa', fa: '/fa/services/spain-digital-nomad-visa' },
     serviceLabel: { en: 'Explore Spain Digital Nomad support', fa: 'بررسی خدمات دیجیتال نومد اسپانیا' },
-    relatedSlugs: ['apply-spain-digital-nomad-visa-tehran-or-spain', 'moving-family-spain-digital-nomad-route'],
+    relatedSlugs: ['apply-spain-digital-nomad-visa-tehran-or-spain', 'moving-family-spain-digital-nomad-route', 'buying-property-spain-after-golden-visa'],
   },
 
   'apply-spain-digital-nomad-visa-tehran-or-spain': {
@@ -298,7 +346,7 @@ export const PLUCO_INSIGHTS: Record<string, PlucoInsight> = {
     sources: [digitalNomadFaq, officialDigitalNomadProcedure],
     servicePath: { en: '/spain-digital-nomad-visa', fa: '/fa/services/spain-digital-nomad-visa' },
     serviceLabel: { en: 'Request a route assessment', fa: 'درخواست ارزیابی مسیر' },
-    relatedSlugs: ['spain-digital-nomad-visa-iranian-applicants-2026', 'moving-family-spain-digital-nomad-route'],
+    relatedSlugs: ['spain-digital-nomad-visa-iranian-applicants-2026', 'moving-family-spain-digital-nomad-route', 'spain-travel-visa-iranian-citizens-documents'],
   },
 
   'moving-family-spain-digital-nomad-route': {
@@ -399,7 +447,7 @@ export const PLUCO_INSIGHTS: Record<string, PlucoInsight> = {
     sources: [digitalNomadFaq, officialDigitalNomadProcedure],
     servicePath: { en: '/spain-digital-nomad-visa', fa: '/fa/services/spain-digital-nomad-visa' },
     serviceLabel: { en: 'Discuss a family relocation plan', fa: 'گفت‌وگو درباره برنامه مهاجرت خانوادگی' },
-    relatedSlugs: ['spain-digital-nomad-visa-iranian-applicants-2026', 'apply-spain-digital-nomad-visa-tehran-or-spain'],
+    relatedSlugs: ['spain-digital-nomad-visa-iranian-applicants-2026', 'apply-spain-digital-nomad-visa-tehran-or-spain', 'spain-travel-visa-iranian-citizens-documents'],
   },
 
   'private-side-of-spain-culture-wellness-mediterranean-life': {
@@ -500,7 +548,233 @@ export const PLUCO_INSIGHTS: Record<string, PlucoInsight> = {
     sources: [spainTourismLuxury, spainTourismWellness],
     servicePath: { en: '/eu-residency', fa: '/fa/services/eu-residency' },
     serviceLabel: { en: 'Explore European residence planning', fa: 'بررسی برنامه‌ریزی اقامت اروپا' },
-    relatedSlugs: ['spain-digital-nomad-visa-iranian-applicants-2026', 'moving-family-spain-digital-nomad-route'],
+    relatedSlugs: ['spain-digital-nomad-visa-iranian-applicants-2026', 'moving-family-spain-digital-nomad-route', 'buying-property-spain-after-golden-visa'],
+  },
+  'spain-travel-visa-iranian-citizens-documents': {
+    slug: 'spain-travel-visa-iranian-citizens-documents',
+    category: { en: 'Travel to Spain', fa: 'سفر به اسپانیا' },
+    country: { en: 'Spain', fa: 'اسپانیا' },
+    title: {
+      en: 'Travel to Spain as an Iranian Citizen: The Documents That Tell Your Story',
+      fa: 'سفر به اسپانیا برای شهروند ایرانی؛ مدارکی که روایت سفر شما را می‌سازند',
+    },
+    description: {
+      en: 'A practical, source-led guide to planning a Spanish Schengen visit from Iran: jurisdiction, itinerary, financial evidence, insurance, timing and the current service-status check.',
+      fa: 'راهنمایی عملی و مستند برای برنامه‌ریزی سفر شنگن اسپانیا از ایران؛ از مقصد اصلی و برنامه سفر تا مدارک مالی، بیمه، زمان‌بندی و بررسی وضعیت جاری خدمات.',
+    },
+    seoTitle: {
+      en: 'Spain Tourist Visa for Iranian Citizens: Document Guide',
+      fa: 'ویزای توریستی اسپانیا برای ایرانیان؛ راهنمای مدارک',
+    },
+    seoDescription: {
+      en: 'A source-led Spain tourist visa guide for Iranian citizens covering itinerary, funds, insurance, passport rules, timing and service notices.',
+      fa: 'راهنمای مستند ویزای توریستی اسپانیا برای ایرانیان؛ برنامه سفر، تمکن مالی، بیمه، گذرنامه، زمان‌بندی و اطلاعیه‌های سفارت.',
+    },
+    eyebrow: { en: 'TRAVEL INTELLIGENCE', fa: 'راهنمای سفر' },
+    introduction: {
+      en: 'A memorable journey to Spain may begin with Madrid’s galleries, Barcelona’s architecture or the slower Mediterranean rhythm of Valencia. For an Iranian traveller, however, the application begins earlier: with a file that explains why this journey makes sense, how it will be funded and why the traveller will return. The strongest documents do not sit in isolation. Together, they tell one credible story.',
+      fa: 'یک سفر به‌یادماندنی به اسپانیا ممکن است از موزه‌های مادرید، معماری بارسلونا یا ریتم آرام‌تر مدیترانه‌ای والنسیا آغاز شود. اما برای مسافر ایرانی، درخواست از جایی زودتر شروع می‌شود: پرونده‌ای که توضیح دهد چرا این سفر منطقی است، هزینه آن چگونه تأمین می‌شود و چرا مسافر بازخواهد گشت. مدارک قوی جدا از یکدیگر نیستند؛ در کنار هم یک روایت معتبر می‌سازند.',
+    },
+    image: '/images/insights/spain-travel-iranian-citizens.webp',
+    imageAlt: {
+      en: 'Iranian traveller calmly organising a Spain itinerary and supporting documents in an elegant Madrid room',
+      fa: 'مسافر ایرانی در حال نظم‌دادن به برنامه سفر اسپانیا و مدارک پشتیبان در فضایی آرام در مادرید',
+    },
+    publishedOn: '2026-08-08',
+    reviewedOn: '2026-08-08',
+    readTime: { en: '9 minute read', fa: '۹ دقیقه مطالعه' },
+    keywords: {
+      en: ['Spain tourist visa Iranian citizens', 'Spain Schengen visa from Iran', 'Spain travel documents Iran', 'travel to Spain from Iran'],
+      fa: ['ویزای توریستی اسپانیا برای ایرانیان', 'ویزای شنگن اسپانیا از ایران', 'مدارک سفر به اسپانیا', 'سفر به اسپانیا از ایران'],
+    },
+    sections: [
+      {
+        heading: { en: 'Check the service status before arranging the journey', fa: 'پیش از برنامه‌ریزی سفر، وضعیت خدمات را بررسی کنید' },
+        paragraphs: {
+          en: [
+            'The Spanish Embassy in Tehran publishes operational notices on its visa page. At the review date of this article, that page carried interruption and customer-service suspension notices. Those notices can change independently of the general Schengen rules, so appointment availability should never be assumed from an older article, a travel agent or a previous applicant’s experience.',
+            'Begin with the embassy’s current page and the appointed application channel. Confirm that the relevant service is operating before paying for non-refundable travel, accommodation or document handling. A carefully prepared file cannot compensate for using an unavailable or unauthorised route.',
+          ],
+          fa: [
+            'سفارت اسپانیا در تهران اطلاعیه‌های عملیاتی خدمات ویزا را در صفحه رسمی خود منتشر می‌کند. در تاریخ بازبینی این مقاله، آن صفحه شامل اطلاعیه وقفه در خدمات و تعلیق پاسخ‌گویی بود. این وضعیت می‌تواند مستقل از قواعد عمومی شنگن تغییر کند؛ بنابراین نباید دسترسی به وقت را بر اساس یک مقاله قدیمی، گفته واسطه یا تجربه متقاضی قبلی قطعی فرض کرد.',
+            'کار را از صفحه جاری سفارت و مجرای رسمی تعیین‌شده آغاز کنید. پیش از پرداخت هزینه‌های غیرقابل استرداد برای پرواز، اقامت یا خدمات مدارک، از فعال‌بودن خدمت مورد نیاز مطمئن شوید. پرونده منظم نمی‌تواند استفاده از مسیر غیرفعال یا غیرمجاز را جبران کند.',
+          ],
+        },
+      },
+      {
+        heading: { en: 'Spain must genuinely be the destination', fa: 'اسپانیا باید واقعاً مقصد سفر باشد' },
+        paragraphs: {
+          en: [
+            'A Spanish Schengen application is appropriate when Spain is the only destination or the principal destination by purpose or length of stay. A decorative night in Madrid does not make Spain the correct jurisdiction when most of the journey is planned elsewhere. The itinerary, reservations and explanation should all reflect the same geography.',
+            'A short-stay visa permits travel for up to 90 days in any 180-day period, but it does not guarantee entry at the border. Travellers should carry evidence of the purpose and conditions of the visit. The practical question is not merely “Do I have a visa?” but “Can I still explain this journey clearly when I arrive?”',
+          ],
+          fa: [
+            'درخواست شنگن اسپانیا زمانی درست است که اسپانیا تنها مقصد یا مقصد اصلی از نظر هدف یا مدت اقامت باشد. افزودن یک شب صوری در مادرید، وقتی بخش اصلی سفر در کشور دیگری است، صلاحیت اسپانیا را ایجاد نمی‌کند. برنامه سفر، رزروها و توضیحات باید یک جغرافیای واحد را نشان دهند.',
+            'ویزای کوتاه‌مدت امکان حضور تا ۹۰ روز در هر دوره ۱۸۰ روزه را فراهم می‌کند، اما ورود در مرز را تضمین نمی‌کند. مسافر باید بتواند مدارک هدف و شرایط سفر را همراه داشته باشد. پرسش عملی فقط این نیست که «ویزا دارم؟»؛ بلکه این است که «هنگام ورود نیز می‌توانم سفرم را روشن و منسجم توضیح دهم؟»',
+          ],
+        },
+      },
+      {
+        heading: { en: 'Build one itinerary, not a pile of reservations', fa: 'یک برنامه منسجم بسازید، نه انبوهی از رزروها' },
+        paragraphs: {
+          en: [
+            'A persuasive itinerary connects dates, cities, accommodation, transport and purpose. A private cultural journey may include museum access in Madrid, architectural visits in Barcelona and a quieter coastal stay, but the pace should remain believable. Every unexplained gap or implausible transfer weakens the whole account.',
+            'Return travel, leave approval or professional commitments, family context and a stable life outside the Schengen Area can help explain the intended end of the visit. These are not boxes to tick mechanically. They should be truthful evidence of the traveller’s actual circumstances.',
+          ],
+          fa: [
+            'برنامه سفر قابل دفاع، تاریخ‌ها، شهرها، اقامتگاه‌ها، جابه‌جایی و هدف را به هم پیوند می‌دهد. یک سفر فرهنگی خصوصی می‌تواند شامل موزه‌های مادرید، معماری بارسلونا و چند روز آرام در ساحل باشد؛ اما ریتم آن باید باورپذیر بماند. هر فاصله توضیح‌داده‌نشده یا انتقال غیرواقعی، کل روایت را تضعیف می‌کند.',
+            'بلیت بازگشت، مرخصی یا تعهدات حرفه‌ای، شرایط خانوادگی و زندگی باثبات خارج از منطقه شنگن می‌تواند پایان مورد انتظار سفر را توضیح دهد. این موارد تیک‌های صوری نیستند؛ باید شواهد واقعی از وضعیت مسافر باشند.',
+          ],
+        },
+      },
+      {
+        heading: { en: 'Financial evidence should explain both capacity and origin', fa: 'مدارک مالی باید هم توان پرداخت و هم منشأ آن را توضیح دهند' },
+        paragraphs: {
+          en: [
+            'The embassy’s Iran-specific page currently refers to €113 per person per day and a minimum total of €1,020, alongside evidence such as six months of bank accounts, employment or income documents and, where relevant, property ownership. These figures and instructions are administrative details that can change; verify the current official page when preparing the application.',
+            'The number alone is not the complete story. Regular income, savings built over time and transactions that match the applicant’s profile are easier to understand than a large unexplained deposit immediately before filing. Iranian documents may require translation into Spanish. Names, dates, currency conversions and the relationship between sponsor and traveller should be consistent across the file.',
+          ],
+          fa: [
+            'صفحه ویژه متقاضیان در ایران در حال حاضر به ۱۱۳ یورو برای هر نفر در هر روز و حداقل مجموع ۱٬۰۲۰ یورو اشاره می‌کند و مدارکی مانند گردش حساب شش‌ماهه، اسناد شغلی یا درآمدی و در صورت ارتباط، سند ملک را مطرح می‌کند. این ارقام و دستورالعمل‌ها جزئیات اداری قابل تغییر هستند؛ هنگام آماده‌سازی پرونده، صفحه رسمی جاری را دوباره بررسی کنید.',
+            'عدد به‌تنهایی روایت کامل نیست. درآمد منظم، پس‌انداز شکل‌گرفته در طول زمان و تراکنش‌های متناسب با وضعیت متقاضی، از یک واریز بزرگ و بدون توضیح درست پیش از درخواست قابل فهم‌ترند. مدارک ایرانی ممکن است به ترجمه اسپانیایی نیاز داشته باشند. نام‌ها، تاریخ‌ها، تبدیل ارز و رابطه میان حامی مالی و مسافر باید در سراسر پرونده هماهنگ باشد.',
+          ],
+        },
+        bullets: {
+          en: ['Six months of coherent account history', 'Income and employment evidence', 'A realistic travel budget', 'Documented sponsorship, when applicable', 'Spanish translations where required'],
+          fa: ['سابقه منسجم شش‌ماهه حساب', 'مدارک درآمد و اشتغال', 'بودجه واقعی و متناسب سفر', 'حمایت مالی مستند، در صورت وجود', 'ترجمه اسپانیایی در موارد لازم'],
+        },
+      },
+      {
+        heading: { en: 'Protect the plan with correct passport, insurance and timing', fa: 'برنامه را با گذرنامه، بیمه و زمان‌بندی درست محافظت کنید' },
+        paragraphs: {
+          en: [
+            'The published requirements call for a passport issued within the previous ten years, valid for at least three months beyond the planned departure from Schengen and containing at least two blank pages. Travel medical insurance should cover the Schengen Area with at least €30,000 for medical expenses, emergency treatment and repatriation.',
+            'Applications are generally contemplated from six months to at least 15 days before travel. The ordinary legal decision period is 15 calendar days, but it may extend to 45 when further examination or documents are needed. Treat those periods as a planning framework, not a promise. Elegant travel begins with enough time to absorb uncertainty without compromising the experience.',
+          ],
+          fa: [
+            'در الزامات منتشرشده، گذرنامه باید در ده سال گذشته صادر شده باشد، دست‌کم سه ماه پس از خروج برنامه‌ریزی‌شده از شنگن اعتبار داشته باشد و حداقل دو صفحه خالی داشته باشد. بیمه درمانی سفر نیز باید سراسر شنگن را با حداقل پوشش ۳۰ هزار یورو برای هزینه‌های پزشکی، درمان اضطراری و بازگرداندن پوشش دهد.',
+            'به‌طور کلی امکان ارائه درخواست از شش ماه پیش از سفر تا حداقل ۱۵ روز قبل در نظر گرفته شده است. مهلت عادی قانونی تصمیم‌گیری ۱۵ روز تقویمی است، اما در صورت بررسی یا مدارک بیشتر می‌تواند تا ۴۵ روز افزایش یابد. این بازه‌ها چارچوب برنامه‌ریزی‌اند، نه وعده. سفر سنجیده با زمانی کافی آغاز می‌شود تا عدم قطعیت، کیفیت تجربه را مخدوش نکند.',
+          ],
+        },
+      },
+    ],
+    sources: [spanishEmbassyTehranSchengenEn, spanishEmbassyTehranSchengenFa],
+    servicePath: { en: '/eu-residency', fa: '/fa/services/eu-residency' },
+    serviceLabel: { en: 'Discuss Spain travel and mobility planning', fa: 'گفت‌وگو درباره سفر و برنامه‌ریزی جابه‌جایی به اسپانیا' },
+    relatedSlugs: ['private-side-of-spain-culture-wellness-mediterranean-life', 'moving-family-spain-digital-nomad-route', 'spain-digital-nomad-visa-iranian-applicants-2026'],
+  },
+  'buying-property-spain-after-golden-visa': {
+    slug: 'buying-property-spain-after-golden-visa',
+    category: { en: 'Property & Residence', fa: 'ملک و اقامت' },
+    country: { en: 'Spain', fa: 'اسپانیا' },
+    title: {
+      en: 'Buying Property in Spain After the Golden Visa: Separate the Home From the Residence Plan',
+      fa: 'خرید ملک در اسپانیا پس از پایان گلدن ویزا؛ خانه را از برنامه اقامت جدا کنید',
+    },
+    description: {
+      en: 'Spain still offers compelling homes and ways of life, but property and immigration now require separate decisions. A private-client guide to residence, funds and due diligence.',
+      fa: 'اسپانیا همچنان خانه‌ها و سبک‌های زندگی جذابی ارائه می‌دهد، اما تصمیم ملک و مهاجرت باید جداگانه طراحی شود؛ راهنمایی برای اقامت، منشأ وجوه و بررسی حقوقی.',
+    },
+    seoTitle: {
+      en: 'Buying Property in Spain After the Golden Visa',
+      fa: 'خرید ملک در اسپانیا پس از پایان گلدن ویزا',
+    },
+    seoDescription: {
+      en: 'A guide to buying Spanish property after the Golden Visa ended: residence planning, legal due diligence, source of funds, banking and lifestyle fit.',
+      fa: 'راهنمای خرید ملک در اسپانیا پس از پایان گلدن ویزا؛ برنامه اقامت، بررسی حقوقی، منشأ وجوه، بانکداری و تناسب سبک زندگی.',
+    },
+    eyebrow: { en: 'PRIVATE PROPERTY BRIEFING', fa: 'یادداشت ملک خصوصی' },
+    introduction: {
+      en: 'A home in Madrid, Mallorca or the Costa del Sol can still be a meaningful family decision: a place to gather, work, rest and build a relationship with Spain. What changed is the legal shortcut once associated with certain investments. Since 3 April 2025, buying qualifying property no longer opens Spain’s investor-residence route. The sophisticated response is not to abandon the life; it is to design the home and the residence plan as two coordinated but separate projects.',
+      fa: 'خانه‌ای در مادرید، مایورکا یا کوستا دل سول همچنان می‌تواند تصمیمی معنادار برای خانواده باشد؛ جایی برای گردهم‌آمدن، کار، آرامش و ساختن رابطه‌ای واقعی با اسپانیا. آنچه تغییر کرده، میان‌بر حقوقی مرتبط با برخی سرمایه‌گذاری‌هاست. از ۳ آوریل ۲۰۲۵، خرید ملک واجد شرایط دیگر مسیر اقامت سرمایه‌گذاری اسپانیا را باز نمی‌کند. پاسخ سنجیده کنارگذاشتن آن زندگی نیست؛ بلکه طراحی خانه و برنامه اقامت به‌عنوان دو پروژه جدا اما هماهنگ است.',
+    },
+    image: '/images/insights/spain-property-after-golden-visa.webp',
+    imageAlt: {
+      en: 'Iranian couple reviewing plans for a refined Spanish coastal home with a property adviser',
+      fa: 'زوج ایرانی در حال بررسی نقشه‌های یک خانه ساحلی سنجیده در اسپانیا همراه مشاور ملک',
+    },
+    publishedOn: '2026-08-08',
+    reviewedOn: '2026-08-08',
+    readTime: { en: '10 minute read', fa: '۱۰ دقیقه مطالعه' },
+    keywords: {
+      en: ['buy property Spain after Golden Visa', 'Spain property Iranian buyer', 'Spain residence after Golden Visa', 'source of funds Spanish property'],
+      fa: ['خرید ملک اسپانیا بعد از گلدن ویزا', 'خرید ملک در اسپانیا برای ایرانیان', 'اقامت اسپانیا پس از گلدن ویزا', 'منشأ وجوه خرید ملک اسپانیا'],
+    },
+    sections: [
+      {
+        heading: { en: 'The investor-residence route ended; the property market did not', fa: 'مسیر اقامت سرمایه‌گذاری پایان یافت؛ بازار ملک نه' },
+        paragraphs: {
+          en: [
+            'Spain’s consolidated Law 14/2013 now shows the former investor-residence provisions removed, and the Spanish government confirmed the end of investor visas from 3 April 2025. A property purchase made now should therefore never be presented as automatically producing Spanish residence.',
+            'This legal change does not make a Spanish home less useful or less beautiful. It changes the decision architecture. Property should be tested on its own merits—use, quality, location, costs and long-term suitability—while the family’s immigration status is assessed under a route that genuinely matches work, financial means and intended time in Spain.',
+          ],
+          fa: [
+            'متن تلفیقی جاری قانون ۱۴/۲۰۱۳ اسپانیا نشان می‌دهد مقررات پیشین اقامت سرمایه‌گذاران حذف شده و دولت اسپانیا نیز پایان ویزای سرمایه‌گذاری از ۳ آوریل ۲۰۲۵ را تأیید کرده است. بنابراین خرید ملک امروز نباید به‌عنوان اقدامی که خودکار اقامت اسپانیا ایجاد می‌کند معرفی شود.',
+            'این تغییر حقوقی، ارزش کاربردی یا زیبایی یک خانه در اسپانیا را از بین نمی‌برد؛ ساختار تصمیم را تغییر می‌دهد. ملک باید بر اساس استفاده، کیفیت، موقعیت، هزینه و تناسب بلندمدت سنجیده شود و وضعیت مهاجرتی خانواده از مسیری بررسی شود که واقعاً با کار، منابع مالی و مدت حضور مورد نظر در اسپانیا هماهنگ است.',
+          ],
+        },
+      },
+      {
+        heading: { en: 'Choose the life before choosing the address', fa: 'پیش از انتخاب نشانی، شکل زندگی را انتخاب کنید' },
+        paragraphs: {
+          en: [
+            'A holiday view can conceal the demands of an ordinary year. The right property depends on whether Spain will be a primary home, a seasonal base, a family meeting point or a managed investment. Schools, healthcare, airport routes, winter activity, privacy, staff or management needs and the family’s language all affect the answer.',
+            'Madrid can suit a globally connected urban life; Barcelona combines business, culture and coast; Valencia offers a measured Mediterranean rhythm; Mallorca prioritises landscape and privacy; the Costa del Sol brings international communities and extended outdoor living. None is universally superior. The best address is the one that continues to work in February as well as August.',
+          ],
+          fa: [
+            'چشم‌انداز یک تعطیلات کوتاه می‌تواند نیازهای یک سال عادی را پنهان کند. ملک درست به این بستگی دارد که اسپانیا خانه اصلی، پایگاه فصلی، محل گردهم‌آیی خانواده یا سرمایه‌گذاری مدیریت‌شده باشد. مدرسه، درمان، مسیرهای پروازی، زندگی زمستانی، حریم خصوصی، نیاز به کارکنان یا مدیریت و زبان خانواده همگی در پاسخ اثر دارند.',
+            'مادرید برای زندگی شهری و جهانی مناسب است؛ بارسلونا کسب‌وکار، فرهنگ و ساحل را ترکیب می‌کند؛ والنسیا ریتمی متعادل و مدیترانه‌ای دارد؛ مایورکا بر طبیعت و حریم خصوصی تکیه دارد و کوستا دل سول جامعه بین‌المللی و زندگی طولانی‌تر در فضای باز ارائه می‌دهد. هیچ‌کدام برای همه برتر نیست. بهترین نشانی جایی است که در فوریه نیز به‌اندازه اوت کارآمد باشد.',
+          ],
+        },
+      },
+      {
+        heading: { en: 'Due diligence should be independent of the sale', fa: 'بررسی حقوقی باید مستقل از فرایند فروش باشد' },
+        paragraphs: {
+          en: [
+            'A private buyer needs independent review of title, charges, planning status, licences, community obligations, occupation and the contract itself. New developments, rural land, renovated heritage properties and coastal homes each carry different questions. The adviser protecting the buyer’s interests should not be reduced to translating the seller’s paperwork.',
+            'The purchase price is only one part of the capital plan. Taxes, notarial and registry expenses, professional fees, works, furnishing, insurance, community charges and ongoing management should be modelled before the emotional decision becomes irreversible. Where a power of attorney is used, its scope and control deserve the same attention as the property.',
+          ],
+          fa: [
+            'خریدار خصوصی به بررسی مستقل مالکیت، بدهی‌ها و محدودیت‌ها، وضعیت شهرسازی، مجوزها، تعهدات مجتمع، تصرف و خود قرارداد نیاز دارد. پروژه نوساز، زمین روستایی، بنای تاریخی بازسازی‌شده و خانه ساحلی هر کدام پرسش‌های متفاوتی دارند. مشاوری که از منافع خریدار حفاظت می‌کند نباید فقط مترجم مدارک فروشنده باشد.',
+            'قیمت خرید تنها بخشی از برنامه سرمایه است. مالیات‌ها، هزینه‌های دفتر اسناد و ثبت، حق‌الزحمه متخصصان، بازسازی، مبلمان، بیمه، شارژ مجتمع و مدیریت مستمر باید پیش از برگشت‌ناپذیرشدن تصمیم احساسی محاسبه شوند. اگر از وکالت‌نامه استفاده می‌شود، دامنه و کنترل آن نیز به همان اندازه ملک اهمیت دارد.',
+          ],
+        },
+        bullets: {
+          en: ['Independent title and contract review', 'Planning and licence verification', 'Full acquisition and holding-cost model', 'Technical inspection appropriate to the property', 'Clear authority for every representative'],
+          fa: ['بررسی مستقل مالکیت و قرارداد', 'تأیید وضعیت شهرسازی و مجوزها', 'محاسبه کامل هزینه خرید و نگهداری', 'بازرسی فنی متناسب با نوع ملک', 'اختیار روشن و محدود برای هر نماینده'],
+        },
+      },
+      {
+        heading: { en: 'Source of funds is part of the transaction, not an afterthought', fa: 'منشأ وجوه بخشی از معامله است، نه موضوعی برای پایان کار' },
+        paragraphs: {
+          en: [
+            'Banks, notaries and other regulated professionals may need to understand the buyer, beneficial owner and economic origin of the purchase funds. For an Iranian buyer, the banking route and documentary history should be examined before signing a contract that assumes money can move on a particular date.',
+            'A credible file connects wealth and funds: sale agreements, company distributions, income, inheritance or accumulated savings should correspond with account records and tax or corporate evidence where relevant. Privacy remains important, but opacity is not privacy. The objective is controlled disclosure—enough verified information for the transaction to proceed, handled through appropriate professionals.',
+          ],
+          fa: [
+            'بانک‌ها، دفاتر اسناد رسمی و دیگر متخصصان تحت نظارت ممکن است نیاز داشته باشند خریدار، ذی‌نفع واقعی و منشأ اقتصادی وجوه خرید را بشناسند. برای خریدار ایرانی، مسیر بانکی و سابقه مستند پول باید پیش از امضای قراردادی بررسی شود که انتقال وجه در تاریخی مشخص را مفروض می‌گیرد.',
+            'پرونده قابل دفاع، منشأ ثروت و منشأ وجه را به هم متصل می‌کند: قرارداد فروش دارایی، سود شرکت، درآمد، ارث یا پس‌انداز انباشته باید با گردش حساب و در صورت ارتباط، اسناد مالیاتی یا شرکتی هماهنگ باشد. حریم خصوصی مهم است، اما ابهام همان حریم خصوصی نیست. هدف افشای کنترل‌شده است؛ اطلاعات تأییدشده کافی برای انجام معامله، با مدیریت متخصصان مناسب.',
+          ],
+        },
+      },
+      {
+        heading: { en: 'Coordinate residence, property, banking and tax in the right order', fa: 'اقامت، ملک، بانک و مالیات را با ترتیب درست هماهنگ کنید' },
+        paragraphs: {
+          en: [
+            'The absence of a property-based residence route makes sequencing more important. A family may need to consider an international teleworker route, a residence option based on means, employment, study or another lawful category depending on its facts. Ownership should not be used to disguise a mismatch between the desired life and the available immigration basis.',
+            'Before reserving a property, map the intended days in Spain, residence route, tax-residence risk, banking path, ownership structure and family use. Then test the property against that map. The most refined purchase is not the fastest one; it is the home that belongs inside a legally coherent and financially sustainable European life.',
+          ],
+          fa: [
+            'نبود مسیر اقامت مبتنی بر ملک، ترتیب تصمیم‌ها را مهم‌تر می‌کند. بسته به شرایط واقعی، خانواده ممکن است مسیر دورکار بین‌المللی، اقامت مبتنی بر منابع مالی، استخدام، تحصیل یا گروه قانونی دیگری را بررسی کند. مالکیت نباید برای پنهان‌کردن ناسازگاری میان زندگی مطلوب و مبنای مهاجرتی موجود استفاده شود.',
+            'پیش از رزرو ملک، تعداد روزهای مورد نظر در اسپانیا، مسیر اقامت، ریسک اقامت مالیاتی، مسیر بانکی، ساختار مالکیت و شیوه استفاده خانواده را ترسیم کنید. سپس ملک را با این نقشه بسنجید. خرید سنجیده سریع‌ترین خرید نیست؛ خانه‌ای است که درون یک زندگی اروپایی منسجم از نظر حقوقی و پایدار از نظر مالی قرار می‌گیرد.',
+          ],
+        },
+      },
+    ],
+    sources: [spanishGoldenVisaLaw, spanishGoldenVisaAnnouncement],
+    servicePath: { en: '/eu-property-purchase', fa: '/fa/services/eu-property-purchase' },
+    serviceLabel: { en: 'Plan a Spanish property purchase', fa: 'برنامه‌ریزی خرید ملک در اسپانیا' },
+    relatedSlugs: ['private-side-of-spain-culture-wellness-mediterranean-life', 'spain-digital-nomad-visa-iranian-applicants-2026', 'moving-family-spain-digital-nomad-route'],
   },
 };
 

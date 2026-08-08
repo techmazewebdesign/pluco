@@ -1,6 +1,6 @@
-# PLUCO Insights launch image prompts
+# PLUCO Insights editorial image prompts
 
-All four launch images were generated with the built-in image generation tool as photorealistic-natural editorial blog headers. They contain no PLUCO logo, embedded text, flag, visa stamp, government insignia or watermark.
+All six images were generated with the built-in image generation tool as photorealistic-natural editorial blog headers. They contain no PLUCO logo, embedded text, flag, visa stamp, government insignia or watermark.
 
 ## Spain Digital Nomad 2026
 
@@ -18,3 +18,10 @@ An Iranian couple and school-age child walking naturally through a quiet, authen
 
 A cultivated Mediterranean terrace in Mallorca at blue hour, overlooking sea and marina lights. A couple is secondary to the atmosphere; aged stone, linen, candlelight and quiet privacy convey a life well lived without ostentation.
 
+## Spain travel documents for Iranian citizens
+
+An Iranian woman traveller calmly organising a Spain itinerary and supporting documents in an elegant Madrid room. The scene communicates preparation, cultural curiosity and quiet anticipation; no visible personal data, passport, visa or government mark.
+
+## Spanish property after the Golden Visa
+
+An Iranian couple with an independent property adviser reviewing architectural plans at a refined Costa del Sol residence. The editorial moment is thoughtful due diligence rather than a signing or key handover, with Mediterranean light and restrained private-client confidence.
