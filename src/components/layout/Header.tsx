@@ -38,8 +38,12 @@ export default function Header() {
     { key: 'nav.home' as const,                    href: isRTL ? '/fa' : '/' },
     ...(!isRTL ? [{ key: 'nav.ourPeople' as const, href: '/our-people' }] : []),
     ...services,
-    ...(isRTL ? [{ key: 'nav.publications' as const, href: '/fa/guides', label: 'راهنماها' }] : []),
+    ...(isRTL ? [
+      { key: 'nav.publications' as const, href: '/fa/guides', label: 'راهنماها' },
+      { key: 'nav.publications' as const, href: '/fa/insights', label: 'بینش‌ها' },
+    ] : []),
     ...(!isRTL ? [{ key: 'nav.publications' as const, href: '/publications' }] : []),
+    ...(!isRTL ? [{ key: 'nav.publications' as const, href: '/insights', label: 'Insights' }] : []),
   ];
 
   const mobileAll = [...mobileBase];
@@ -179,6 +183,14 @@ export default function Header() {
                 />
               </Link>
             ) : null}
+
+            <Link href={isRTL ? '/fa/insights' : '/insights'} className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
+              {isRTL ? 'بینش‌ها' : 'Insights'}
+              <span
+                className={`absolute bottom-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full ${isRTL ? 'right-0' : 'left-0'}`}
+                style={{ backgroundColor: '#C9A35A' }}
+              />
+            </Link>
 
             {/* Auth Links */}
             {!loading && !user ? (

@@ -5,6 +5,7 @@ import {
 } from '@/lib/plucoPersianServices';
 import { PERSIAN_GUIDES } from '@/lib/plucoPersianGuides';
 import { ENGLISH_GUIDES } from '@/lib/plucoEnglishGuides';
+import { PLUCO_INSIGHT_LIST } from '@/lib/plucoInsights';
 
 const BASE_URL = 'https://www.plucogroup.com';
 
@@ -33,6 +34,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: '/privacy-policy',          priority: 0.3,  changeFrequency: 'yearly'  },
     { url: '/disclaimer',              priority: 0.3,  changeFrequency: 'yearly'  },
     { url: '/guides',                  priority: 0.8,  changeFrequency: 'weekly'  },
+    { url: '/insights',                priority: 0.85, changeFrequency: 'weekly'  },
     { url: '/editorial-standards',     priority: 0.4,  changeFrequency: 'yearly'  },
     { url: '/resources/source-of-funds-checklist', priority: 0.85, changeFrequency: 'monthly' },
     { url: '/guides/bank-account-closure-iranian-nationals-europe', priority: 0.85, changeFrequency: 'monthly' },
@@ -45,6 +47,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
           ? '/fa'
           : url === '/guides'
             ? '/fa/guides'
+            : url === '/insights'
+              ? '/fa/insights'
             : url === '/editorial-standards'
               ? '/fa/editorial-standards'
             : url === '/resources/source-of-funds-checklist'
@@ -94,6 +98,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   );
 
+  const insightPages: MetadataRoute.Sitemap = PLUCO_INSIGHT_LIST.flatMap((article) => {
+    const englishUrl = `${BASE_URL}/insights/${article.slug}`;
+    const persianUrl = `${BASE_URL}/fa/insights/${article.slug}`;
+    const alternates = {
+      languages: { en: englishUrl, fa: persianUrl, 'x-default': englishUrl },
+    };
+
+    return [
+      {
+        url: englishUrl,
+        lastModified: article.reviewedOn,
+        changeFrequency: 'monthly' as const,
+        priority: 0.82,
+        alternates,
+      },
+      {
+        url: persianUrl,
+        lastModified: article.reviewedOn,
+        changeFrequency: 'monthly' as const,
+        priority: 0.82,
+        alternates,
+      },
+    ];
+  });
+
   const persianPages: MetadataRoute.Sitemap = [
     {
       url: `${BASE_URL}/fa`,
@@ -128,6 +157,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
           en: `${BASE_URL}/guides`,
           fa: `${BASE_URL}/fa/guides`,
           'x-default': `${BASE_URL}/guides`,
+        },
+      },
+    },
+    {
+      url: `${BASE_URL}/fa/insights`,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+      alternates: {
+        languages: {
+          en: `${BASE_URL}/insights`,
+          fa: `${BASE_URL}/fa/insights`,
+          'x-default': `${BASE_URL}/insights`,
         },
       },
     },
@@ -177,5 +218,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   ];
 
-  return [...englishPages, ...englishGuidePages, ...persianPages];
+  return [...englishPages, ...englishGuidePages, ...insightPages, ...persianPages];
 }
