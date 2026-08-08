@@ -731,3 +731,277 @@ h1, h2, h3, h4, h5, h6 {
     display: none;
   }
 }
+
+/* ── Selected midnight editorial concept ──────────────────────────── */
+.pluco-site-header {
+  background: rgba(3, 18, 37, 0.95) !important;
+  border-bottom-color: rgba(213, 173, 95, 0.3) !important;
+  box-shadow: 0 14px 44px rgba(1, 8, 20, 0.24);
+}
+
+.pluco-header-top {
+  background: rgba(2, 13, 29, 0.82) !important;
+  border-color: rgba(213, 173, 95, 0.18) !important;
+}
+
+.pluco-site-header nav > a,
+.pluco-site-header nav > div > button {
+  color: #ffffff !important;
+}
+
+.pluco-site-header nav > a[href="/client-sign-in"],
+.pluco-site-header nav > a[href="/dashboard"] {
+  color: #d5ad5f !important;
+  border-color: #d5ad5f !important;
+}
+
+.pluco-site-header button[aria-label="Toggle menu"] svg {
+  color: #ffffff !important;
+}
+
+.pluco-dark-home {
+  background: #031225;
+  color: #f4efe5;
+}
+
+.pluco-dark-home > section,
+.pluco-home-trust-rail {
+  border-bottom-color: rgba(213, 173, 95, 0.25);
+}
+
+.pluco-home-hero {
+  background: #031225;
+}
+
+.pluco-home-hero__copy {
+  background:
+    radial-gradient(circle at 88% 20%, rgba(31, 91, 138, 0.25), transparent 38%),
+    linear-gradient(135deg, #031225 0%, #061b35 68%, #08213d 100%) !important;
+}
+
+.pluco-home-hero__copy::before {
+  opacity: 0.2;
+  background-image:
+    linear-gradient(115deg, transparent 0 48%, rgba(213, 173, 95, 0.18) 49%, transparent 50%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+  background-size: 210px 210px, 84px 100%;
+}
+
+.pluco-home-hero__copy h1 {
+  color: #f4efe5 !important;
+}
+
+.pluco-home-hero__copy p:nth-of-type(2) {
+  color: #ffffff !important;
+}
+
+.pluco-home-hero__copy p:nth-of-type(3) {
+  color: #c5cfdb !important;
+}
+
+.pluco-home-hero__copy a:first-child {
+  background: linear-gradient(135deg, #cda654, #e1c27b) !important;
+  color: #071c3c !important;
+  border-color: transparent !important;
+}
+
+.pluco-home-hero__copy a:last-child {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.pluco-home-hero__copy a:last-child:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.pluco-home-hero__media::before {
+  display: none !important;
+}
+
+.pluco-home-hero__media::after {
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(3, 18, 37, 0.44), transparent 22%),
+    linear-gradient(0deg, rgba(3, 18, 37, 0.3), transparent 46%);
+}
+
+.pluco-home-hero__media img {
+  filter: saturate(0.82) contrast(1.06) brightness(0.82);
+}
+
+.pluco-home-trust-rail {
+  background: #04162c !important;
+  border-color: rgba(213, 173, 95, 0.25) !important;
+}
+
+.pluco-home-trust-rail > div > div {
+  border-color: rgba(213, 173, 95, 0.18) !important;
+}
+
+.pluco-home-trust-item:hover {
+  background: rgba(213, 173, 95, 0.05) !important;
+}
+
+.pluco-home-trust-item img {
+  opacity: 0.86;
+  filter: sepia(1) saturate(0.7) brightness(1.2);
+}
+
+.pluco-home-trust-item span {
+  color: #dce4ed !important;
+}
+
+.pluco-home-featured {
+  background:
+    radial-gradient(circle at 10% 20%, rgba(33, 91, 133, 0.14), transparent 34%),
+    #03162d !important;
+}
+
+.pluco-home-featured h2,
+.pluco-home-featured p:not(:first-child),
+.pluco-home-featured .grid p.text-sm {
+  color: #f4efe5 !important;
+}
+
+.pluco-home-featured p.text-xs {
+  color: #8f9daf !important;
+}
+
+.pluco-home-featured a:first-child {
+  background: #d5ad5f !important;
+  color: #071c3c !important;
+  border-color: #d5ad5f !important;
+}
+
+.pluco-home-featured button {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.42) !important;
+}
+
+.pluco-home-featured button:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.pluco-home-featured__media {
+  border: 1px solid rgba(213, 173, 95, 0.76);
+  box-shadow: 18px -18px 0 -17px #d5ad5f, 0 30px 80px rgba(0, 0, 0, 0.34);
+}
+
+.pluco-home-featured__media::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: linear-gradient(145deg, rgba(3, 18, 37, 0.04), rgba(3, 18, 37, 0.24));
+}
+
+.pluco-home-featured__media img {
+  filter: saturate(0.8) contrast(1.05) brightness(0.88);
+}
+
+.pluco-home-services,
+.pluco-home-process,
+.pluco-home-first-contact {
+  background: #031225 !important;
+}
+
+.pluco-home-trust,
+.pluco-home-contact {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(32, 88, 132, 0.13), transparent 28%),
+    #04162c !important;
+}
+
+.pluco-home-services::before,
+.pluco-home-process::before,
+.pluco-home-first-contact::before {
+  opacity: 0.2;
+  background-image: linear-gradient(90deg, rgba(213, 173, 95, 0.08) 1px, transparent 1px);
+}
+
+.pluco-home-services h2,
+.pluco-home-trust h2,
+.pluco-home-process h2,
+.pluco-home-contact h2,
+.pluco-home-first-contact h2 {
+  color: #f4efe5 !important;
+}
+
+.pluco-home-services > div > div:first-child > p:last-child,
+.pluco-home-trust > div > div:first-child > p:last-child,
+.pluco-home-process > div > div:first-child > p:last-child,
+.pluco-home-contact > div > div:first-child > p:last-child,
+.pluco-home-first-contact p {
+  color: #b8c4d2 !important;
+}
+
+.pluco-home-service-card,
+.pluco-home-panel {
+  border-color: rgba(213, 173, 95, 0.43) !important;
+  background: linear-gradient(145deg, rgba(8, 34, 62, 0.92), rgba(3, 20, 41, 0.96)) !important;
+}
+
+.pluco-home-service-card:hover,
+.pluco-home-panel:hover {
+  border-color: rgba(226, 194, 127, 0.9) !important;
+  box-shadow: 0 24px 54px rgba(0, 0, 0, 0.24) !important;
+}
+
+.pluco-home-service-card h3,
+.pluco-home-panel h3 {
+  color: #f4efe5 !important;
+}
+
+.pluco-home-service-card p,
+.pluco-home-panel p {
+  color: #b8c4d2 !important;
+}
+
+.pluco-home-position {
+  background: #041a34 !important;
+}
+
+.pluco-home-position h2 {
+  color: #ffffff !important;
+}
+
+.pluco-home-position p:not(:first-child) {
+  color: #cbd5e0 !important;
+}
+
+.pluco-home-position__media {
+  border-color: rgba(213, 173, 95, 0.62);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.32) !important;
+}
+
+.pluco-home-position__media img {
+  filter: saturate(0.82) contrast(1.03) brightness(0.88);
+}
+
+.pluco-home-first-contact a:hover {
+  background-color: rgba(213, 173, 95, 0.08) !important;
+}
+
+.pluco-home-cta {
+  background:
+    linear-gradient(90deg, rgba(213, 173, 95, 0.08), transparent 38%),
+    #020f22 !important;
+}
+
+@media (min-width: 1024px) {
+  .pluco-home-hero__copy,
+  .pluco-home-hero__media {
+    width: 50% !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .pluco-home-featured__media {
+    order: -1;
+  }
+}
+
+@media (max-width: 639px) {
+  .pluco-home-featured__media {
+    box-shadow: 10px -10px 0 -9px #d5ad5f;
+  }
+}
