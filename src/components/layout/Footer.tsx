@@ -23,6 +23,7 @@ export default function Footer() {
   const quickLinks = [
     [isRTL ? 'صفحه فارسی' : t('nav.ourPeople'), isRTL ? '/fa' : '/our-people'],
     ...(isRTL ? [['راهنماهای فارسی', '/fa/guides']] : []),
+    ...(!isRTL ? [['For Iranian Clients', '/iranian-clients']] : [['خدمات برای ایرانیان', '/fa/iranians-abroad']]),
     ...(!isRTL ? [['Guides', '/guides']] : []),
     ...(isRTL ? [['بینش‌ها', '/fa/insights']] : []),
     ...(!isRTL ? [['Insights', '/insights']] : []),
