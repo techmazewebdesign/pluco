@@ -9,6 +9,7 @@ const copy = {
     sources: 'Primary sources and further reading',
     sourceNote: 'Sources were checked on the review date shown above. Always confirm the current rule before acting.',
     reviewed: 'Reviewed',
+    byline: 'By Reza Ostad · PLUCO GROUP editorial review',
     published: 'Published',
     related: 'Continue reading',
     disclaimerTitle: 'Important context',
@@ -23,6 +24,7 @@ const copy = {
     sources: 'منابع رسمی و مطالعه بیشتر',
     sourceNote: 'منابع در تاریخ بازبینی درج‌شده بررسی شده‌اند. پیش از اقدام، قاعده جاری را دوباره تأیید کنید.',
     reviewed: 'بازبینی',
+    byline: 'نویسنده: رضا استاد · بازبینی تحریریه PLUCO GROUP',
     published: 'انتشار',
     related: 'مطالب مرتبط',
     disclaimerTitle: 'توضیح مهم',
@@ -72,6 +74,11 @@ export default function InsightArticle({ article, locale }: { article: PlucoInsi
                 <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[#E3C783]" />{t.reviewed} {formatEditorialDate(article.reviewedOn, locale)}</span>
                 <span className="inline-flex items-center gap-2"><Clock3 className="h-4 w-4 text-[#E3C783]" />{article.readTime[locale]}</span>
               </div>
+              <p className="mt-5 text-sm text-slate-300">
+                <Link href="/our-people/reza-ostad" className="font-bold text-[#E3C783] underline underline-offset-4">{t.byline}</Link>
+                {' · '}
+                <Link href={isFa ? '/fa/editorial-standards' : '/editorial-standards'} className="underline underline-offset-4">{isFa ? 'روش تهیه و اصلاح محتوا' : 'How content is prepared and corrected'}</Link>
+              </p>
             </div>
           </div>
         </header>

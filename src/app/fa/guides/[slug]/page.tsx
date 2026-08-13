@@ -86,11 +86,12 @@ export default async function PersianGuidePage({ params }: Props) {
         dateModified: guide.reviewedOn,
         mainEntityOfPage: url,
         author: {
-          '@type': 'Organization',
-          '@id': `${SITE_URL}/#organization`,
-          name: 'PLUCO GROUP',
-          url: SITE_URL,
+          '@type': 'Person',
+          '@id': `${SITE_URL}/our-people/reza-ostad#person`,
+          name: 'Reza Ostad',
+          url: `${SITE_URL}/our-people/reza-ostad`,
         },
+        reviewedBy: { '@id': `${SITE_URL}/#organization` },
         publisher: { '@id': `${SITE_URL}/#organization` },
         isPartOf: { '@id': `${SITE_URL}/#website` },
         citation: guide.sources.map((source) => source.url),
@@ -121,8 +122,8 @@ export default async function PersianGuidePage({ params }: Props) {
               <span>·</span>
               <span>
                 تهیه‌کننده:{' '}
-                <Link href="/fa/editorial-standards" className="underline underline-offset-4">
-                  PLUCO GROUP
+                <Link href="/our-people/reza-ostad" className="underline underline-offset-4">
+                  رضا استاد
                 </Link>
               </span>
               <span>·</span>
@@ -152,6 +153,13 @@ export default async function PersianGuidePage({ params }: Props) {
             >
               مشاهده {guide.sources.length} منبع رسمی استفاده‌شده در این راهنما
             </a>
+          </section>
+
+          <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 text-sm leading-8 text-slate-700">
+            <p className="font-black text-[#172033]">نویسنده و فرایند بازبینی</p>
+            <p className="mt-2">
+              این راهنما توسط <Link href="/our-people/reza-ostad" className="font-bold underline">رضا استاد</Link> برای PLUCO GROUP تهیه و مطابق <Link href="/fa/editorial-standards" className="font-bold underline">استانداردهای تحریریه</Link> بازبینی شده است. منابع و ادعاهای اصلی در تاریخ {guide.reviewedOn} کنترل شده‌اند. این بازبینی سازمانی به معنی تأیید مطلب توسط مرجع دولتی یا وکیل محلی نام‌برده‌نشده نیست.
+            </p>
           </section>
 
           <div className="mt-10 grid gap-12">

@@ -2,35 +2,36 @@
 
 import { motion } from 'framer-motion';
 import { Shield, Users, Globe, Lock, Briefcase, CheckCircle2 } from 'lucide-react';
+import type { Variants } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const trustItems = [
   {
     titleEn: 'Discreet & Confidential',
     titleFa: 'محرمانه و ایمن',
-    descEn: 'We handle sensitive matters with complete confidentiality. No public announcements, no unnecessary correspondence, no disclosure of your affairs.',
-    descFa: 'ما امور حساس را با رازداری کامل مدیریت می‌کنیم. هیچ اعلام عمومی، هیچ مکاتبه غیر ضروری، هیچ افشای امور شما.',
+    descEn: 'We limit collection and disclosure of sensitive information, use confidential working practices and explain when information must be shared to progress a matter.',
+    descFa: 'گردآوری و افشای اطلاعات حساس را محدود می‌کنیم، از روش‌های کاری محرمانه استفاده می‌کنیم و موارد لازم برای اشتراک اطلاعات جهت پیشبرد موضوع را توضیح می‌دهیم.',
     Icon: Lock,
   },
   {
     titleEn: 'Legal Rigor & Compliance',
     titleFa: 'دقت حقوقی و انطباق',
-    descEn: 'Every engagement follows strict conflict checks, regulatory compliance and professional standards. We act within legal frameworks, not around them.',
+    descEn: 'Work begins only after scope, conflicts, eligibility and applicable professional or regulatory requirements have been considered.',
     descFa: 'هر مشاركت بر اساس بررسی‌های دقیق تعارض منافع، انطباق نظارتی و استانداردهای حرفه‌ای صورت می‌گیرد.',
     Icon: Shield,
   },
   {
     titleEn: 'Cross-Border Expertise',
     titleFa: 'تخصص بین‌المللی',
-    descEn: 'Our team spans European legal systems, tax jurisdictions, banking regulations and immigration frameworks. Coordinated advice across borders.',
+    descEn: 'We organise cross-border facts, documents and risks, and coordinate jurisdiction-specific input where a matter requires local licensed counsel or another specialist.',
     descFa: 'تیم ما در نظام‌های حقوقی اروپایی، حوزه‌های مالیاتی، مقررات بانکی و چارچوب‌های مهاجرتی فعالیت دارد.',
     Icon: Globe,
   },
   {
-    titleEn: 'Senior-Led & Experienced',
+    titleEn: 'Named Professionals',
     titleFa: 'رهبری ارشد و تجربه‌شده',
-    descEn: 'Led by Reza Ostad, an international banking, compliance and immigration lawyer. Your matters are handled by experienced professionals, not junior staff.',
-    descFa: 'تحت رهبری رضا استاد، وکیل بین‌المللی متخصص در بانکداری، انطباق و مهاجرت. امور شما توسط متخصصین مجرب رسیدگی می‌شود.',
+    descEn: 'PLUCO GROUP identifies the professionals responsible for advisory, legal, documentation and coordination work, together with their stated roles and experience.',
+    descFa: 'PLUCO GROUP متخصصان مسئول امور مشاوره، حقوقی، مستندسازی و هماهنگی را همراه با نقش و تجربه اعلام‌شده آنان معرفی می‌کند.',
     Icon: Users,
   },
   {
@@ -41,15 +42,15 @@ const trustItems = [
     Icon: Briefcase,
   },
   {
-    titleEn: 'Outcome-Focused Results',
+    titleEn: 'Defined Scope & Process',
     titleFa: 'نتایج متمرکز بر اهداف',
-    descEn: 'We measure success by your success. Clear milestones, transparent communication, and documented outcomes on every engagement.',
-    descFa: 'موفقیت ما بر اساس موفقیت شما سنجیده می‌شود. سنگ‌نشان‌های واضح، ارتباط شفاف و نتایج مستندسازی شده در هر پروژه.',
+    descEn: 'A matter proceeds through written scope, document requirements, known risks and the appropriate professional handoff. No authority, bank or case outcome is guaranteed.',
+    descFa: 'هر موضوع با دامنه کتبی، مدارک مورد نیاز، ریسک‌های شناخته‌شده و ارجاع حرفه‌ای مناسب پیش می‌رود. نتیجه هیچ مرجع، بانک یا پرونده‌ای تضمین نمی‌شود.',
     Icon: CheckCircle2,
   },
 ];
 
-const cardVariants: any = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: (index: number) => ({
     opacity: 1,
@@ -97,8 +98,8 @@ export default function Trust() {
             style={{ color: '#5E6470', fontFamily: isRTL ? "'Vazirmatn', Tahoma, Arial, sans-serif" : undefined }}
           >
             {isRTL
-              ? 'ما خدمات حقوقی ارائه نمی‌دهیم — ما پشتیبانی استراتژیک، رازداری و محافظت دراز‌مدت برای خانواده‌ها و کارآفرینان بین‌المللی فراهم می‌کنیم.'
-              : 'We don\'t provide legal services—we provide strategic support, confidentiality and long-term protection for internationally mobile families and entrepreneurs.'}
+              ? 'PLUCO GROUP خدمات مشاوره و هماهنگی فرامرزی را در محدوده توافق کتبی ارائه می‌دهد. هرجا قانون یا موضوع نیازمند وکیل دارای مجوز محلی یا متخصص دیگری باشد، نقش و حوزه قضایی او پیش از شروع کار مشخص می‌شود.'
+              : 'PLUCO GROUP provides cross-border advisory and coordination within an agreed written scope. Where local law or the matter requires licensed counsel or another regulated specialist, that role and jurisdiction are identified before work begins.'}
           </p>
         </motion.div>
 

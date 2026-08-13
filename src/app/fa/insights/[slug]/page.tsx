@@ -47,8 +47,11 @@ export default async function PersianInsightPage({ params }: Props) {
         '@type': 'Article', '@id': `${url}#article`, headline: article.title.fa,
         description: article.description.fa, image: `${SITE_URL}${article.image}`,
         datePublished: article.publishedOn, dateModified: article.reviewedOn,
-        inLanguage: 'fa', author: { '@type': 'Organization', name: 'PLUCO GROUP' },
+        inLanguage: 'fa', author: { '@id': `${SITE_URL}/our-people/reza-ostad#person` },
+        reviewedBy: { '@id': `${SITE_URL}/#organization` },
         publisher: { '@id': `${SITE_URL}/#organization` }, mainEntityOfPage: url,
+        isPartOf: { '@id': `${SITE_URL}/#website` },
+        citation: article.sources.map((source) => source.url),
         translationOfWork: { '@id': `${englishUrl}#article` },
       },
       {

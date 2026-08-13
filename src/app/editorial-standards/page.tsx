@@ -43,7 +43,7 @@ const standards = [
   {
     title: 'Who prepares the guides',
     body:
-      'PLUCO GROUP prepares the public guides under its organisational name. A guide does not imply that an unnamed lawyer, regulator, bank, or public authority has approved it. When a named specialist materially reviews a future publication, that contribution should be identified accurately.',
+      'Public guides identify Reza Ostad as the principal author and PLUCO GROUP as the organisational reviewer unless a page states otherwise. A byline describes authorship, not approval by an unnamed lawyer, regulator, bank, or public authority. Any additional specialist who materially reviews a publication must be named only when that contribution is documented.',
   },
   {
     title: 'How sources are selected',

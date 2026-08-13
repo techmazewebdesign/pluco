@@ -40,6 +40,13 @@ const structuredData = {
         availableLanguage: ['English', 'Persian'],
       },
       description: SITE_DESCRIPTION,
+      founder: { '@id': `${SITE_URL}/our-people/reza-ostad#person` },
+      employee: [
+        { '@id': `${SITE_URL}/our-people/reza-ostad#person` },
+        { '@id': `${SITE_URL}/our-people/sara-rezaie#person` },
+        { '@id': `${SITE_URL}/our-people/mohammad-hossein-heidarpour#person` },
+        { '@id': `${SITE_URL}/our-people/holly-gilani#person` },
+      ],
     },
     {
       '@type': 'WebSite',

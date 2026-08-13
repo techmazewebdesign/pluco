@@ -47,8 +47,11 @@ export default async function EnglishInsightPage({ params }: Props) {
         '@type': 'Article', '@id': `${url}#article`, headline: article.title.en,
         description: article.description.en, image: `${SITE_URL}${article.image}`,
         datePublished: article.publishedOn, dateModified: article.reviewedOn,
-        inLanguage: 'en', author: { '@type': 'Organization', name: 'PLUCO GROUP' },
+        inLanguage: 'en', author: { '@id': `${SITE_URL}/our-people/reza-ostad#person` },
+        reviewedBy: { '@id': `${SITE_URL}/#organization` },
         publisher: { '@id': `${SITE_URL}/#organization` }, mainEntityOfPage: url,
+        isPartOf: { '@id': `${SITE_URL}/#website` },
+        citation: article.sources.map((source) => source.url),
       },
       {
         '@type': 'BreadcrumbList', itemListElement: [

@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { PLUCO_PEOPLE } from '@/lib/plucoPeople';
 import {
   ENGLISH_TO_PERSIAN_PATH,
   PERSIAN_SERVICES,
@@ -100,6 +101,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       };
     },
   );
+
+  const peoplePages: MetadataRoute.Sitemap = PLUCO_PEOPLE.map((person) => ({
+    url: `${BASE_URL}/our-people/${person.slug}`,
+    changeFrequency: 'monthly',
+    priority: 0.65,
+  }));
 
   const insightPages: MetadataRoute.Sitemap = PLUCO_INSIGHT_LIST.flatMap((article) => {
     const englishUrl = `${BASE_URL}/insights/${article.slug}`;
@@ -233,5 +240,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   ];
 
-  return [...englishPages, ...englishGuidePages, ...insightPages, ...persianPages];
+  return [...englishPages, ...peoplePages, ...englishGuidePages, ...insightPages, ...persianPages];
 }

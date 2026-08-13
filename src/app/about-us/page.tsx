@@ -40,13 +40,13 @@ export default function AboutUs() {
               </h2>
               <div className="space-y-4 text-gray-600 leading-relaxed">
                 <p>
-                  PLUCO GROUP SP. Z O.O. was founded with a clear vision: to provide sophisticated legal and commercial advisory services that bridge the gap between international legal frameworks and practical business needs.
+                  PLUCO GROUP SP. Z O.O. was founded to help internationally mobile clients organise complex legal, compliance and commercial decisions before they commit money, sign documents or begin a cross-border process.
                 </p>
                 <p>
-                  Based in Warsaw, Poland, we leverage our strategic European location to serve clients across international markets, combining deep legal expertise with commercial acumen to deliver solutions that are both legally sound and business-driven.
+                  Based in Warsaw, Poland, we provide cross-border advisory, documentation and professional coordination within a written scope. When local law or a matter requires licensed counsel or another regulated specialist, that role and jurisdiction are identified before the work begins.
                 </p>
                 <p>
-                  Our team brings together extensive experience in international law, commercial transactions, and cross-border regulatory compliance, enabling us to provide comprehensive support for complex business matters.
+                  Our named team brings together legal, compliance, documentation and international advisory experience. Public profiles explain each person’s stated role, languages and areas of work.
                 </p>
               </div>
             </motion.div>
@@ -62,7 +62,7 @@ export default function AboutUs() {
               </h2>
               <div className="space-y-4 text-gray-600 leading-relaxed">
                 <p>
-                  We are committed to providing exceptional legal and commercial advisory services that enable our clients to navigate complex international business environments with confidence and strategic advantage.
+                  Our mission is to give clients a clear, documented process for understanding the facts, evidence, risks and professional responsibilities around an international matter.
                 </p>
                 <p>
                   Our mission is built on three core principles:
@@ -77,7 +77,7 @@ export default function AboutUs() {
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-gold-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
                     <div>
-                      <strong className="text-navy-900">Commercial Precision:</strong> Business-focused solutions that align with our clients' strategic objectives.
+                      <strong className="text-navy-900">Commercial Precision:</strong> Business-focused solutions aligned with the documented objectives of each client.
                     </div>
                   </li>
                   <li className="flex items-start">
@@ -158,7 +158,7 @@ export default function AboutUs() {
               <div className="text-left">
                 <h3 className="text-xl font-semibold mb-4">Legal Entity</h3>
                 <p className="text-gray-300">Pluco Group Sp. z o.o.</p>
-                <p className="text-gray-300">Commercial & Legal Consultancy</p>
+                <p className="text-gray-300">Cross-Border Advisory & Professional Coordination</p>
                 <p className="text-gray-300">KRS: 0000564904</p>
               </div>
               <div className="text-left">

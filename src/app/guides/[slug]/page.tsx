@@ -88,11 +88,12 @@ export default async function EnglishGuidePage({ params }: Props) {
         dateModified: guide.reviewedOn,
         mainEntityOfPage: url,
         author: {
-          '@type': 'Organization',
-          '@id': `${SITE_URL}/#organization`,
-          name: 'PLUCO GROUP',
-          url: SITE_URL,
+          '@type': 'Person',
+          '@id': `${SITE_URL}/our-people/reza-ostad#person`,
+          name: 'Reza Ostad',
+          url: `${SITE_URL}/our-people/reza-ostad`,
         },
+        reviewedBy: { '@id': `${SITE_URL}/#organization` },
         publisher: { '@id': `${SITE_URL}/#organization` },
         isPartOf: { '@id': `${SITE_URL}/#website` },
         citation: guide.sources.map((source) => source.url),
@@ -125,8 +126,8 @@ export default async function EnglishGuidePage({ params }: Props) {
               <span>{guide.readTime}</span><span>·</span>
               <span>
                 Prepared by{' '}
-                <Link href="/editorial-standards" className="underline underline-offset-4">
-                  PLUCO GROUP
+                <Link href="/our-people/reza-ostad" className="underline underline-offset-4">
+                  Reza Ostad
                 </Link>
               </span><span>·</span>
               <span>Updated {guide.reviewedOn}</span>
@@ -160,6 +161,13 @@ export default async function EnglishGuidePage({ params }: Props) {
             >
               Check the {guide.sources.length} official {guide.sources.length === 1 ? 'source' : 'sources'} used for this guide
             </a>
+          </section>
+
+          <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 text-sm leading-7 text-slate-700">
+            <p className="font-black text-[#172033]">Authorship and review</p>
+            <p className="mt-2">
+              Prepared by <Link href="/our-people/reza-ostad" className="font-bold underline">Reza Ostad</Link> for PLUCO GROUP and reviewed under our <Link href="/editorial-standards" className="font-bold underline">editorial standards</Link>. Sources and material claims were checked on {guide.reviewedOn}. This organisational review is not approval by a government authority or unnamed local lawyer.
+            </p>
           </section>
 
           <div className="mt-10 grid gap-12">
