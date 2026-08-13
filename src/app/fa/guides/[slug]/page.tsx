@@ -19,12 +19,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   if (!isPersianGuideSlug(slug)) return {};
   const guide = PERSIAN_GUIDES[slug];
+  const metadataTitle = 'metadataTitle' in guide ? guide.metadataTitle : guide.title;
   const url = `${SITE_URL}/fa/guides/${slug}`;
   const englishUrl = 'englishPath' in guide && guide.englishPath
     ? `${SITE_URL}${guide.englishPath}`
     : undefined;
   return {
-    title: guide.title,
+    title: metadataTitle,
     description: guide.description,
     keywords: [guide.searchIntent, ...('keywords' in guide && guide.keywords ? guide.keywords : [])],
     alternates: {
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: guide.title,
+      title: metadataTitle,
       description: guide.description,
       url,
       locale: 'fa_IR',
@@ -50,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: guide.title,
+      title: metadataTitle,
       description: guide.description,
       images: [`${SITE_URL}${DEFAULT_SOCIAL_IMAGE}`],
     },

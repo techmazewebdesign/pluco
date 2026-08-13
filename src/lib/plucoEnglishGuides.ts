@@ -307,7 +307,7 @@ export const ENGLISH_GUIDES = {
     title: 'Buying Property in Spain as an Iranian National: Legal and Banking Checks',
     metadataTitle: 'Buying Property in Spain as an Iranian National',
     description:
-      'A preparation guide for Iranian buyers covering title review, contracts, tax identification, source of funds, payment routes, and the distinction between ownership and residence.',
+      'A guide for Iranian buyers covering title review, contracts, tax identification, source of funds, payment routes, and residence considerations.',
     searchIntent: 'buy property Spain Iranian national',
     keywords: [
       'Spain property purchase Iranian buyer',
@@ -368,7 +368,7 @@ export const ENGLISH_GUIDES = {
     title: 'Opening a European Bank Account as an Iranian National: Evidence Checklist',
     metadataTitle: 'EU Bank Accounts for Iranian Nationals: Evidence Guide',
     description:
-      'What Iranian nationals living internationally should prepare for lawful bank onboarding, including residence, tax, activity, source-of-funds, and expected-transaction evidence.',
+      'Evidence Iranian nationals living abroad should prepare for bank onboarding, including residence, tax, activity, source of funds and expected transactions.',
     searchIntent: 'open European bank account Iranian national',
     keywords: [
       'European bank account Iranian passport',

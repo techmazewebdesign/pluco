@@ -7,7 +7,7 @@ const url = `${SITE_URL}${path}`;
 const enUrl = `${SITE_URL}/iranian-clients`;
 
 export const metadata: Metadata = {
-  title: 'خدمات حقوقی، اقامتی و بانکی اروپا برای ایرانیان خارج از کشور',
+  title: 'خدمات اقامت و بانکداری اروپا برای ایرانیان',
   description: 'راهنمای انتخاب خدمات PLUCO GROUP برای اقامت اروپا، ثبت شرکت، امور بانکی، اثبات منبع سرمایه، قراردادها و خرید ملک برای ایرانیان.',
   alternates: { canonical: url, languages: { fa: url, en: enUrl, 'x-default': enUrl } },
   openGraph: {

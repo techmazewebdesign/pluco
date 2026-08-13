@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { createPageMetadata } from "@/lib/siteMetadata";
 
 const TITLE = "Spain Digital Nomad Visa";
-const DESCRIPTION = "Structured preparation, documentation coordination and legal partner handoff for the Spain Digital Nomad Visa — Bronze, Silver and Gold support packages for employees, freelancers, business owners and families.";
+const DESCRIPTION = "Spain Digital Nomad Visa preparation for employees, freelancers, founders and families, including document coordination and specialist handoff.";
 
 export const metadata: Metadata = createPageMetadata({
   title: TITLE,

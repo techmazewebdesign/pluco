@@ -4,11 +4,12 @@ import { ENGLISH_GUIDES } from '@/lib/plucoEnglishGuides';
 import { DEFAULT_SOCIAL_IMAGE, SITE_URL } from '@/lib/siteMetadata';
 
 const PAGE_URL = `${SITE_URL}/guides`;
+const PAGE_TITLE = 'Cross-Border Banking and Residency Guides';
 const PAGE_DESCRIPTION =
   'Source-led PLUCO GROUP guides for international banking, European residence, company formation, and property decisions.';
 
 export const metadata: Metadata = {
-  title: 'Cross-Border Banking, Residency, Company, and Property Guides',
+  title: PAGE_TITLE,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: PAGE_URL,
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Cross-Border Banking, Residency, Company, and Property Guides',
+    title: `${PAGE_TITLE} | PLUCO GROUP`,
     description: PAGE_DESCRIPTION,
     url: PAGE_URL,
     siteName: 'PLUCO GROUP',
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cross-Border Banking, Residency, Company, and Property Guides',
+    title: `${PAGE_TITLE} | PLUCO GROUP`,
     description: PAGE_DESCRIPTION,
     images: [`${SITE_URL}${DEFAULT_SOCIAL_IMAGE}`],
   },

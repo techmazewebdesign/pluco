@@ -24,11 +24,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!isPersianServiceSlug(slug)) return {};
 
   const service = PERSIAN_SERVICES[slug];
+  const metadataTitle = 'metadataTitle' in service ? service.metadataTitle : service.title;
   const persianUrl = `${SITE_URL}/fa/services/${slug}`;
   const englishUrl = `${SITE_URL}${service.englishPath}`;
 
   return {
-    title: service.title,
+    title: metadataTitle,
     description: service.description,
     keywords: [service.intent, service.canonicalService, 'مشاوره حقوقی فارسی زبان'],
     alternates: {
@@ -40,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: service.title,
+      title: metadataTitle,
       description: service.description,
       url: persianUrl,
       locale: 'fa_IR',
@@ -55,7 +56,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: service.title,
+      title: metadataTitle,
       description: service.description,
       images: [`${SITE_URL}${DEFAULT_SOCIAL_IMAGE}`],
     },

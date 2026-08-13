@@ -7,6 +7,7 @@ export type PersianService = {
   canonicalService: string;
   englishPath: string;
   shortTitle: string;
+  metadataTitle?: string;
   title: string;
   description: string;
   intent: string;
@@ -50,6 +51,7 @@ export const PERSIAN_SERVICES = {
     canonicalService: 'Spain Digital Nomad Visa / Remote Residency Support',
     englishPath: '/spain-digital-nomad-visa',
     shortTitle: 'دیجیتال نومد اسپانیا',
+    metadataTitle: 'ویزای دیجیتال نومد اسپانیا برای فارسی‌زبانان',
     title: 'بررسی و هماهنگی ویزای دیجیتال نومد اسپانیا برای فارسی‌زبانان',
     description: 'بررسی اولیه شرایط فعالیت دورکار، سابقه کاری، درآمد، قراردادها، بیمه و مدارک مورد نیاز پیش از شروع مسیر اقامت دیجیتال نومد اسپانیا.',
     intent: 'ویزای دیجیتال نومد اسپانیا برای ایرانیان',
@@ -63,6 +65,7 @@ export const PERSIAN_SERVICES = {
     canonicalService: 'EU Company Registration',
     englishPath: '/eu-company-registration',
     shortTitle: 'ثبت شرکت در اروپا',
+    metadataTitle: 'ثبت شرکت در اروپا برای ایرانیان',
     title: 'مشاوره ثبت شرکت در اروپا برای ایرانیان و کسب‌وکارهای فارسی‌زبان',
     description: 'بررسی کشور، ساختار شرکتی، فعالیت واقعی، مالیات، مدیریت، بانک و الزامات انطباق پیش از انتخاب محل ثبت شرکت در اروپا.',
     intent: 'ثبت شرکت در اروپا برای ایرانیان',
@@ -76,6 +79,7 @@ export const PERSIAN_SERVICES = {
     canonicalService: 'Banking & Compliance',
     englishPath: '/banking',
     shortTitle: 'بانک و انطباق',
+    metadataTitle: 'مشکلات بانکی و منبع وجوه برای ایرانیان خارج از کشور',
     title: 'مشاوره مشکلات بانکی، مسدودی حساب و منبع وجوه برای ایرانیان خارج از کشور',
     description: 'بررسی نامه بسته‌شدن یا محدودیت حساب، سازمان‌دهی منبع وجوه و منبع ثروت و آماده‌سازی پاسخ مستند برای ایرانیان و کسب‌وکارهای بین‌المللی.',
     intent: 'مشاوره مشکلات بانکی ایرانیان در اروپا',
@@ -102,6 +106,7 @@ export const PERSIAN_SERVICES = {
     canonicalService: 'International Mobility & Nationality Planning',
     englishPath: '/new-identity',
     shortTitle: 'برنامه‌ریزی تحرک',
+    metadataTitle: 'برنامه‌ریزی تحرک و تابعیت برای خانواده‌های ایرانی',
     title: 'برنامه‌ریزی تحرک بین‌المللی و وضعیت تابعیتی برای خانواده‌های ایرانی',
     description: 'سامان‌دهی وضعیت اقامتی، تابعیتی، خانوادگی و مدارک انطباق پیش از انتخاب مسیر یا هر تعهد مالی.',
     intent: 'برنامه ریزی تحرک بین المللی برای ایرانیان',
@@ -128,6 +133,7 @@ export const PERSIAN_SERVICES = {
     canonicalService: 'Cross-Border Dispute Resolution',
     englishPath: '/dispute-resolution',
     shortTitle: 'حل اختلاف',
+    metadataTitle: 'راهبرد حل اختلاف بین‌المللی برای ایرانیان',
     title: 'راهبرد حل اختلافات بین‌المللی برای اشخاص و کسب‌وکارهای ایرانی',
     description: 'بررسی اولیه اسناد، قرارداد، طرف‌ها، فوریت و حوزه‌های قضایی برای انتخاب میان مذاکره، اخطار رسمی، میانجی‌گری، داوری یا ارجاع به وکیل محلی.',
     intent: 'حل اختلاف بین المللی برای ایرانیان',

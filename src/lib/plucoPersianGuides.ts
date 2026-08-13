@@ -6,6 +6,7 @@ export type PersianGuideSection = {
 
 export type PersianGuide = {
   title: string;
+  metadataTitle?: string;
   description: string;
   searchIntent: string;
   keywords?: readonly string[];
@@ -21,6 +22,7 @@ export type PersianGuide = {
 export const PERSIAN_GUIDES = {
   'choose-eu-residency-route': {
     title: 'چگونه مسیر اقامت اروپا را متناسب با شرایط خود انتخاب کنیم؟',
+    metadataTitle: 'انتخاب مسیر اقامت اروپا برای ایرانیان',
     description: 'چارچوبی برای مقایسه مسیرهای اقامت اروپا بر اساس هدف، شغل، خانواده، بودجه، مدارک و کشور محل اقامت فعلی.',
     searchIntent: 'بهترین راه اقامت اروپا برای ایرانیان',
     englishPath: '/guides/choose-eu-residency-route',
@@ -59,6 +61,7 @@ export const PERSIAN_GUIDES = {
   },
   'spain-digital-nomad-document-checklist': {
     title: 'آماده‌سازی مدارک ویزای دیجیتال نومد اسپانیا: از قرارداد تا سابقه حرفه‌ای',
+    metadataTitle: 'چک‌لیست مدارک ویزای دیجیتال نومد اسپانیا',
     description: 'راهنمای مقدماتی سازمان‌دهی مدارک فعالیت دورکار، رابطه حرفه‌ای، درآمد، بیمه و خانواده پیش از بررسی ویزای دیجیتال نومد اسپانیا.',
     searchIntent: 'مدارک ویزای دیجیتال نومد اسپانیا',
     englishPath: '/guides/spain-digital-nomad-document-checklist',
@@ -128,6 +131,7 @@ export const PERSIAN_GUIDES = {
   },
   'source-of-funds-file': {
     title: 'پرونده منبع وجوه برای بانک‌های اروپایی چگونه آماده می‌شود؟',
+    metadataTitle: 'پرونده منبع وجوه برای بانک‌های اروپا',
     description: 'روش ساخت یک خط زمانی مستند برای توضیح منشأ پول، مسیر انتقال، مالکیت واقعی و ارتباط میان قراردادها و گردش حساب.',
     searchIntent: 'اثبات منبع پول برای بانک اروپا',
     englishPath: '/guides/source-of-funds-file',
@@ -163,6 +167,7 @@ export const PERSIAN_GUIDES = {
   },
   'bank-account-closure-iranians-europe': {
     title: 'مسدود شدن یا بسته شدن حساب بانکی ایرانیان در اروپا؛ راهنمای اقدام و اعتراض',
+    metadataTitle: 'بسته شدن حساب بانکی ایرانیان در اروپا؛ راهنمای اقدام',
     description: 'اگر بانک اروپایی حساب شما را محدود، مسدود یا در آستانه بسته‌شدن اعلام کرده است، این راهنما اقدامات فوری، مدارک منبع وجوه و مسیر ثبت اعتراض را توضیح می‌دهد.',
     searchIntent: 'مسدود شدن حساب بانکی ایرانیان در اروپا',
     keywords: [
@@ -258,6 +263,7 @@ export const PERSIAN_GUIDES = {
   },
   'poland-company-registration-iranian-founders': {
     title: 'ثبت شرکت در لهستان برای ایرانیان؛ ساختار، بانک و اقامت چه تفاوتی دارند؟',
+    metadataTitle: 'ثبت شرکت در لهستان برای ایرانیان؛ بانک و اقامت',
     description: 'راهنمای آماده‌سازی ثبت شرکت در لهستان برای بنیان‌گذاران ایرانی با تمرکز بر نوع شرکت، فعالیت واقعی، مالیات، مالکیت، حساب بانکی و وضعیت اقامت شخصی.',
     searchIntent: 'ثبت شرکت در لهستان برای ایرانیان',
     keywords: [
@@ -308,6 +314,7 @@ export const PERSIAN_GUIDES = {
   },
   'spain-property-purchase-iranian-buyers': {
     title: 'خرید ملک در اسپانیا برای ایرانیان؛ بررسی حقوقی، بانکی و منبع وجوه',
+    metadataTitle: 'خرید ملک در اسپانیا برای ایرانیان؛ راهنمای حقوقی',
     description: 'راهنمای مقدماتی خریداران ایرانی برای بررسی مالکیت، قرارداد، مالیات، شماره شناسایی، منبع وجوه و تفاوت خرید ملک با حق اقامت در اسپانیا.',
     searchIntent: 'خرید ملک در اسپانیا برای ایرانیان',
     keywords: [
@@ -358,6 +365,7 @@ export const PERSIAN_GUIDES = {
   },
   'eu-bank-account-opening-iranian-nationals': {
     title: 'افتتاح حساب بانکی در اروپا برای ایرانیان؛ چک‌لیست مدارک و انطباق',
+    metadataTitle: 'افتتاح حساب بانکی اروپا برای ایرانیان؛ مدارک لازم',
     description: 'مدارکی که ایرانیان مقیم خارج برای بررسی افتتاح حساب در اروپا باید درباره اقامت، مالیات، فعالیت، منبع درآمد، منبع وجوه و تراکنش‌های مورد انتظار آماده کنند.',
     searchIntent: 'افتتاح حساب بانکی اروپا برای ایرانیان',
     keywords: [
