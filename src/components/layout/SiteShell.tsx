@@ -15,6 +15,7 @@ const PORTAL_PREFIXES = [
   '/document-reviewer',
   '/compliance-officer',
   '/enquiry-handler',
+  '/sales-team',
   '/bookings'
 ];
 

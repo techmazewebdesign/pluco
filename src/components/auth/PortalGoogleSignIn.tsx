@@ -58,11 +58,16 @@ export default function PortalGoogleSignIn() {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
       const credential = await signInWithPopup(auth, provider);
+      const token = await credential.user.getIdToken();
+      const claim = await fetch('/api/sales-team/claim', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((response) => response.ok ? response.json() : null).catch(() => null);
       const destination = await resolveDestination(
         credential.user.uid,
         credential.user.email,
       );
-      router.push(destination);
+      router.push(destination === '/dashboard' && claim?.active ? '/sales-team/dashboard' : destination);
     } catch {
       setState('error');
     }

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
-import { LogOut, Users, FileText, MessageSquare, BarChart3, Bot, Zap, Shield, Menu, X, BookOpen, Calendar } from 'lucide-react';
+import { LogOut, Users, FileText, MessageSquare, BarChart3, Bot, Zap, Shield, Menu, X, BookOpen, Calendar, BriefcaseBusiness } from 'lucide-react';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { isAdminUser } from '@/lib/utils/adminUtils';
@@ -26,7 +26,6 @@ export default function AdminDashboard() {
   const [clients, setClients] = useState(0);
   const [leads, setLeads] = useState(0);
   const [cases, setCases] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showHelpPanel, setShowHelpPanel] = useState(false);
   const [tourCompleted, setTourCompleted] = useState(false);
@@ -94,7 +93,7 @@ export default function AdminDashboard() {
       } catch (error) {
         console.error('Error loading stats:', error);
       } finally {
-        setIsLoading(false);
+        // Dashboard remains usable even when an optional statistic is unavailable.
       }
     };
 
@@ -160,6 +159,7 @@ export default function AdminDashboard() {
     { titleEn: 'AI Agents', titleFa: 'AI عوامل', href: '/admin/dashboard/ai-agents', Icon: Bot },
     { titleEn: 'Consultants', titleFa: 'مشاورین', href: '/admin/dashboard/consultants', Icon: Users },
     { titleEn: 'User Management', titleFa: 'مدیریت کاربران', href: '/admin/dashboard/users', Icon: Shield },
+    { titleEn: 'Sales Team', titleFa: 'تیم فروش', href: '/sales-team/dashboard', Icon: BriefcaseBusiness },
     { titleEn: 'Training Manual', titleFa: 'راهنمای آموزش', href: '/admin/dashboard/training', Icon: BookOpen },
     { titleEn: 'Activity Logs', titleFa: 'سوابق فعالیت', href: '/admin/dashboard/consultant-activities', Icon: BarChart3 },
     { titleEn: 'Notifications', titleFa: 'اطلاعیه‌ها', href: '/admin/dashboard/notifications', Icon: MessageSquare },
@@ -171,6 +171,7 @@ export default function AdminDashboard() {
     { titleEn: 'AI Agents', titleFa: 'AI عوامل', href: '/admin/dashboard/ai-agents', Icon: Bot },
     { titleEn: 'Consultants', titleFa: 'مشاورین', href: '/admin/dashboard/consultants', Icon: Users },
     { titleEn: 'User Management', titleFa: 'مدیریت کاربران', href: '/admin/dashboard/users', Icon: Shield },
+    { titleEn: 'Sales Team', titleFa: 'تیم فروش', href: '/sales-team/dashboard', Icon: BriefcaseBusiness },
     { titleEn: 'Training Manual', titleFa: 'راهنمای آموزش', href: '/admin/dashboard/training', Icon: BookOpen },
   ];
 
@@ -310,7 +311,7 @@ export default function AdminDashboard() {
                 <BookOpen className="w-5 h-5" style={{ color: '#5E6470' }} />
               </button>
               <GuideMeButton
-                onClick={() => (window as any).__dashboardTour?.reopenTour?.()}
+                onClick={() => (window as Window & { __dashboardTour?: { reopenTour?: () => void } }).__dashboardTour?.reopenTour?.()}
                 tourCompleted={tourCompleted}
               />
               <RoleBadge role="admin" email={user?.email} size="sm" />
