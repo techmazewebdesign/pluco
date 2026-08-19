@@ -106,6 +106,11 @@ export default function PlucoSalesDashboard() {
           <div className="mt-7 grid gap-3 sm:grid-cols-3"><Metric label="Active team" value={String(data.team.length)}/><Metric label="Your available codes" value={String(data.codes.filter(code=>code.status==='available').length)}/><Metric label="Pending invitations" value={String(data.invitations.filter(item=>item.status==='pending').length)}/></div>
         </section>
 
+        <section className="mt-7 grid items-center gap-5 overflow-hidden rounded-[24px] border border-[#dbc58d]/50 bg-white p-5 shadow-[0_18px_55px_rgba(7,28,60,.07)] lg:grid-cols-[.72fr_1.28fr] lg:p-7" aria-label="PLUCO Sales Team video guide">
+          <div><p className="text-xs font-black uppercase tracking-[.14em] text-[#9a762f]">Start here</p><h2 className="mt-2 text-2xl font-bold text-[#071c3c]">How the PLUCO Sales Team works</h2><p className="mt-3 text-sm leading-7 text-slate-600">A clear walkthrough of invitations, approved materials, proposal-code rules, global outreach, measurement, and the administrator hand-off.</p><p className="mt-3 text-xs leading-6 text-slate-400">The example screens contain no private client data.</p></div>
+          <video className="aspect-video w-full rounded-2xl bg-[#071c3c] shadow-lg" controls preload="metadata" playsInline src="/training/pluco-sales-team-tour.mp4">Your browser does not support the Sales Team tutorial video.</video>
+        </section>
+
         {error ? <div role="alert" className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div> : null}
 
         <section id="prospects" className="mt-7 grid gap-5 xl:grid-cols-[1.15fr_.85fr]">
