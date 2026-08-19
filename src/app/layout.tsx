@@ -7,6 +7,7 @@ import RTLWrapper from "@/components/shared/RTLWrapper";
 import SiteShell from "@/components/layout/SiteShell";
 import ChatbotWidget from "@/components/chatbot/ChatbotWidget";
 import ConsentManager from "@/components/privacy/ConsentManager";
+import { DesivoVisualContent } from "@/components/DesivoVisualContent";
 import {
   createPageMetadata,
   SITE_DESCRIPTION,
@@ -57,6 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <SiteShell>
                   {children}
                 </SiteShell>
+                <DesivoVisualContent />
                 <ConsentManager />
               </RTLWrapper>
             </LanguageProvider>
