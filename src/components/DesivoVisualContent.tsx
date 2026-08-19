@@ -31,6 +31,7 @@ function applyPatch(patch: Patch): boolean {
     if (image && patch.clone?.assetPath) { image.src = `${ASSET}?path=${encodeURIComponent(patch.clone.assetPath)}`; image.alt = patch.clone.alt || ''; }
     element.after(clone);
   }
+  element.dataset.desivoManaged = 'true';
   return true;
 }
 
