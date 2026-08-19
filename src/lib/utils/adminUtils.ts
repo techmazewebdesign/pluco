@@ -16,6 +16,7 @@ interface UserProfile {
 const ALLOWED_ADMIN_EMAILS = [
   'desivo.de@gmail.com',
   'techmazewebdesign@gmail.com',
+  'sara.rezai9031@gmail.com',
 ];
 
 /**
