@@ -204,7 +204,8 @@ service cloud.firestore {
       // Nested messages subcollection
       match /messages/{messageId} {
         // Customer service can read messages in sessions they can read
-        allow read: if isCustomerService() && parent.resource.data.source == 'faq-chatbot';
+        allow read: if isCustomerService()
+          && get(/databases/$(database)/documents/chatSessions/$(sessionId)).data.source == 'faq-chatbot';
 
         // Admins can read/write all messages
         allow read, write: if isAdmin();
