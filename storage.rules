@@ -2,6 +2,8 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     function isSignedIn() { return request.auth != null; }
+    function isAdmin() { return isSignedIn() && request.auth.token.role == 'admin'; }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
 
     // ========== CONSULTANT PHOTOS ==========
     // Public read (signed URLs have tokens for security)
@@ -14,7 +16,12 @@ service firebase.storage {
     // Readable with signed URLs containing tokens
     match /profiles/{uid}/{fileName} {
       allow read: if true;  // Signed URL token provides security
-      allow write, delete: if isSignedIn();
+      allow write, delete: if isOwner(uid) || isAdmin();
+    }
+
+    // ========== CLIENT DOCUMENTS ==========
+    match /documents/{uid}/{allPaths=**} {
+      allow read, write, delete: if isOwner(uid) || isAdmin();
     }
 
     // ========== DEFAULT DENY ==========

@@ -7,6 +7,10 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
     function isAdmin() {
       return isSignedIn() && request.auth.token.role == 'admin';
     }
@@ -31,6 +35,80 @@ service cloud.firestore {
       // Users can read/write their own document
       allow read: if isSignedIn() && request.auth.uid == userId;
       allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ========== CLIENT PORTAL DATA ==========
+    // Portal records are partitioned by Firebase UID. A client can access only
+    // their own workspace; administrators retain operational access.
+    match /clients/{userId} {
+      allow read, create, update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+
+      match /family/{memberId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    match /cases/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /messages/{userId}/thread/{messageId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId)
+        && request.resource.data.from == 'client';
+      allow update, delete: if isAdmin();
+    }
+
+    match /invoices/{userId}/items/{invoiceId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /documents/{userId}/files/{documentId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId)
+        && request.resource.data.clientUid == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    match /notifications/{userId}/items/{notificationId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow update: if isOwner(userId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow create, delete: if isAdmin();
+    }
+
+    match /tickets/{ticketId} {
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.clientUid == request.auth.uid);
+      allow create: if isSignedIn()
+        && request.resource.data.clientUid == request.auth.uid;
+      allow update: if isAdmin()
+        || (isSignedIn()
+          && resource.data.clientUid == request.auth.uid
+          && request.resource.data.clientUid == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['unreadClient', 'unreadAgent', 'updatedAt', 'status']));
+      allow delete: if isAdmin();
+
+      match /messages/{messageId} {
+        allow read: if isAdmin()
+          || (isSignedIn()
+            && get(/databases/$(database)/documents/tickets/$(ticketId)).data.clientUid == request.auth.uid);
+        allow create: if isSignedIn()
+          && get(/databases/$(database)/documents/tickets/$(ticketId)).data.clientUid == request.auth.uid
+          && request.resource.data.senderUid == request.auth.uid
+          && request.resource.data.from == 'client';
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    match /consultation_bookings/{bookingId} {
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.clientUid == request.auth.uid);
+      allow write: if isAdmin();
     }
 
     // ========== CUSTOMER SERVICE PROFILES ==========
