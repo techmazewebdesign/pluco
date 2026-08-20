@@ -49,6 +49,8 @@ export default function TourOverlay({
   useEffect(() => {
     if (!isActive || !selector) return;
 
+    let repositionTimer: ReturnType<typeof setTimeout> | undefined;
+
     const updateHighlight = () => {
       const element = document.querySelector(selector);
       if (!element) {
@@ -57,12 +59,16 @@ export default function TourOverlay({
       }
 
       const rect = element.getBoundingClientRect();
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
+      const outsideViewport = rect.top < 16 || rect.bottom > window.innerHeight - 16;
+      if (outsideViewport) {
+        element.scrollIntoView({ block: 'center', inline: 'nearest' });
+        repositionTimer = setTimeout(updateHighlight, 250);
+        return;
+      }
 
       const highlightData = {
-        top: rect.top + scrollTop - highlightPadding,
-        left: rect.left + scrollLeft - highlightPadding,
+        top: rect.top - highlightPadding,
+        left: rect.left - highlightPadding,
         width: rect.width + highlightPadding * 2,
         height: rect.height + highlightPadding * 2,
       };
@@ -86,7 +92,7 @@ export default function TourOverlay({
       }
 
       setCardPosition({
-        top: Math.max(10, cardTop),
+        top: Math.max(10, Math.min(cardTop, window.innerHeight - 300)),
         left: Math.max(10, Math.min(cardLeft, window.innerWidth - 320)),
       });
     };
@@ -96,6 +102,7 @@ export default function TourOverlay({
     window.addEventListener('scroll', updateHighlight);
 
     return () => {
+      if (repositionTimer) clearTimeout(repositionTimer);
       window.removeEventListener('resize', updateHighlight);
       window.removeEventListener('scroll', updateHighlight);
     };
