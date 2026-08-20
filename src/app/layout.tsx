@@ -8,6 +8,7 @@ import SiteShell from "@/components/layout/SiteShell";
 import ChatbotWidget from "@/components/chatbot/ChatbotWidget";
 import ConsentManager from "@/components/privacy/ConsentManager";
 import { DesivoVisualContent } from "@/components/DesivoVisualContent";
+import GoogleOneTap from "@/components/auth/GoogleOneTap";
 import {
   createPageMetadata,
   SITE_DESCRIPTION,
@@ -16,6 +17,9 @@ import {
 } from "@/lib/siteMetadata";
 
 const defaultPageMetadata = createPageMetadata();
+const GOOGLE_ONE_TAP_CLIENT_ID = process.env.GOOGLE_ONE_TAP_CLIENT_ID
+  ?? process.env.NEXT_PUBLIC_GOOGLE_ONE_TAP_CLIENT_ID
+  ?? "591351934366-jo1l9776q7q0v4pq8vjg7japh768cjsf.apps.googleusercontent.com";
 
 export const metadata: Metadata = {
   ...defaultPageMetadata,
@@ -52,6 +56,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <body className="min-h-full">
         <AuthProvider>
+          <GoogleOneTap
+            clientId={GOOGLE_ONE_TAP_CLIENT_ID}
+          />
           <AgentProvider>
             <LanguageProvider>
               <RTLWrapper>

@@ -60,3 +60,15 @@ export async function resolvePortalDestination(user: User) {
 
   return '/dashboard';
 }
+
+export async function resolveGooglePortalDestination(user: User) {
+  await ensurePortalUser(user);
+  const token = await user.getIdToken();
+  const claim = await fetch('/api/sales-team/claim', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((response) => response.ok ? response.json() as Promise<{ active?: boolean }> : null)
+    .catch(() => null);
+  const destination = await resolvePortalDestination(user);
+  return destination === '/dashboard' && claim?.active ? '/sales-team/dashboard' : destination;
+}

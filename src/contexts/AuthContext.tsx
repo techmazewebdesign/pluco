@@ -72,6 +72,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     clearError();
     window.sessionStorage.setItem('pluco-logout', '1');
+    window.sessionStorage.setItem('pluco-one-tap-suppressed', '1');
+    window.google?.accounts?.id.disableAutoSelect();
     await firebaseSignOut(auth);
     window.location.replace('/');
     await new Promise<void>(() => undefined);

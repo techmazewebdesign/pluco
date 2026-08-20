@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { auth } from '@/lib/firebase';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { ensurePortalUser, resolvePortalDestination } from '@/lib/authRouting';
+import { resolveGooglePortalDestination } from '@/lib/authRouting';
 
 export default function PortalGoogleSignIn() {
   const router = useRouter();
@@ -20,14 +20,7 @@ export default function PortalGoogleSignIn() {
     if (loading || !user) return;
     void (async () => {
       try {
-        await ensurePortalUser(user);
-        const token = await user.getIdToken();
-        const claim = await fetch('/api/sales-team/claim', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-        }).then((response) => response.ok ? response.json() : null).catch(() => null);
-        const destination = await resolvePortalDestination(user);
-        router.replace(destination === '/dashboard' && claim?.active ? '/sales-team/dashboard' : destination);
+        router.replace(await resolveGooglePortalDestination(user));
       } catch {
         setState('error');
       }
@@ -40,9 +33,7 @@ export default function PortalGoogleSignIn() {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
       const credential = await signInWithPopup(auth, provider);
-      await ensurePortalUser(credential.user);
-      const destination = await resolvePortalDestination(credential.user);
-      router.replace(destination);
+      router.replace(await resolveGooglePortalDestination(credential.user));
     } catch {
       setState('error');
     }
