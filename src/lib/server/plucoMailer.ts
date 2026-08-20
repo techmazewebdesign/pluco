@@ -27,7 +27,7 @@ export async function sendPlucoEmail(options: { to: string; subject: string; htm
     }
   }
   if (process.env.RESEND_API_KEY) {
-    const result = await new Resend(process.env.RESEND_API_KEY).emails.send({ ...options, from: process.env.RESEND_FROM || FROM, replyTo: 'info@plucogroup.com' });
+    const result = await new Resend(process.env.RESEND_API_KEY).emails.send({ ...options, from: FROM, replyTo: 'info@plucogroup.com' });
     if (result.error) throw new Error('PLUCO email delivery failed. Check the verified sender configuration.');
     return { id: result.data?.id || '', transport: 'resend' as const };
   }

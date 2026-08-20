@@ -22,6 +22,10 @@ export default function UsersPage() {
       router.push('/login');
       return;
     }
+    if (isAdminUser({ email: user.email || '' })) {
+      queueMicrotask(() => setIsAdmin(true));
+      return;
+    }
     void (async () => {
       try {
         const snapshot = await getDoc(doc(db, 'users', user.uid));
