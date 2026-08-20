@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { auth } from '@/lib/firebase';
@@ -39,7 +39,10 @@ export default function PortalGoogleSignIn() {
     try {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
-      await signInWithRedirect(auth, provider);
+      const credential = await signInWithPopup(auth, provider);
+      await ensurePortalUser(credential.user);
+      const destination = await resolvePortalDestination(credential.user);
+      router.replace(destination);
     } catch {
       setState('error');
     }
