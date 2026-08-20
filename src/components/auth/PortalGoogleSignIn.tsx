@@ -1,73 +1,45 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
 import { Loader2 } from 'lucide-react';
-import { auth, db } from '@/lib/firebase';
+import Link from 'next/link';
+import { auth } from '@/lib/firebase';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-const ROLE_ROUTES: Record<string, string> = {
-  admin: '/admin/dashboard',
-  consultant: '/consultant/dashboard',
-  case_manager: '/case-manager/dashboard',
-  customer_service: '/customer-service/dashboard',
-  document_reviewer: '/document-reviewer/dashboard',
-  compliance_officer: '/compliance-officer/dashboard',
-  enquiry_handler: '/enquiry-handler/dashboard',
-  user: '/dashboard',
-  client: '/dashboard',
-};
-
-async function resolveDestination(uid: string, email: string | null) {
-  const normalizedEmail = email?.toLowerCase() || '';
-  const references = [
-    doc(db, 'agents', uid),
-    ...(normalizedEmail ? [doc(db, 'agents', normalizedEmail)] : []),
-    doc(db, 'users', uid),
-    ...(normalizedEmail ? [doc(db, 'users', normalizedEmail)] : []),
-  ];
-
-  for (const reference of references) {
-    try {
-      const snapshot = await getDoc(reference);
-      if (snapshot.exists()) {
-        const data = snapshot.data();
-        const role = data.is_admin === true || data.isAdmin === true
-          ? 'admin'
-          : String(data.role || 'user').toLowerCase();
-        return ROLE_ROUTES[role] || '/dashboard';
-      }
-    } catch {
-      // Continue to the next known profile location.
-    }
-  }
-
-  return '/dashboard';
-}
+import { useAuth } from '@/contexts/AuthContext';
+import { ensurePortalUser, resolvePortalDestination } from '@/lib/authRouting';
 
 export default function PortalGoogleSignIn() {
   const router = useRouter();
   const { isRTL } = useLanguage();
+  const { user, loading } = useAuth();
   const [state, setState] = useState<'idle' | 'loading' | 'error'>('idle');
+
+  useEffect(() => {
+    if (loading || !user) return;
+    void (async () => {
+      try {
+        await ensurePortalUser(user);
+        const token = await user.getIdToken();
+        const claim = await fetch('/api/sales-team/claim', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        }).then((response) => response.ok ? response.json() : null).catch(() => null);
+        const destination = await resolvePortalDestination(user);
+        router.replace(destination === '/dashboard' && claim?.active ? '/sales-team/dashboard' : destination);
+      } catch {
+        setState('error');
+      }
+    })();
+  }, [loading, router, user]);
 
   async function signIn() {
     setState('loading');
     try {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
-      const credential = await signInWithPopup(auth, provider);
-      const token = await credential.user.getIdToken();
-      const claim = await fetch('/api/sales-team/claim', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      }).then((response) => response.ok ? response.json() : null).catch(() => null);
-      const destination = await resolveDestination(
-        credential.user.uid,
-        credential.user.email,
-      );
-      router.push(destination === '/dashboard' && claim?.active ? '/sales-team/dashboard' : destination);
+      await signInWithRedirect(auth, provider);
     } catch {
       setState('error');
     }
@@ -105,6 +77,12 @@ export default function PortalGoogleSignIn() {
             : 'Sign-in was not completed. Try again or contact your case team.'}
         </p>
       ) : null}
+      <p className="mt-4 text-center text-xs text-slate-500">
+        {isRTL ? 'یا با ایمیل ادامه دهید: ' : 'Or continue with email: '}
+        <Link className="font-bold text-[#071C3C] underline" href="/login">{isRTL ? 'ورود' : 'Sign in'}</Link>
+        {' · '}
+        <Link className="font-bold text-[#071C3C] underline" href="/signup">{isRTL ? 'ثبت‌نام' : 'Sign up'}</Link>
+      </p>
     </div>
   );
 }
