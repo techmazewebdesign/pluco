@@ -225,9 +225,12 @@ service cloud.firestore {
       }
     }
 
-    // ========== DEFAULT DENY ==========
+    // ========== ADMIN FALLBACK / DEFAULT DENY ==========
+    // Approved administrators manage several operational collections used by
+    // the dashboard. Everyone else remains denied unless a narrower rule above
+    // explicitly grants access.
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if isAdmin();
     }
   }
 }
