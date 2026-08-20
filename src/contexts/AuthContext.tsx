@@ -38,9 +38,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
+      if (!u && window.sessionStorage.getItem('pluco-logout') === '1') {
+        window.location.replace('/');
+        return;
+      }
       setUser(u);
       setLoading(false);
     });
+    if (window.location.pathname === '/') {
+      window.sessionStorage.removeItem('pluco-logout');
+    }
     return unsubscribe;
   }, []);
 
@@ -62,8 +69,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ── Sign Out ───────────────────────────────────────────────────────
   const signOut = async () => {
     clearError();
+    window.sessionStorage.setItem('pluco-logout', '1');
     await firebaseSignOut(auth);
     window.location.replace('/');
+    await new Promise<void>(() => undefined);
   };
 
   return (
