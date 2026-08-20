@@ -24,8 +24,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!user) return;
     const checkAdmin = async () => {
       try {
-        const snap = await getDoc(doc(db, 'agents', user.uid));
-        if (snap.exists() && snap.data()?.role === 'admin') {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        const profile = snap.data();
+        if (snap.exists() && (profile?.role === 'admin' || profile?.isAdmin === true || profile?.is_admin === true)) {
           setIsAdmin(true);
           router.push('/admin/dashboard');
           return;
