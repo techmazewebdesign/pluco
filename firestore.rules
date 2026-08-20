@@ -12,7 +12,17 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isSignedIn() && request.auth.token.role == 'admin';
+      return isSignedIn() && (
+        request.auth.token.role == 'admin'
+        || (
+          request.auth.token.email != null
+          && request.auth.token.email in [
+            'desivo.de@gmail.com',
+            'techmazewebdesign@gmail.com',
+            'sara.rezai9031@gmail.com'
+          ]
+        )
+      );
     }
 
     function isCustomerService() {
