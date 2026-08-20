@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useDashboardTour } from '@/lib/hooks/useDashboardTour';
 import { DashboardTour, DashboardRole } from '@/lib/types/dashboardTour';
 import TourWelcomeModal from './TourWelcomeModal';
@@ -14,6 +14,7 @@ interface DashboardTourProviderProps {
   onTourStart?: () => void;
   onTourExit?: () => void;
   onTourFinish?: () => void;
+  language?: 'en' | 'fa';
 }
 
 export default function DashboardTourProvider({
@@ -24,6 +25,7 @@ export default function DashboardTourProvider({
   onTourStart,
   onTourExit,
   onTourFinish,
+  language = 'en',
 }: DashboardTourProviderProps) {
   const {
     currentStep,
@@ -44,19 +46,18 @@ export default function DashboardTourProvider({
     reopenTour,
   } = useDashboardTour(userId, tour.id, userRole, tour.steps);
 
-  // Expose reopen method via window for external access
-  if (typeof window !== 'undefined') {
-    (window as any).__reopenTour = reopenTour;
-    console.log('[Tour] DashboardTourProvider initialized:', {
-      tourId: tour.id,
-      userId,
-      userRole,
-      showWelcome,
-      isActive,
-      isLoading,
-      totalSteps,
-    });
-  }
+  useEffect(() => {
+    const tourWindow = window as Window & {
+      __reopenTour?: () => void;
+      __dashboardTour?: { reopenTour: () => void; startTour: () => void };
+    };
+    tourWindow.__reopenTour = reopenTour;
+    tourWindow.__dashboardTour = { reopenTour, startTour: reopenTour };
+    return () => {
+      delete tourWindow.__reopenTour;
+      delete tourWindow.__dashboardTour;
+    };
+  }, [reopenTour]);
 
   if (isLoading) {
     return <>{children}</>;
@@ -87,6 +88,7 @@ export default function DashboardTourProvider({
         onContinue={handleTourStart}
         onExit={handleTourExit}
         onDoNotShowAgain={setDoNotShowAgain}
+        language={language}
       />
 
       {/* Tour Overlay */}
@@ -107,20 +109,7 @@ export default function DashboardTourProvider({
           onExit={handleTourExit}
           onFinish={handleTourFinish}
           onRestart={restartTour}
-        />
-      )}
-
-      {/* Expose controls for external use */}
-      {typeof window !== 'undefined' && (
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.__dashboardTour = {
-                reopenTour: () => window.__reopenTour?.(),
-                startTour: () => window.__reopenTour?.(),
-              };
-            `,
-          }}
+          language={language}
         />
       )}
 

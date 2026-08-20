@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
 import { getAdminAuth, getAdminDb } from '@/lib/firebase-admin';
-
-// Initialize Resend if API key is available
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+import { sendPlucoEmail } from '@/lib/server/plucoMailer';
 
 const SIGNUP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.plucogroup.com';
 
@@ -151,31 +148,20 @@ If you have any questions, contact: support@plucogroup.com
 © 2024 PLUCO GROUP
     `;
 
-    // Send email via Resend
-    if (!resend) {
-      throw new Error('Email service not configured. Please set RESEND_API_KEY environment variable.');
-    }
-
-    const emailResult = await resend.emails.send({
-      from: process.env.RESEND_FROM || 'PLUCO GROUP <noreply@plucogroup.com>',
+    const emailResult = await sendPlucoEmail({
       to: email,
       subject: `Invitation to Join PLUCO GROUP as ${roleDisplay}`,
       html: htmlContent,
       text: textContent,
     });
 
-    if (emailResult.error) {
-      console.error('Resend email error:', emailResult.error);
-      throw new Error(`Failed to send email: ${emailResult.error.message}`);
-    }
-
-    console.log('Invitation email sent to:', email, 'Message ID:', emailResult.data?.id);
+    console.log('Invitation email sent to:', email, 'Message ID:', emailResult.id);
 
     return NextResponse.json({
       success: true,
       message: `Invitation email sent to ${email}`,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error sending invitation email:', error);
 
     // Even if email fails, don't block user creation
@@ -183,7 +169,7 @@ If you have any questions, contact: support@plucogroup.com
       {
         success: false,
         message: 'User created but failed to send invitation email',
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown email delivery error',
       },
       { status: 500 }
     );

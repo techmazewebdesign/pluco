@@ -13,10 +13,11 @@ import Link from 'next/link';
 import NotificationDropdown from '@/components/admin/NotificationDropdown';
 import RoleBadge from '@/components/shared/RoleBadge';
 import DashboardTourProvider from '@/components/tour/DashboardTourProvider';
-import { adminDashboardTour } from '@/lib/tours/adminDashboardTour';
+import { adminDashboardTour, adminDashboardTourFa } from '@/lib/tours/adminDashboardTour';
 import GuideMeButton from '@/components/tour/GuideMeButton';
 import HelpPanel from '@/components/tour/HelpPanel';
 import ConsultationRequestsSection from '@/components/admin/ConsultationRequestsSection';
+import EmailConnectionCard from '@/components/admin/EmailConnectionCard';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -31,6 +32,9 @@ export default function AdminDashboard() {
   const [tourCompleted, setTourCompleted] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
+  const isSara = user?.email?.trim().toLowerCase() === 'sara.rezai9031@gmail.com';
+  const [persianOverride, setPersianOverride] = useState<boolean | null>(null);
+  const persianAdmin = persianOverride ?? isSara;
 
   // Check if user is logged in and is admin
   useEffect(() => {
@@ -304,6 +308,13 @@ export default function AdminDashboard() {
             </h1>
             <div className="flex items-center gap-3">
               <button
+                onClick={() => setPersianOverride(!persianAdmin)}
+                className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-black text-[#071C3C]"
+                aria-label="Switch admin guide language"
+              >
+                {persianAdmin ? 'EN' : 'فارسی'}
+              </button>
+              <button
                 onClick={() => setShowHelpPanel(true)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors hidden sm:block"
                 title="View help panel"
@@ -324,14 +335,18 @@ export default function AdminDashboard() {
 
         {/* Main Content */}
         <main className="flex-1 px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-          <section className="mb-8 grid items-center gap-5 overflow-hidden rounded-2xl border border-[#D7BF83]/50 bg-white p-5 shadow-md lg:grid-cols-[.72fr_1.28fr] lg:p-7" aria-label="PLUCO admin dashboard video guide">
+          <EmailConnectionCard />
+          <section className="mb-8 grid items-center gap-5 overflow-hidden rounded-2xl border border-[#D7BF83]/50 bg-white p-5 shadow-md lg:grid-cols-[.72fr_1.28fr] lg:p-7" aria-label="PLUCO admin dashboard video guide" dir={persianAdmin ? 'rtl' : 'ltr'}>
             <div>
-              <p className="text-xs font-black uppercase tracking-[.14em]" style={{ color: '#9A762F' }}>Admin video guide</p>
-              <h2 className="mt-2 text-2xl font-bold" style={{ color: '#071C3C' }}>Run clients, follow-up, roles and Sales Team hand-offs</h2>
-              <p className="mt-3 text-sm leading-7" style={{ color: '#5E6470' }}>Start with the overview, import a clean client CSV, keep the next action current, protect private case access, and use Desivo when website content needs editing.</p>
-              <p className="mt-3 text-xs" style={{ color: '#8A93A0' }}>Narrated in clear American English. No private client records are shown.</p>
+              <p className="text-xs font-black uppercase tracking-[.14em]" style={{ color: '#9A762F' }}>{persianAdmin ? 'راهنمای ویدیویی مدیریت' : 'Admin video guide'}</p>
+              <h2 className="mt-2 text-2xl font-bold" style={{ color: '#071C3C' }}>{persianAdmin ? 'مدیریت موکلان، پیگیری‌ها، نقش‌ها و تیم فروش' : 'Run clients, follow-up, roles and Sales Team hand-offs'}</h2>
+              <p className="mt-3 text-sm leading-7" style={{ color: '#5E6470' }}>{persianAdmin ? 'از نمای کلی شروع کنید، موکلان قدیمی را دستی یا با فایل CSV وارد کنید، اقدام بعدی را ثبت کنید و دسترسی پرونده‌ها را محرمانه نگه دارید.' : 'Start with the overview, import a clean client CSV, keep the next action current, protect private case access, and use Desivo when website content needs editing.'}</p>
+              <p className="mt-3 text-xs" style={{ color: '#8A93A0' }}>{persianAdmin ? 'روایت و زیرنویس فارسی است. هیچ اطلاعات واقعی موکلان در ویدیو نمایش داده نمی‌شود.' : 'Narrated in clear American English. No private client records are shown.'}</p>
             </div>
-            <video className="aspect-video w-full rounded-2xl bg-[#071C3C] shadow-lg" controls preload="metadata" playsInline src="/training/pluco-admin-dashboard-tour.mp4">Your browser does not support the admin tutorial video.</video>
+            <video key={persianAdmin ? 'fa' : 'en'} className="aspect-video w-full rounded-2xl bg-[#071C3C] shadow-lg" controls preload="metadata" playsInline src={persianAdmin ? '/training/pluco-admin-dashboard-tour-fa.mp4' : '/training/pluco-admin-dashboard-tour.mp4'}>
+              {persianAdmin ? <track kind="captions" src="/training/pluco-admin-dashboard-tour-fa.vtt" srcLang="fa" label="فارسی" default /> : null}
+              {persianAdmin ? 'مرورگر شما از ویدیوی آموزشی پشتیبانی نمی‌کند.' : 'Your browser does not support the admin tutorial video.'}
+            </video>
           </section>
 
           {/* Stats Grid */}
@@ -445,7 +460,8 @@ export default function AdminDashboard() {
       <DashboardTourProvider
         userId={user?.uid}
         userRole="admin"
-        tour={adminDashboardTour}
+        tour={persianAdmin ? adminDashboardTourFa : adminDashboardTour}
+        language={persianAdmin ? 'fa' : 'en'}
         onTourStart={() => {
           setTourCompleted(false);
         }}

@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { DashboardGuideProgress, DashboardRole, TourStep } from '@/lib/types/dashboardTour';
 
@@ -21,7 +21,7 @@ export function useDashboardTour(
 
     if (!userId) {
       console.log('[useDashboardTour] No userId, skipping load');
-      setIsLoading(false);
+      queueMicrotask(() => setIsLoading(false));
       return;
     }
 
@@ -33,6 +33,28 @@ export function useDashboardTour(
         if (progressSnap.exists()) {
           const progressData = progressSnap.data() as DashboardGuideProgress;
           console.log('[useDashboardTour] Found existing progress:', progressData);
+
+          if (progressData.tourId !== tourId) {
+            const nextProgress: DashboardGuideProgress = {
+              userId,
+              role,
+              tourId,
+              tourCompleted: false,
+              tourExited: false,
+              doNotShowAgain: false,
+              currentStep: 0,
+              lastViewedStep: 0,
+              completedTours: progressData.completedTours || [],
+              exitedTours: progressData.exitedTours || [],
+              updatedAt: new Date().toISOString(),
+            };
+            setProgress(nextProgress);
+            setCurrentStep(0);
+            setIsActive(false);
+            setShowWelcome(true);
+            return;
+          }
+
           setProgress(progressData);
 
           // Show welcome if: tour not completed, not exited, and not "do not show again"
@@ -145,7 +167,7 @@ export function useDashboardTour(
         ? [...progress.completedTours, tourId]
         : [tourId],
     });
-  }, [tourId, steps.length, progress?.completedTours, saveProgress]);
+  }, [tourId, steps.length, progress, saveProgress]);
 
   const restartTour = useCallback(() => {
     setCurrentStep(0);

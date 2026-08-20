@@ -106,3 +106,31 @@ export const adminDashboardTour: DashboardTour = {
   description: 'This quick tour will show you what each important section, card, and button does.',
   steps: adminDashboardSteps,
 };
+
+export const adminDashboardTourFa: DashboardTour = {
+  id: 'admin-dashboard-tour-fa',
+  role: 'admin',
+  title: 'به داشبورد مدیریت PLUCO خوش آمدید',
+  description: 'در این راهنمای کوتاه، بخش‌های اصلی داشبورد و کاربرد هر دکمه را مرحله‌به‌مرحله می‌بینید.',
+  steps: [
+    ['admin-total-clients', '[data-tour="admin-total-clients"]', 'تعداد کل موکلان', 'این کارت تعداد موکلان ثبت‌شده را نشان می‌دهد و یک نمای سریع از پایگاه موکلان ارائه می‌کند.'],
+    ['admin-pending-leads', '[data-tour="admin-pending-leads"]', 'سرنخ‌های در انتظار', 'درخواست‌ها و سرنخ‌های جدیدی که نیاز به بررسی و پیگیری دارند در این بخش دیده می‌شوند.'],
+    ['admin-active-cases', '[data-tour="admin-active-cases"]', 'پرونده‌های فعال', 'تعداد پرونده‌هایی که هم‌اکنون در حال رسیدگی هستند و باید پیگیری شوند.'],
+    ['admin-ai-agents', '[data-tour="admin-ai-agents"]', 'دستیارهای هوشمند', 'وضعیت دستیارهای هوشمند، از جمله پاسخ‌گوی پرسش‌های متداول، در این کارت نمایش داده می‌شود.'],
+    ['admin-quick-access', '[data-tour="admin-quick-access"]', 'دسترسی سریع', 'از این میان‌برها برای رفتن مستقیم به بخش‌های پرکاربرد استفاده کنید.'],
+    ['admin-enquiry-bookings', '[data-tour="admin-enquiry-bookings"]', 'رزروهای مشاوره', 'رزروهای مشاوره را بررسی، تأیید، واگذار، جابه‌جا یا لغو کنید.'],
+    ['admin-ai-leads', '[data-tour="admin-ai-leads"]', 'سرنخ‌ها', 'گفت‌وگوها و سرنخ‌های جدید را بررسی کنید و وضعیت پیگیری را به‌روز نگه دارید.'],
+    ['admin-ai-agents-mgmt', '[data-tour="admin-ai-agents-mgmt"]', 'مدیریت دستیارها', 'تنظیمات، منابع دانشی و عملکرد دستیارهای هوشمند از این بخش مدیریت می‌شود.'],
+    ['admin-consultants', '[data-tour="admin-consultants"]', 'مشاوران', 'پروفایل، زمان‌های آزاد، تخصص‌ها و واگذاری موکلان به مشاوران را مدیریت کنید.'],
+    ['admin-user-management', '[data-tour="admin-user-management"]', 'مدیریت کاربران و موکلان', 'کاربران و نقش‌ها را مدیریت کنید و موکلان قدیمی را دستی یا با فایل CSV وارد کنید.'],
+    ['admin-notifications', '[data-tour="admin-notifications"]', 'اعلان‌ها', 'هشدارهای مهم، سرنخ‌های جدید، وظایف و تغییرات سیستم را در اینجا ببینید.'],
+    ['admin-help-button', 'button[title="View help panel"]', 'راهنما', 'برای باز کردن راهنمای سریع همه بخش‌ها، روی دکمه کتاب کلیک کنید.'],
+  ].map(([id, selector, title, description], index) => ({
+    id,
+    selector,
+    title,
+    description,
+    position: index >= 10 ? 'left' : 'bottom',
+    highlightPadding: 8,
+  })) as TourStep[],
+};

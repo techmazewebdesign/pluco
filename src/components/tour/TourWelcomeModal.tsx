@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 interface TourWelcomeModalProps {
   isOpen: boolean;
@@ -11,6 +11,7 @@ interface TourWelcomeModalProps {
   onContinue: () => void;
   onExit: () => void;
   onDoNotShowAgain: (value: boolean) => void;
+  language?: 'en' | 'fa';
 }
 
 export default function TourWelcomeModal({
@@ -20,6 +21,7 @@ export default function TourWelcomeModal({
   onContinue,
   onExit,
   onDoNotShowAgain,
+  language = 'en',
 }: TourWelcomeModalProps) {
   const [doNotShow, setDoNotShow] = useState(false);
 
@@ -41,6 +43,7 @@ export default function TourWelcomeModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
+      dir={language === 'fa' ? 'rtl' : 'ltr'}
     >
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
@@ -68,7 +71,7 @@ export default function TourWelcomeModal({
               className="w-4 h-4 rounded border-gray-300 cursor-pointer"
             />
             <span className="text-sm" style={{ color: '#5E6470' }}>
-              Do not show this tour again
+              {language === 'fa' ? 'این راهنما دوباره نمایش داده نشود' : 'Do not show this tour again'}
             </span>
           </label>
 
@@ -79,14 +82,14 @@ export default function TourWelcomeModal({
               className="flex-1 px-4 py-2.5 rounded-lg font-semibold transition-all text-sm border border-gray-300 hover:bg-gray-50"
               style={{ color: '#5E6470' }}
             >
-              Exit Tour
+              {language === 'fa' ? 'خروج از راهنما' : 'Exit Tour'}
             </button>
             <button
               onClick={handleContinue}
               className="flex-1 px-4 py-2.5 rounded-lg font-semibold transition-all text-sm text-white"
               style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
             >
-              Continue Tour
+              {language === 'fa' ? 'شروع راهنما' : 'Continue Tour'}
             </button>
           </div>
         </div>

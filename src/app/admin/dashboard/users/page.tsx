@@ -7,6 +7,9 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import ProUserManagement from '@/components/admin/ProUserManagement';
 import NotificationDropdown from '@/components/admin/NotificationDropdown';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { isAdminUser } from '@/lib/utils/adminUtils';
 
 export default function UsersPage() {
   const router = useRouter();
@@ -14,9 +17,24 @@ export default function UsersPage() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (loading) return;
+    if (!user) {
       router.push('/login');
+      return;
     }
+    void (async () => {
+      try {
+        const snapshot = await getDoc(doc(db, 'users', user.uid));
+        const profile = { ...(snapshot.exists() ? snapshot.data() : {}), email: user.email || '' };
+        if (!isAdminUser(profile)) {
+          router.push('/dashboard');
+          return;
+        }
+        setIsAdmin(true);
+      } catch {
+        router.push('/dashboard');
+      }
+    })();
   }, [user, loading, router]);
 
   const handleLogout = async () => {
@@ -28,7 +46,7 @@ export default function UsersPage() {
     }
   };
 
-  if (loading) {
+  if (loading || !isAdmin) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">

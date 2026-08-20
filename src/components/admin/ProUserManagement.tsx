@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Plus, Shield, User, Trash2, Edit2, X, Check, History, Activity, AlertTriangle, Search, Mail, Clock, UserPlus, ChevronDown } from 'lucide-react';
-import { collection, getDocs, getDoc, doc, updateDoc, setDoc, Timestamp, query, where, deleteDoc, addDoc, orderBy } from 'firebase/firestore';
+import { useState, useEffect, useCallback } from 'react';
+import { Plus, Shield, User, Edit2, X, Check, Activity, AlertTriangle, Search, Mail, Clock, UserPlus, ChevronDown } from 'lucide-react';
+import { collection, getDocs, getDoc, doc, updateDoc, setDoc, Timestamp, query, deleteDoc, addDoc, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { getAuth } from 'firebase/auth';
 import { motion } from 'framer-motion';
-import { AgentRole } from '@/lib/types';
+import HistoricalClientTools from '@/components/admin/HistoricalClientTools';
 
 interface AdminUser {
   uid: string;
@@ -38,12 +38,12 @@ const ROLE_OPTIONS = [
 ];
 
 // Helper function to format dates from Firestore
-const formatDate = (date: any): string => {
+const formatDate = (date: unknown): string => {
   if (!date) return '—';
   try {
     // Handle Firestore Timestamp objects
-    if (date.toDate) {
-      return date.toDate().toLocaleDateString();
+    if (typeof date === 'object' && date !== null && 'toDate' in date && typeof date.toDate === 'function') {
+      return (date.toDate as () => Date)().toLocaleDateString();
     }
     // Handle string dates
     if (typeof date === 'string') {
@@ -89,11 +89,7 @@ export default function ProUserManagement() {
 
   const auth = getAuth();
 
-  useEffect(() => {
-    loadAllData();
-  }, []);
-
-  const loadAllData = async () => {
+  const loadAllData = useCallback(async () => {
     try {
       setIsLoading(true);
 
@@ -193,7 +189,11 @@ export default function ProUserManagement() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void loadAllData();
+  }, [loadAllData]);
 
   const handleInviteUser = async () => {
     if (!newUserEmail.trim()) {
@@ -226,10 +226,9 @@ export default function ProUserManagement() {
         status: 'pending',
       }, { merge: true });
 
-      // Send invitation email
-      try {
-        const idToken = await auth.currentUser?.getIdToken();
-        await fetch('/api/auth/send-invitation', {
+      // Send invitation email and report the real delivery result.
+      const idToken = await auth.currentUser?.getIdToken();
+      const invitationResponse = await fetch('/api/auth/send-invitation', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -242,8 +241,9 @@ export default function ProUserManagement() {
             invitedBy: auth.currentUser?.email || 'admin',
           }),
         });
-      } catch (emailErr) {
-        console.warn('Failed to send invitation email');
+      const invitationResult = await invitationResponse.json().catch(() => null);
+      if (!invitationResponse.ok || invitationResult?.success !== true) {
+        throw new Error(invitationResult?.error || invitationResult?.message || 'The user record was saved, but the invitation email was not delivered.');
       }
 
       // Log activity
@@ -392,7 +392,7 @@ export default function ProUserManagement() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold mb-2" style={{ color: '#071C3C' }}>
             User Management
@@ -401,14 +401,17 @@ export default function ProUserManagement() {
             {users.length} total users • {activities.length} activity records
           </p>
         </div>
-        <button
-          onClick={() => setShowInviteModal(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-semibold transition-all hover:brightness-110"
-          style={{ backgroundColor: '#C9A35A' }}
-        >
-          <Plus className="w-4 h-4" />
-          Invite User
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <HistoricalClientTools onComplete={loadAllData} />
+          <button
+            onClick={() => setShowInviteModal(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-semibold transition-all hover:brightness-110"
+            style={{ backgroundColor: '#C9A35A' }}
+          >
+            <Plus className="w-4 h-4" />
+            Invite User
+          </button>
+        </div>
       </div>
 
       {/* Messages */}

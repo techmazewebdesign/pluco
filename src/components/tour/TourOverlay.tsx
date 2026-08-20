@@ -21,6 +21,7 @@ interface TourOverlayProps {
   onExit: () => void;
   onFinish: () => void;
   onRestart: () => void;
+  language?: 'en' | 'fa';
 }
 
 export default function TourOverlay({
@@ -39,6 +40,7 @@ export default function TourOverlay({
   onExit,
   onFinish,
   onRestart,
+  language = 'en',
 }: TourOverlayProps) {
   const [highlightRect, setHighlightRect] = useState<TourHighlightRect | null>(null);
   const [cardPosition, setCardPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
@@ -164,6 +166,7 @@ export default function TourOverlay({
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           className="fixed bg-white rounded-lg shadow-2xl p-6 max-w-sm border border-gray-200 pointer-events-auto"
+          dir={language === 'fa' ? 'rtl' : 'ltr'}
           style={{
             top: `${cardPosition.top}px`,
             left: `${cardPosition.left}px`,
@@ -176,7 +179,7 @@ export default function TourOverlay({
                 {title}
               </h3>
               <p className="text-xs mt-1" style={{ color: '#C9A35A' }}>
-                Step {currentStep + 1} of {totalSteps}
+                {language === 'fa' ? `مرحله ${currentStep + 1} از ${totalSteps}` : `Step ${currentStep + 1} of ${totalSteps}`}
               </p>
             </div>
             <button
@@ -211,7 +214,7 @@ export default function TourOverlay({
                 style={{ color: '#5E6470' }}
               >
                 <ChevronLeft className="w-4 h-4" />
-                Back
+                {language === 'fa' ? 'قبلی' : 'Back'}
               </button>
             )}
 
@@ -221,7 +224,7 @@ export default function TourOverlay({
                 className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm font-semibold rounded-lg text-white transition-all"
                 style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
               >
-                Next
+                {language === 'fa' ? 'بعدی' : 'Next'}
                 <ChevronRight className="w-4 h-4" />
               </button>
             ) : (
@@ -230,7 +233,7 @@ export default function TourOverlay({
                 className="flex-1 px-3 py-2 text-sm font-semibold rounded-lg text-white transition-all"
                 style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
               >
-                Finish Tour
+                {language === 'fa' ? 'پایان راهنما' : 'Finish Tour'}
               </button>
             )}
 
@@ -240,7 +243,7 @@ export default function TourOverlay({
                 className="px-3 py-2 text-sm font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
                 style={{ color: '#5E6470' }}
               >
-                Restart
+                {language === 'fa' ? 'شروع دوباره' : 'Restart'}
               </button>
             )}
 
@@ -249,7 +252,7 @@ export default function TourOverlay({
               className="px-3 py-2 text-sm font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
               style={{ color: '#5E6470' }}
             >
-              Exit
+              {language === 'fa' ? 'خروج' : 'Exit'}
             </button>
           </div>
         </motion.div>
