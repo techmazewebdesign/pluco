@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
   const admin = await requireAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Administrator access is required.' }, { status: 403 });
 
-  const payload = await request.json().catch(() => null) as { clients?: HistoricalClientInput[]; sendInvitations?: boolean } | null;
+  const payload = await request.json().catch(() => null) as { clients?: HistoricalClientInput[]; sendInvitations?: boolean; source?: 'manual_entry' | 'csv_import' } | null;
   if (!payload?.clients?.length || payload.clients.length > MAX_CLIENTS) {
     return NextResponse.json({ error: `Provide between 1 and ${MAX_CLIENTS} clients.` }, { status: 400 });
   }
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     await reference.set({
       ...client,
       role: 'client',
-      source: clients.length > 1 ? 'csv_import' : 'manual_entry',
+      source: payload.source === 'csv_import' ? 'csv_import' : 'manual_entry',
       importedBy: admin.email,
       updatedAt: FieldValue.serverTimestamp(),
       ...(snapshot.exists ? {} : { createdAt: FieldValue.serverTimestamp() }),

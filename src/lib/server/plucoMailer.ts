@@ -18,15 +18,22 @@ function smtpTransport() {
 export async function sendPlucoEmail(options: { to: string; subject: string; html: string; text: string }) {
   const smtp = smtpTransport();
   if (smtp) {
-    const result = await smtp.sendMail({ ...options, from: FROM, replyTo: 'info@plucogroup.com' });
-    return { id: result.messageId };
+    try {
+      const result = await smtp.sendMail({ ...options, from: FROM, replyTo: 'info@plucogroup.com' });
+      return { id: result.messageId, transport: 'smtp' as const };
+    } catch {
+      // Keep delivery available through the configured transactional provider
+      // while surfacing the mailbox login separately in the dashboard health card.
+    }
   }
   if (process.env.RESEND_API_KEY) {
     const result = await new Resend(process.env.RESEND_API_KEY).emails.send({ ...options, from: process.env.RESEND_FROM || FROM, replyTo: 'info@plucogroup.com' });
-    if (result.error) throw new Error(result.error.message);
-    return { id: result.data?.id || '' };
+    if (result.error) throw new Error('PLUCO email delivery failed. Check the verified sender configuration.');
+    return { id: result.data?.id || '', transport: 'resend' as const };
   }
-  throw new Error('Neither the PLUCO SMTP mailbox nor Resend is configured.');
+  throw new Error(smtp
+    ? 'The PLUCO mailbox login failed and no fallback mail provider is configured.'
+    : 'Neither the PLUCO SMTP mailbox nor a fallback mail provider is configured.');
 }
 
 export async function verifyPlucoSmtp() {
@@ -39,4 +46,3 @@ export async function verifyPlucoSmtp() {
     return false;
   }
 }
-

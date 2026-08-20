@@ -24,13 +24,13 @@ export default function HistoricalClientTools({ onComplete }: { onComplete: () =
   const [message, setMessage] = useState('');
   const [manual, setManual] = useState<HistoricalClientInput>({ email: '', fullName: '', phone: '', country: '', status: 'historical', notes: '', legacyId: '', lastContactAt: '' });
 
-  async function save(clients: HistoricalClientInput[]) {
+  async function save(clients: HistoricalClientInput[], source: 'manual_entry' | 'csv_import') {
     const token = await getAuth().currentUser?.getIdToken();
     if (!token) throw new Error('Your administrator session expired. Sign in again.');
     const response = await fetch('/api/admin/clients/import', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ clients, sendInvitations }),
+      body: JSON.stringify({ clients, sendInvitations, source }),
     });
     const result = await response.json() as ImportResult & { error?: string };
     if (!response.ok) throw new Error(result.error || 'The client records could not be saved.');
@@ -42,7 +42,7 @@ export default function HistoricalClientTools({ onComplete }: { onComplete: () =
     setBusy(true);
     setMessage('');
     try {
-      const result = await save([manual]);
+      const result = await save([manual], 'manual_entry');
       setMessage(`Saved: ${result.created} new, ${result.updated} updated. Emails sent: ${result.invitationsSent}.${result.emailErrors.length ? ` ${result.emailErrors.join(' ')}` : ''}`);
       setManual({ email: '', fullName: '', phone: '', country: '', status: 'historical', notes: '', legacyId: '', lastContactAt: '' });
       await onComplete();
@@ -60,7 +60,7 @@ export default function HistoricalClientTools({ onComplete }: { onComplete: () =
     setBusy(true);
     setMessage('');
     try {
-      const result = await save(parsed.clients);
+      const result = await save(parsed.clients, 'csv_import');
       setMessage(`Imported: ${result.created} new, ${result.updated} updated. Emails sent: ${result.invitationsSent}.${result.emailErrors.length ? ` ${result.emailErrors.join(' ')}` : ''}`);
       await onComplete();
     } catch (error) {
@@ -145,4 +145,3 @@ export default function HistoricalClientTools({ onComplete }: { onComplete: () =
     </>
   );
 }
-
