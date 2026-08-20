@@ -15,19 +15,24 @@ const ROLE_ROUTES: Record<string, string> = {
 };
 
 export async function ensurePortalUser(user: User, displayName?: string) {
-  const reference = doc(db, 'users', user.uid);
-  const snapshot = await getDoc(reference);
-  if (snapshot.exists()) return;
+  try {
+    const reference = doc(db, 'users', user.uid);
+    const snapshot = await getDoc(reference);
+    if (snapshot.exists()) return;
 
-  await setDoc(reference, {
-    uid: user.uid,
-    email: user.email?.trim().toLowerCase() || '',
-    displayName: displayName?.trim() || user.displayName || '',
-    role: 'user',
-    status: 'active',
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  });
+    await setDoc(reference, {
+      uid: user.uid,
+      email: user.email?.trim().toLowerCase() || '',
+      displayName: displayName?.trim() || user.displayName || '',
+      role: 'user',
+      status: 'active',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  } catch {
+    // Some verified accounts are provisioned centrally and cannot create a
+    // profile document. Authentication must still reach the empty dashboard.
+  }
 }
 
 export async function resolvePortalDestination(user: User) {
