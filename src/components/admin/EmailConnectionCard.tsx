@@ -11,6 +11,7 @@ interface EmailStatus {
   dmarcReady: boolean;
   dkimReady: boolean;
   smtpReady: boolean;
+  outboundReady: boolean;
   automaticDnsReady: boolean;
 }
 
@@ -73,7 +74,7 @@ export default function EmailConnectionCard() {
     ['Sender policy (SPF)', status?.spfReady],
     ['Domain policy (DMARC)', status?.dmarcReady],
     ['Email signature (DKIM)', status?.dkimReady],
-    ['Outgoing mailbox login (SMTP)', status?.smtpReady],
+    ['Outgoing email delivery', status?.outboundReady],
   ] as const;
 
   return (

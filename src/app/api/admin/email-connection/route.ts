@@ -29,11 +29,15 @@ async function dnsStatus() {
 
 export async function GET(request: NextRequest) {
   if (!await requireAdmin(request)) return NextResponse.json({ error: 'Administrator access is required.' }, { status: 403 });
+  const status = await dnsStatus();
+  const smtpReady = await verifyPlucoSmtp();
+  const dnsReady = status.mxReady && status.spfReady && status.dmarcReady && status.dkimReady;
   return NextResponse.json({
     mailbox: MAILBOX,
-    ...(await dnsStatus()),
-    smtpReady: await verifyPlucoSmtp(),
-    automaticDnsReady: Boolean(process.env.CLOUDFLARE_API_TOKEN),
+    ...status,
+    smtpReady,
+    outboundReady: smtpReady || Boolean(process.env.RESEND_API_KEY),
+    automaticDnsReady: dnsReady || Boolean(process.env.CLOUDFLARE_API_TOKEN),
   });
 }
 
@@ -86,6 +90,10 @@ export async function POST(request: NextRequest) {
 
   const token = process.env.CLOUDFLARE_API_TOKEN;
   if (!token) {
+    const status = await dnsStatus();
+    if (status.mxReady && status.spfReady && status.dmarcReady && status.dkimReady) {
+      return NextResponse.json({ success: true, mailbox: MAILBOX, recordsAdded: 0, status });
+    }
     return NextResponse.json({
       error: 'Automatic DNS is not configured. Add a least-privilege Cloudflare DNS token to the production environment.',
     }, { status: 503 });
