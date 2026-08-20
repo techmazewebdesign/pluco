@@ -37,6 +37,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (['/', '/login', '/signup', '/client-sign-in'].includes(window.location.pathname)) {
+      window.sessionStorage.removeItem('pluco-logout');
+    }
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       if (!u && window.sessionStorage.getItem('pluco-logout') === '1') {
         window.location.replace('/');
@@ -45,9 +48,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(u);
       setLoading(false);
     });
-    if (window.location.pathname === '/') {
-      window.sessionStorage.removeItem('pluco-logout');
-    }
     return unsubscribe;
   }, []);
 
@@ -55,12 +55,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     clearError();
+    window.sessionStorage.removeItem('pluco-logout');
     const credential = await signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
     return credential.user;
   };
 
   const signUp = async (email: string, password: string, name: string) => {
     clearError();
+    window.sessionStorage.removeItem('pluco-logout');
     const credential = await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
     await updateProfile(credential.user, { displayName: name.trim() });
     return credential.user;
