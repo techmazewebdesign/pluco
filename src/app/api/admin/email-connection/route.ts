@@ -1,19 +1,29 @@
-import { resolveMx, resolveTxt } from 'node:dns/promises';
+import { resolveCname, resolveMx, resolveTxt } from 'node:dns/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/server/adminAuthorization';
 import { verifyPlucoSmtp } from '@/lib/server/plucoMailer';
 
 const DOMAIN = 'plucogroup.com';
 const MAILBOX = 'info@plucogroup.com';
+const HOSTINGER_DKIM_RECORDS = [
+  { name: `hostingermail-a._domainkey.${DOMAIN}`, content: 'hostingermail-a.dkim.mail.hostinger.com' },
+  { name: `hostingermail-b._domainkey.${DOMAIN}`, content: 'hostingermail-b.dkim.mail.hostinger.com' },
+  { name: `hostingermail-c._domainkey.${DOMAIN}`, content: 'hostingermail-c.dkim.mail.hostinger.com' },
+] as const;
 
 async function dnsStatus() {
   const mx = await resolveMx(DOMAIN).catch(() => []);
   const rootTxt = (await resolveTxt(DOMAIN).catch(() => [])).map(parts => parts.join(''));
   const dmarcTxt = (await resolveTxt(`_dmarc.${DOMAIN}`).catch(() => [])).map(parts => parts.join(''));
+  const dkimResults = await Promise.all(HOSTINGER_DKIM_RECORDS.map(async record => {
+    const values = await resolveCname(record.name).catch(() => []);
+    return values.some(value => value.replace(/\.$/, '').toLowerCase() === record.content.toLowerCase());
+  }));
   return {
     mxReady: mx.some(record => /hostinger/i.test(record.exchange)),
     spfReady: rootTxt.some(record => record.startsWith('v=spf1') && /hostinger/i.test(record)),
     dmarcReady: dmarcTxt.some(record => record.startsWith('v=DMARC1')),
+    dkimReady: dkimResults.every(Boolean),
   };
 }
 
@@ -23,11 +33,11 @@ export async function GET(request: NextRequest) {
     mailbox: MAILBOX,
     ...(await dnsStatus()),
     smtpReady: await verifyPlucoSmtp(),
-    automaticDnsReady: Boolean(process.env.CLOUDFLARE_API_TOKEN && process.env.PLUCO_EMAIL_DKIM_NAME && process.env.PLUCO_EMAIL_DKIM_VALUE),
+    automaticDnsReady: Boolean(process.env.CLOUDFLARE_API_TOKEN),
   });
 }
 
-type CloudflareRecord = { type: 'MX' | 'TXT'; name: string; content: string; priority?: number };
+type CloudflareRecord = { type: 'MX' | 'TXT' | 'CNAME'; name: string; content: string; priority?: number };
 
 function selectExistingRecord(record: CloudflareRecord, existing: { id: string; content: string }[]) {
   const exact = existing.find(item => item.content === record.content);
@@ -47,8 +57,8 @@ function selectExistingRecord(record: CloudflareRecord, existing: { id: string; 
     return existing.find(item => item.content.startsWith('v=DMARC1'));
   }
 
-  // A DKIM selector may have only one TXT value. Updating it is safer than
-  // publishing multiple keys for the same selector.
+  // A DKIM selector may have only one target. Updating it is safer than
+  // publishing multiple records for the same selector.
   return existing[0];
 }
 
@@ -58,7 +68,7 @@ async function upsertRecord(zoneId: string, token: string, record: CloudflareRec
   const lookupJson = await lookup.json() as { success?: boolean; result?: { id: string; content: string }[]; errors?: { message: string }[] };
   if (!lookup.ok || !lookupJson.success) throw new Error(lookupJson.errors?.[0]?.message || 'Cloudflare DNS lookup failed.');
   const existing = selectExistingRecord(record, lookupJson.result || []);
-  const body = JSON.stringify({ ...record, ttl: 3600 });
+  const body = JSON.stringify({ ...record, ttl: record.type === 'CNAME' ? 300 : 3600, ...(record.type === 'CNAME' ? { proxied: false } : {}) });
   const response = existing
     ? await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records/${existing.id}`, { method: 'PUT', headers, body })
     : await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records`, { method: 'POST', headers, body });
@@ -75,11 +85,9 @@ export async function POST(request: NextRequest) {
   }
 
   const token = process.env.CLOUDFLARE_API_TOKEN;
-  const dkimName = process.env.PLUCO_EMAIL_DKIM_NAME;
-  const dkimValue = process.env.PLUCO_EMAIL_DKIM_VALUE;
-  if (!token || !dkimName || !dkimValue) {
+  if (!token) {
     return NextResponse.json({
-      error: 'Automatic DNS is not configured. Add a least-privilege Cloudflare DNS token and the exact Hostinger DKIM name/value to the production environment.',
+      error: 'Automatic DNS is not configured. Add a least-privilege Cloudflare DNS token to the production environment.',
     }, { status: 503 });
   }
 
@@ -95,7 +103,7 @@ export async function POST(request: NextRequest) {
     { type: 'MX', name: DOMAIN, content: 'mx2.hostinger.com', priority: 10 },
     { type: 'TXT', name: DOMAIN, content: 'v=spf1 include:_spf.mail.hostinger.com ~all' },
     { type: 'TXT', name: `_dmarc.${DOMAIN}`, content: `v=DMARC1; p=none; rua=mailto:${MAILBOX}; adkim=s; aspf=s` },
-    { type: 'TXT', name: dkimName, content: dkimValue },
+    ...HOSTINGER_DKIM_RECORDS.map(record => ({ type: 'CNAME' as const, ...record })),
   ];
 
   try {

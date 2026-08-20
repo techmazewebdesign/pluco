@@ -9,6 +9,7 @@ interface EmailStatus {
   mxReady: boolean;
   spfReady: boolean;
   dmarcReady: boolean;
+  dkimReady: boolean;
   smtpReady: boolean;
   automaticDnsReady: boolean;
 }
@@ -71,6 +72,7 @@ export default function EmailConnectionCard() {
     ['Incoming mail (MX)', status?.mxReady],
     ['Sender policy (SPF)', status?.spfReady],
     ['Domain policy (DMARC)', status?.dmarcReady],
+    ['Email signature (DKIM)', status?.dkimReady],
     ['Outgoing mailbox login (SMTP)', status?.smtpReady],
   ] as const;
 
@@ -84,14 +86,14 @@ export default function EmailConnectionCard() {
         </div>
         <button onClick={refresh} disabled={busy} className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold disabled:opacity-50"><RefreshCw className="h-4 w-4" /> Recheck</button>
       </div>
-      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
         {indicators.map(([label, ready]) => <div key={label} className={`rounded-lg p-3 text-sm font-semibold ${ready ? 'bg-green-50 text-green-800' : 'bg-amber-50 text-amber-900'}`}>{ready ? 'Ready' : 'Not ready'} · {label}</div>)}
       </div>
       <div className="mt-4 flex flex-col gap-3 sm:flex-row">
         <input aria-label="Business email address" type="email" value={mailbox} onChange={event => setMailbox(event.target.value)} className="min-h-11 flex-1 rounded-lg border px-4" />
         <button onClick={connect} disabled={busy || mailbox.trim().toLowerCase() !== 'info@plucogroup.com'} className="min-h-11 rounded-lg bg-[#071C3C] px-5 font-bold text-white disabled:opacity-50">{busy ? 'Checking…' : 'Add DNS records and connect'}</button>
       </div>
-      {status && !status.automaticDnsReady ? <p className="mt-3 text-xs text-amber-800">Automatic DNS is locked until a least-privilege Cloudflare DNS token and the exact Hostinger DKIM record are configured.</p> : null}
+      {status && !status.automaticDnsReady ? <p className="mt-3 text-xs text-amber-800">Automatic DNS is locked until a least-privilege Cloudflare DNS token is configured.</p> : null}
       {message ? <p role="status" className="mt-3 rounded-lg bg-slate-100 p-3 text-sm">{message}</p> : null}
     </section>
   );
