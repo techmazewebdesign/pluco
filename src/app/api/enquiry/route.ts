@@ -7,7 +7,7 @@ async function sendToGoogleSheets(data: Record<string, unknown>) {
   try {
     if (!process.env.GOOGLE_LEADS_WEB_APP_URL) {
       console.log('Google Leads Web App URL not configured');
-      return;
+      return false;
     }
 
     // Send data without requiring secret first
@@ -50,9 +50,15 @@ async function sendToGoogleSheets(data: Record<string, unknown>) {
     }
 
     const result = await response.json();
-    console.log('✓ Data sent to Google Sheets:', result);
+    if (result?.success !== true) {
+      console.error('✗ Google Sheets rejected the enquiry:', result?.error || 'Unknown error');
+      return false;
+    }
+    console.log('✓ Data sent to Google Sheets');
+    return true;
   } catch (error) {
     console.error('✗ Error sending to Google Sheets:', error);
+    return false;
   }
 }
 
@@ -92,20 +98,20 @@ export async function POST(req: NextRequest) {
       firstName: firstNameValue,
       lastName: lastNameValue,
       email,
-      phone,
+      phone: phone || '',
       company: body.company || '',
       service,
       description,
       packageInterest: packageInterest || null,
-      nationality,
-      country,
-      language,
-      familyMembers,
-      numFamilyMembers,
-      urgency,
-      preferredContactMethod: preferredContact,
-      preferredDate,
-      preferredTime,
+      nationality: nationality || '',
+      country: country || '',
+      language: language || '',
+      familyMembers: familyMembers || '',
+      numFamilyMembers: numFamilyMembers || '',
+      urgency: urgency || '',
+      preferredContactMethod: preferredContact || '',
+      preferredDate: preferredDate || null,
+      preferredTime: preferredTime || null,
       consent: !!consent,
       locale: locale || null,
       sourcePage: sourcePage || null,
@@ -123,11 +129,11 @@ export async function POST(req: NextRequest) {
         ...enquiryData,
         clientName: `${firstNameValue} ${lastNameValue}`,
         clientEmail: email,
-        clientPhone: phone,
-        countryOfResidence: country,
+        clientPhone: phone || '',
+        countryOfResidence: country || '',
         message: description,
-        preferredLanguage: language,
-        preferredContactMethod: preferredContact,
+        preferredLanguage: language || '',
+        preferredContactMethod: preferredContact || '',
         source: consultantId ? 'consultant_book_now' : 'private_enquiry',
       });
       console.log('✓ Booking saved to Firestore:', bookingRef.id);
@@ -141,7 +147,7 @@ export async function POST(req: NextRequest) {
     const isFarsi = language === 'Farsi / Persian' || language === 'فارسی' || locale === 'fa';
     const timestamp = new Date().toLocaleString('en-GB', { timeZone: 'Europe/Warsaw' });
     // ── 0. Send to Google Sheets ────────────────────────────────────
-    await sendToGoogleSheets({
+    const sheetSaved = await sendToGoogleSheets({
       fullName, email, phone, nationality, country, familyMembers, numFamilyMembers,
       service, language, description, urgency, preferredContact,
       sourcePage, attribution: salesAttribution,
@@ -267,7 +273,7 @@ export async function POST(req: NextRequest) {
       console.error('✗ Client confirmation delivery failed:', confirmationError);
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, sheetSaved });
   } catch (err) {
     console.error('Enquiry API error:', err);
     return NextResponse.json(
