@@ -2,7 +2,6 @@ import admin from 'firebase-admin';
 
 const APPLY = process.argv.includes('--apply');
 const ADMINS = [
-  { email: 'sara.rezai9031@gmail.com', displayName: 'Sara Rezaie' },
   { email: 'techmazewebdesign@gmail.com', displayName: 'Techmaze Webdesign' },
   { email: 'rezaostad@googlemail.com', displayName: 'Reza Ostad' },
 ];
@@ -45,4 +44,3 @@ async function run() {
 }
 
 run().catch((error) => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1); });
-

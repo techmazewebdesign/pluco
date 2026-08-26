@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MapPin, Clock, ArrowRight } from 'lucide-react';
+import { Mail, MapPin, Clock, ArrowRight, Phone } from 'lucide-react';
 import ConsultationProcess from '@/components/sections/ConsultationProcess';
 import DiscreetFirstContact from '@/components/sections/DiscreetFirstContact';
 import LegalDisclaimer from '@/components/shared/LegalDisclaimer';
@@ -51,6 +51,11 @@ export default function ContactPage() {
                     Icon: Mail,
                     title: 'Email',
                     lines: ['info@plucogroup.com', 'General enquiries & consultations'],
+                  },
+                  {
+                    Icon: Phone,
+                    title: 'Phone / WhatsApp',
+                    lines: ['+48 730 962 085 (Ostad)', 'Direct contact with Ostad'],
                   },
                   {
                     Icon: MapPin,

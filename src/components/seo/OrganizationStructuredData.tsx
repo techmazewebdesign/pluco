@@ -12,6 +12,7 @@ const structuredData = {
       url: SITE_URL,
       logo: `${SITE_URL}/images/logo-pluco.png`,
       email: 'info@plucogroup.com',
+      telephone: '+48730962085',
       taxID: '5272739549',
       identifier: [
         { '@type': 'PropertyValue', propertyID: 'KRS', value: '0000564904' },
@@ -28,6 +29,7 @@ const structuredData = {
         '@type': 'ContactPoint',
         contactType: 'customer service',
         email: 'info@plucogroup.com',
+        telephone: '+48730962085',
         availableLanguage: ['English', 'Persian', 'Polish'],
       },
       knowsAbout: [

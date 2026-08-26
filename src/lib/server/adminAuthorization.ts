@@ -4,7 +4,6 @@ import { getAdminAuth, getAdminDb } from '@/lib/firebase-admin';
 const APPROVED_ADMIN_EMAILS = new Set([
   'desivo.de@gmail.com',
   'techmazewebdesign@gmail.com',
-  'sara.rezai9031@gmail.com',
 ]);
 
 export async function requireAdmin(request: NextRequest) {
@@ -34,4 +33,3 @@ export async function requireAdmin(request: NextRequest) {
   }
   return null;
 }
-

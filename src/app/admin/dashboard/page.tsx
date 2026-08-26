@@ -32,9 +32,8 @@ export default function AdminDashboard() {
   const [tourCompleted, setTourCompleted] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
-  const isSara = user?.email?.trim().toLowerCase() === 'sara.rezai9031@gmail.com';
   const [persianOverride, setPersianOverride] = useState<boolean | null>(null);
-  const persianAdmin = persianOverride ?? isSara;
+  const persianAdmin = persianOverride ?? isRTL;
 
   // Check if user is logged in and is admin
   useEffect(() => {

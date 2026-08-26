@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { MapPin, Mail, FileText } from 'lucide-react';
+import { MapPin, Mail, FileText, Phone, MessageCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { OPEN_COOKIE_SETTINGS_EVENT } from '@/components/privacy/ConsentManager';
@@ -62,6 +62,18 @@ export default function Footer() {
                 <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#C9A35A' }} />
                 <a href="mailto:info@plucogroup.com" className="text-xs hover:text-white transition-colors" style={{ color: '#CBD5E0' }}>
                   info@plucogroup.com
+                </a>
+              </li>
+              <li className="flex items-start gap-2">
+                <Phone className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#C9A35A' }} />
+                <a href="tel:+48730962085" className="text-xs hover:text-white transition-colors" style={{ color: '#CBD5E0' }} dir="ltr">
+                  +48 730 962 085 (Ostad)
+                </a>
+              </li>
+              <li className="flex items-start gap-2">
+                <MessageCircle className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#C9A35A' }} />
+                <a href="https://wa.me/48730962085" className="text-xs hover:text-white transition-colors" style={{ color: '#CBD5E0' }} target="_blank" rel="noopener noreferrer" dir="ltr">
+                  WhatsApp: +48 730 962 085 (Ostad)
                 </a>
               </li>
               <li className="flex items-start gap-2">

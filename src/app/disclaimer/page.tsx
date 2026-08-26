@@ -114,7 +114,7 @@ export default function Disclaimer() {
                 </p>
                 <div className="mt-4 space-y-2">
                   <p><strong>Email:</strong> info@plucogroup.com</p>
-                  <p><strong>Phone:</strong> +48 22 123 4567</p>
+                  <p><strong>Phone / WhatsApp:</strong> <a href="https://wa.me/48730962085">+48 730 962 085 (Ostad)</a></p>
                   <p><strong>Address:</strong> Ksawerów 3, 02-656 Warsaw, Poland</p>
                 </div>
               </div>
