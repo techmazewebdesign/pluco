@@ -27,6 +27,7 @@ export default function Footer() {
     [t('nav.clientSignIn'),       '/client-sign-in'],
     ['Contact',                   '/contact'],
     [t('footer.privacyPolicy'),   '/privacy-policy'],
+    ['Legal Notice / Impressum',  '/impressum'],
     [t('footer.legalDisclaimer'), '/disclaimer'],
   ];
 
@@ -126,6 +127,8 @@ export default function Footer() {
           <p className="text-xs" style={{ color: '#64748B' }}>
             © {new Date().getFullYear()} Pluco Group Sp. z o.o. {t('footer.copyright')} &nbsp;·&nbsp;
             <Link href="/privacy-policy" className="hover:text-white transition-colors" style={{ color: '#64748B' }}>{t('footer.privacyPolicy')}</Link>
+            &nbsp;·&nbsp;
+            <Link href="/impressum" className="hover:text-white transition-colors" style={{ color: '#64748B' }}>Legal Notice / Impressum</Link>
             &nbsp;·&nbsp;
             <Link href="/disclaimer" className="hover:text-white transition-colors" style={{ color: '#64748B' }}>{t('footer.legalDisclaimer')}</Link>
             &nbsp;·&nbsp;
