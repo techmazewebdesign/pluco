@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PLUCO_CONTACT_EMAIL, sendPlucoEmail } from '@/lib/server/plucoMailer';
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,7 +27,6 @@ export async function POST(req: NextRequest) {
     // Get environment variables
     const googleScriptUrl = process.env.GOOGLE_LEADS_WEB_APP_URL;
     const googleSecret = process.env.GOOGLE_LEADS_SECRET;
-    const resendApiKey = process.env.RESEND_API_KEY;
 
     console.log(`[CONTACT API] GOOGLE_SCRIPT_URL exists: ${!!googleScriptUrl}`);
 
@@ -125,19 +125,12 @@ export async function POST(req: NextRequest) {
 
     // Step 2: Send Email Notification (after Google Sheets succeeds)
     console.log('[CONTACT API] Sending email...');
-    if (resendApiKey) {
-      try {
-        await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${resendApiKey}`,
-          },
-          body: JSON.stringify({
-            from: 'noreply@plucogroup.com',
-            to: 'info@plucogroup.com',
-            subject: `New Enquiry from ${fullName}`,
-            html: `
+    try {
+      await sendPlucoEmail({
+        to: PLUCO_CONTACT_EMAIL,
+        replyTo: email,
+        subject: `New Enquiry from ${fullName}`,
+        html: `
               <h2>New Contact Form Submission</h2>
               <p><strong>Name:</strong> ${fullName}</p>
               <p><strong>Email:</strong> ${email}</p>
@@ -152,13 +145,22 @@ export async function POST(req: NextRequest) {
               <p>Lead ID: ${leadId}</p>
               <p>Submitted at: ${new Date().toISOString()}</p>
             `,
-          }),
-        });
-
-        console.log('[CONTACT API] Email sent');
-      } catch (emailError) {
-        console.error('[CONTACT API] Email sending error:', emailError);
-      }
+        text: [
+          `New contact form submission from ${fullName}`,
+          `Email: ${email}`,
+          `Phone: ${phone || 'Not provided'}`,
+          `Service: ${serviceNeeded || 'Not specified'}`,
+          `Message: ${message || 'No message provided'}`,
+          `Lead ID: ${leadId}`,
+        ].join('\n'),
+      });
+      console.log('[CONTACT API] Email sent to the canonical PLUCO mailbox');
+    } catch (emailError) {
+      console.error('[CONTACT API] Email sending error:', emailError);
+      return NextResponse.json(
+        { success: false, error: 'Lead saved, but mailbox delivery failed' },
+        { status: 502 }
+      );
     }
 
     // Return success only after Google Sheets succeeds

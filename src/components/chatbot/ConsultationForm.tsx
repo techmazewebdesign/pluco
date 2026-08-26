@@ -116,6 +116,32 @@ export default function ConsultationForm({
       console.log('[Booking] Firestore document created:', docRef.id);
       console.log('[ConsultationForm] Request saved:', docRef.id);
 
+      const nameParts = formData.fullName.trim().split(/\s+/);
+      const deliveryResponse = await fetch('/api/enquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: nameParts[0],
+          lastName: nameParts.slice(1).join(' ') || '(not provided)',
+          fullName: formData.fullName.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          service: formData.service,
+          description: formData.caseDescription.trim() || 'Chatbot consultation request',
+          preferredDate: formData.preferredDate || undefined,
+          preferredTime: formData.preferredTime || undefined,
+          preferredContact: 'No preference',
+          language: formData.language === 'fa' ? 'Farsi / Persian' : formData.language,
+          consent: formData.consentAccepted,
+          sourcePage: window.location.pathname,
+          locale: formData.language,
+        }),
+      });
+
+      if (!deliveryResponse.ok) {
+        throw new Error('Your request was saved, but mailbox delivery could not be confirmed. Please email info@plucogroup.com.');
+      }
+
       setSuccess(true);
       onSubmitted(consultationRequest);
     } catch (err: any) {

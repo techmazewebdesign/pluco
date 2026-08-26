@@ -656,7 +656,7 @@ export default function TrainingPage() {
                 {/* Email Sent */}
                 <rect x="300" y="280" width="300" height="50" fill="#FFF8E8" stroke="#C9A35A" strokeWidth="2" rx="6" />
                 <text x="450" y="305" fontSize="13" fontWeight="bold" textAnchor="middle" fill="#1E2430">✉️ Email Sent to Both Admins</text>
-                <text x="450" y="320" fontSize="10" textAnchor="middle" fill="#92400E">info@plucogroup.com & desivo.de@gmail.com</text>
+                <text x="450" y="320" fontSize="10" textAnchor="middle" fill="#92400E">info@plucogroup.com</text>
               </svg>
 
               {/* Email Contents */}

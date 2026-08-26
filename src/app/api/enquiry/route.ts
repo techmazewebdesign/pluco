@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
 import { getAdminDb } from '@/lib/firebase-admin';
 import { normalizeSalesAttribution } from '@/lib/salesAttribution';
+import { PLUCO_CONTACT_EMAIL, sendPlucoEmail } from '@/lib/server/plucoMailer';
 
 async function sendToGoogleSheets(data: Record<string, unknown>) {
   try {
@@ -140,22 +140,6 @@ export async function POST(req: NextRequest) {
 
     const isFarsi = language === 'Farsi / Persian' || language === 'فارسی' || locale === 'fa';
     const timestamp = new Date().toLocaleString('en-GB', { timeZone: 'Europe/Warsaw' });
-    const fromAddress = process.env.RESEND_FROM || 'PLUCO GROUP <noreply@plucogroup.com>';
-    const toAddress = process.env.PRIVATE_ENQUIRY_TO_EMAIL || 'info@plucogroup.com';
-
-    if (!process.env.RESEND_API_KEY) {
-      console.log('Resend API key not configured — enquiry logged instead of emailed:', enquiryData);
-      if (process.env.NODE_ENV === 'production') {
-        return NextResponse.json(
-          { success: false, error: 'Server misconfiguration: email service not configured.' },
-          { status: 500 }
-        );
-      }
-      return NextResponse.json({ success: true, dev: true });
-    }
-
-    const resend = new Resend(process.env.RESEND_API_KEY);
-
     // ── 0. Send to Google Sheets ────────────────────────────────────
     await sendToGoogleSheets({
       fullName, email, phone, nationality, country, familyMembers, numFamilyMembers,
@@ -164,9 +148,8 @@ export async function POST(req: NextRequest) {
     });
 
     // ── 1. Notification to PLUCO GROUP ──────────────────────────────
-    const { data: notificationEmail, error: notificationError } = await resend.emails.send({
-      from: fromAddress,
-      to: toAddress,
+    const notificationEmail = await sendPlucoEmail({
+      to: PLUCO_CONTACT_EMAIL,
       replyTo: email,
       subject: `New Private Enquiry — ${service || 'General'}`,
       html: `
@@ -208,25 +191,23 @@ export async function POST(req: NextRequest) {
               </div>` : ''}
           </div>
         </div>`,
+      text: [
+        `New private enquiry: ${service || 'General'}`,
+        `Name: ${fullName || `${firstNameValue} ${lastNameValue}`}`,
+        `Email: ${email}`,
+        `Phone: ${phone || '—'}`,
+        `Description: ${description}`,
+        `Submitted: ${timestamp} Warsaw`,
+      ].join('\n'),
     });
 
+    console.log('✓ Enquiry notification accepted:', notificationEmail.id, notificationEmail.transport);
+
     // ── 2. Confirmation to client ────────────────────────────────────
-    if (notificationError) {
-      console.error('✗ Resend rejected the PLUCO enquiry notification:', {
-        name: notificationError.name,
-        message: notificationError.message,
-      });
-      return NextResponse.json(
-        { success: false, error: 'Unable to deliver the enquiry notification.' },
-        { status: 502 }
-      );
-    }
-
-    console.log('✓ Enquiry notification accepted by Resend:', notificationEmail?.id);
-
-    const { data: confirmationEmail, error: confirmationError } = await resend.emails.send({
-      from: fromAddress,
+    try {
+      const confirmationEmail = await sendPlucoEmail({
       to: email,
+      replyTo: PLUCO_CONTACT_EMAIL,
       subject: isFarsi
         ? 'تأیید استعلام شما – PLUCO GROUP'
         : 'Your Enquiry Has Been Received – PLUCO GROUP',
@@ -275,17 +256,15 @@ export async function POST(req: NextRequest) {
             </div>
           </div>
         </div>`,
-    });
-
-    if (confirmationError) {
+      text: isFarsi
+        ? `استعلام شما دریافت شد. برای تماس: ${PLUCO_CONTACT_EMAIL}`
+        : `Your enquiry has been received. Contact: ${PLUCO_CONTACT_EMAIL}`,
+      });
+      console.log('✓ Client confirmation accepted:', confirmationEmail.id, confirmationEmail.transport);
+    } catch (confirmationError) {
       // The PLUCO notification is the critical delivery. Do not make the user
       // resubmit and create a duplicate lead if only their receipt fails.
-      console.error('✗ Resend rejected the client confirmation:', {
-        name: confirmationError.name,
-        message: confirmationError.message,
-      });
-    } else {
-      console.log('✓ Client confirmation accepted by Resend:', confirmationEmail?.id);
+      console.error('✗ Client confirmation delivery failed:', confirmationError);
     }
 
     return NextResponse.json({ success: true });
