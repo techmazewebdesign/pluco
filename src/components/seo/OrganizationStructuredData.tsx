@@ -7,9 +7,16 @@ const structuredData = {
       '@type': 'Organization',
       '@id': `${SITE_URL}/#organization`,
       name: 'PLUCO GROUP Sp. z o.o.',
+      legalName: 'PLUCO GROUP SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ',
+      alternateName: 'PLUCO GROUP',
       url: SITE_URL,
       logo: `${SITE_URL}/images/logo-pluco.png`,
       email: 'info@plucogroup.com',
+      taxID: '5272739549',
+      identifier: [
+        { '@type': 'PropertyValue', propertyID: 'KRS', value: '0000564904' },
+        { '@type': 'PropertyValue', propertyID: 'REGON', value: '361874067' },
+      ],
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Ksawerów 3',
@@ -17,6 +24,18 @@ const structuredData = {
         addressLocality: 'Warsaw',
         addressCountry: 'PL',
       },
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'customer service',
+        email: 'info@plucogroup.com',
+        availableLanguage: ['English', 'Persian', 'Polish'],
+      },
+      knowsAbout: [
+        'European immigration and residency',
+        'Private client advisory',
+        'Cross-border contracts',
+        'Company registration in the European Union',
+      ],
       description: SITE_DESCRIPTION,
     },
     {
