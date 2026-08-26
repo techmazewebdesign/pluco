@@ -112,16 +112,18 @@ export async function POST(req: NextRequest) {
     console.log(`[CONTACT API] Google Sheet response status: ${gasResponse.status}`);
     console.log(`[CONTACT API] Google Sheet response text: ${gasText}`);
 
-    // CRITICAL: Only continue if Google Sheets succeeds
-    if (!gasResponse.ok) {
-      console.error('[CONTACT API] Google Sheet submission failed - NOT sending success response');
-      return NextResponse.json(
-        { success: false, error: 'Failed to save lead to database' },
-        { status: 500 }
-      );
+    let sheetSaved = false;
+    if (gasResponse.ok) {
+      try {
+        const gasResult = JSON.parse(gasText);
+        sheetSaved = gasResult?.success === true;
+        if (!sheetSaved) console.error('[CONTACT API] Google Sheet rejected the lead:', gasResult?.error || 'Unknown error');
+      } catch {
+        console.error('[CONTACT API] Google Sheet returned an invalid response');
+      }
+    } else {
+      console.error('[CONTACT API] Google Sheet submission failed');
     }
-
-    console.log('[CONTACT API] Google Sheet submission succeeded');
 
     // Step 2: Send Email Notification (after Google Sheets succeeds)
     console.log('[CONTACT API] Sending email...');
@@ -169,6 +171,7 @@ export async function POST(req: NextRequest) {
       success: true,
       message: 'Thank you. Your enquiry has been received. Our team will contact you shortly.',
       leadId,
+      sheetSaved,
     });
   } catch (error) {
     console.error('[CONTACT API] FATAL ERROR:', error);
