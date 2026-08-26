@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
       </p>
 
       <p style="margin-top: 30px; font-size: 13px; color: #666;">
-        If you have any questions, please contact us at <strong>support@plucogroup.com</strong>
+        If you have any questions, please contact us at <strong>info@plucogroup.com</strong>
       </p>
     </div>
     <div class="footer">
@@ -130,7 +130,7 @@ Next Steps:
 
 View your dashboard: ${APP_URL}/consultant/dashboard
 
-If you have any questions, contact: support@plucogroup.com
+If you have any questions, contact: info@plucogroup.com
 
 ---
 © 2024 PLUCO GROUP

@@ -11,6 +11,7 @@ interface InquiryFormProps {
     service: string;
     nationality: string;
     residenceCountry: string;
+    consentAccepted: boolean;
   }) => Promise<void>;
   onCancel: () => void;
 }
@@ -66,6 +67,7 @@ export default function InquiryForm({ onSubmit, onCancel }: InquiryFormProps) {
     service: '',
     nationality: '',
     residenceCountry: '',
+    consentAccepted: false,
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,6 +82,7 @@ export default function InquiryForm({ onSubmit, onCancel }: InquiryFormProps) {
     if (!formData.service) newErrors.service = 'Please select a service';
     if (!formData.nationality) newErrors.nationality = 'Please select nationality';
     if (!formData.residenceCountry) newErrors.residenceCountry = 'Please select residence country';
+    if (!formData.consentAccepted) newErrors.consent = 'Please accept the privacy consent';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -194,6 +197,17 @@ export default function InquiryForm({ onSubmit, onCancel }: InquiryFormProps) {
         </select>
         {errors.residenceCountry && <p className="text-xs text-red-600 mt-1">{errors.residenceCountry}</p>}
       </div>
+
+      <label className="flex items-start gap-2 text-xs text-gray-600">
+        <input
+          type="checkbox"
+          checked={formData.consentAccepted}
+          onChange={(e) => setFormData({ ...formData, consentAccepted: e.target.checked })}
+          className="mt-0.5"
+        />
+        <span>I consent to PLUCO GROUP processing this information to respond to my enquiry.</span>
+      </label>
+      {errors.consent && <p className="text-xs text-red-600 mt-1">{errors.consent}</p>}
 
       {errors.submit && (
         <div className="flex gap-2 p-2 bg-red-50 rounded border border-red-200">

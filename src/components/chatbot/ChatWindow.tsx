@@ -371,7 +371,7 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
     setShowConsultationForm(false);
   };
 
-  const handleInquirySubmit = async (data: { name: string; email: string; phone: string; service: string; nationality: string; residenceCountry: string }) => {
+  const handleInquirySubmit = async (data: { name: string; email: string; phone: string; service: string; nationality: string; residenceCountry: string; consentAccepted: boolean }) => {
     try {
       console.log('[Chatbot] Submitting inquiry...');
 
@@ -389,6 +389,32 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
         createdAt: now,
         updatedAt: now,
       };
+
+      const nameParts = data.name.trim().split(/\s+/);
+      const response = await fetch('/api/enquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: nameParts[0],
+          lastName: nameParts.slice(1).join(' ') || '(not provided)',
+          fullName: data.name,
+          email: data.email,
+          phone: data.phone,
+          nationality: data.nationality,
+          country: data.residenceCountry,
+          service: data.service,
+          description: inquiry.message,
+          preferredContact: 'No preference',
+          language: 'English',
+          consent: data.consentAccepted,
+          sourcePage: window.location.pathname,
+          locale: 'en',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Mailbox notification failed');
+      }
 
       // Try to update session and save inquiry (prioritize inquiry save)
       if (firebaseAvailable) {

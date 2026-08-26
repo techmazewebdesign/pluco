@@ -201,7 +201,7 @@ function generateCancellationEmail(performedBy: string, consultantName: string, 
         ${reason ? `<p><strong>Reason:</strong> ${reason}</p>` : ''}
       </div>
 
-      <p>If you have any questions, please contact us at support@plucogroup.com or use your PLUCO GROUP dashboard to schedule a new consultation.</p>
+      <p>If you have any questions, please contact us at info@plucogroup.com or use your PLUCO GROUP dashboard to schedule a new consultation.</p>
     </div>
   </div>
 </body>
@@ -259,7 +259,7 @@ The consultation scheduled for ${new Date(bookingData.scheduledAt).toLocaleDateS
 Cancelled by: ${performedBy === 'consultant' ? consultantName : 'Client'}
 ${reason ? `Reason: ${reason}` : ''}
 
-If you have any questions, please contact support@plucogroup.com
+If you have any questions, please contact info@plucogroup.com
   `;
 }
 

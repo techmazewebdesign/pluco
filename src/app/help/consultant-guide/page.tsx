@@ -553,7 +553,7 @@ const trainingModules: TrainingModule[] = [
 
         FOR TECHNICAL ISSUES:
         • Check FAQ section
-        • Email: support@plucogroup.com
+        • Email: info@plucogroup.com
         • Attach screenshots of errors
         • Describe steps that led to issue
 

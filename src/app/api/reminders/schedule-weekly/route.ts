@@ -41,8 +41,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get admin emails (send to both)
-    const adminEmails = ['info@plucogroup.com', 'desivo.de@gmail.com'];
+    // Website lead summaries stay inside the PLUCO mailbox.
+    const adminEmails = ['info@plucogroup.com'];
 
     // Get all leads
     const leadsSnap = await getDocs(collection(db, 'leads'));

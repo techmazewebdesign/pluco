@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
       ` : ''}
 
       <p style="margin-top: 30px; font-size: 13px; color: #666;">
-        If you have any questions, please contact us at <strong>support@plucogroup.com</strong>
+        If you have any questions, please contact us at <strong>info@plucogroup.com</strong>
       </p>
     </div>
     <div class="footer">
@@ -142,7 +142,7 @@ Role: ${roleDisplay}
 
 Sign in with the invited Google account to access your dashboard.
 
-If you have any questions, contact: support@plucogroup.com
+If you have any questions, contact: info@plucogroup.com
 
 ---
 © 2024 PLUCO GROUP

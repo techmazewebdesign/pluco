@@ -1,7 +1,8 @@
 import nodemailer from 'nodemailer';
 import { Resend } from 'resend';
 
-const FROM = 'PLUCO GROUP <info@plucogroup.com>';
+export const PLUCO_CONTACT_EMAIL = 'info@plucogroup.com';
+const FROM = `PLUCO GROUP <${PLUCO_CONTACT_EMAIL}>`;
 
 function smtpTransport() {
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) return null;
@@ -15,11 +16,18 @@ function smtpTransport() {
   });
 }
 
-export async function sendPlucoEmail(options: { to: string; subject: string; html: string; text: string }) {
+export async function sendPlucoEmail(options: {
+  to: string | string[];
+  subject: string;
+  html: string;
+  text: string;
+  replyTo?: string;
+}) {
+  const { replyTo = PLUCO_CONTACT_EMAIL, ...message } = options;
   const smtp = smtpTransport();
   if (smtp) {
     try {
-      const result = await smtp.sendMail({ ...options, from: FROM, replyTo: 'info@plucogroup.com' });
+      const result = await smtp.sendMail({ ...message, from: FROM, replyTo });
       return { id: result.messageId, transport: 'smtp' as const };
     } catch {
       // Keep delivery available through the configured transactional provider
@@ -27,7 +35,7 @@ export async function sendPlucoEmail(options: { to: string; subject: string; htm
     }
   }
   if (process.env.RESEND_API_KEY) {
-    const result = await new Resend(process.env.RESEND_API_KEY).emails.send({ ...options, from: FROM, replyTo: 'info@plucogroup.com' });
+    const result = await new Resend(process.env.RESEND_API_KEY).emails.send({ ...message, from: FROM, replyTo });
     if (result.error) throw new Error('PLUCO email delivery failed. Check the verified sender configuration.');
     return { id: result.data?.id || '', transport: 'resend' as const };
   }

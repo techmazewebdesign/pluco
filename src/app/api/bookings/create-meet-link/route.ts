@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
       <div class="warning">
         <p class="warning-text" style="margin: 0;">
           <strong>⚠️ Important:</strong> This consultation is taking place through PLUCO GROUP platform.
-          Please join at the scheduled time. If you have any issues, contact support@plucogroup.com
+          Please join at the scheduled time. If you have any issues, contact info@plucogroup.com
         </p>
       </div>
 
@@ -134,7 +134,7 @@ Or copy this link if the button doesn't work:
 ${meetLink}
 
 IMPORTANT: This consultation is taking place through PLUCO GROUP platform.
-Please join at the scheduled time. If you have any issues, contact support@plucogroup.com
+Please join at the scheduled time. If you have any issues, contact info@plucogroup.com
 
 If you need to reschedule or cancel, please use your PLUCO GROUP dashboard.
 
