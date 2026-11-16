@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { languageAlternates } from "./languageRoutes";
+import { getPageImages } from "./pageImages";
 
 export const SITE_URL = "https://www.plucogroup.com";
 export const SITE_NAME = "PLUCO GROUP";
@@ -25,59 +26,56 @@ type PageMetadataOptions = {
 export function createPageMetadata({
   title = SITE_TITLE,
   description = SITE_DESCRIPTION,
-  path = "/",
-  image = DEFAULT_SOCIAL_IMAGE,
-  imageAlt = DEFAULT_SOCIAL_IMAGE_ALT,
-  locale = "en_US",
-  alternateLocales = ["fa_IR"],
+  path,
+  image,
+  imageAlt,
+  locale,
+  alternateLocales,
   robots,
   keywords,
 }: PageMetadataOptions = {}): Metadata {
-  const canonicalUrl = new URL(path, SITE_URL).toString();
-  const socialImageUrl = new URL(image, SITE_URL).toString();
+  const pagePath = path ?? "/";
+  const canonicalUrl = new URL(pagePath, SITE_URL).toString();
+  const languages = languageAlternates(pagePath, SITE_URL);
+  const pageImages = path ? getPageImages(path) : undefined;
+  const primary = pageImages?.images[0];
+  const imagePath = image ?? (pageImages ? `/images/social/${pageImages.socialKey}.jpg` : DEFAULT_SOCIAL_IMAGE);
+  const socialImageUrl = new URL(imagePath, SITE_URL).toString();
+  const socialImage = {
+    url: socialImageUrl,
+    secureUrl: socialImageUrl,
+    type: imagePath.endsWith(".jpg") ? "image/jpeg" : "image/png",
+    width: 1200,
+    height: 630,
+    alt: imageAlt ?? (primary && pageImages ? primary.alt[pageImages.lang] : DEFAULT_SOCIAL_IMAGE_ALT),
+  };
+  const pageLocale = locale ?? (pageImages?.lang === "fa" ? "fa_IR" : "en_US");
+  const pageAlternateLocales = alternateLocales ?? (languages ? [pageLocale === "fa_IR" ? "en_US" : "fa_IR"] : undefined);
 
   return {
     title: { absolute: title },
     description,
     alternates: {
       canonical: canonicalUrl,
-      languages: languageAlternates(path, SITE_URL),
+      languages,
     },
     keywords,
-    robots,
+    robots: robots ?? (pageImages ? { "max-image-preview": "large" } : undefined),
     openGraph: {
       title,
       description,
       type: "website",
       url: canonicalUrl,
       siteName: SITE_NAME,
-      locale,
-      alternateLocale: alternateLocales,
-      images: [
-        {
-          url: socialImageUrl,
-          secureUrl: socialImageUrl,
-          type: "image/png",
-          width: 1200,
-          height: 630,
-          alt: imageAlt,
-        },
-      ],
+      locale: pageLocale,
+      alternateLocale: pageAlternateLocales,
+      images: [socialImage],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [
-        {
-          url: socialImageUrl,
-          alt: imageAlt,
-          secureUrl: socialImageUrl,
-          type: "image/png",
-          width: 1200,
-          height: 630,
-        },
-      ],
+      images: [socialImage],
     },
   };
 }

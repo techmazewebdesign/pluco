@@ -105,6 +105,7 @@ export default function NewIdentity() {
   return (
     <div className="min-h-screen bg-white">
       <PageHero
+        service="new-identity"
         eyebrow={isRTL ? 'برنامه‌ریزی هویت' : 'IDENTITY PLANNING'}
         title={isRTL ? 'برنامه‌ریزی قانونی هویت، تحرک و تابعیت دوم برای خانواده‌های بین‌المللی' : 'Lawful Identity, Mobility and Second Citizenship Planning for International Families'}
         subtitle={isRTL ? 'PLUCO GROUP به افراد و خانواده‌های متحرک بین‌المللی در برنامه‌ریزی قانونی تابعیت دوم، اقامت و هویت بین‌المللی با تمرکز بر رازداری، انطباق، مستندسازی منبع وجوه و حمایت بلندمدت خانوادگی کمک می‌کند.' : 'PLUCO GROUP assists internationally mobile individuals and families with lawful second citizenship, residency and international identity planning, with a focus on discretion, compliance, source-of-funds documentation and long-term family protection.'}

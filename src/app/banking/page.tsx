@@ -95,6 +95,7 @@ export default function Banking() {
     <div className="min-h-screen bg-white">
       {/* Page Hero */}
       <PageHero
+        service="banking"
         eyebrow={isRTL ? 'مشاوره بانکی و انطباق' : 'BANKING & COMPLIANCE'}
         title={isRTL ? 'مشاوره بانکی و انطباق برای موکلین خصوصی بین‌المللی' : 'Banking & Compliance Advisory for International Private Clients'}
         subtitle={isRTL

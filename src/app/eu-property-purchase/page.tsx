@@ -102,6 +102,7 @@ export default function EUPropertyPurchase() {
   return (
     <div className="min-h-screen bg-white">
       <PageHero
+        service="eu-property-purchase"
         eyebrow={isRTL ? 'ملک در اروپا' : 'EU PROPERTY'}
         title={isRTL ? 'خرید ملک اروپایی با دقت حقوقی، استراتژی اقامت و مراقبت از موکلین خصوصی' : 'European Property Acquisition with Legal Precision, Residency Strategy and Private Client Care'}
         subtitle={isRTL ? 'PLUCO GROUP به موکلین بین‌المللی در زمینه برنامه‌ریزی خرید ملک اروپایی، هماهنگی بررسی حقوقی دقیق، مستندات انتقال وجه و استراتژی‌های ملکی مرتبط با اقامت کمک می‌کند.' : 'PLUCO GROUP assists international clients with European property purchase planning, legal due diligence coordination, fund-transfer documentation and residence-linked property strategies.'}

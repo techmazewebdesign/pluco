@@ -2,6 +2,9 @@ import { ArrowDown, ArrowRight, ArrowUpRight, MapPin } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { advisoryContent, advisoryServicePath, serviceIcons } from './advisoryContent';
+import { CONTACT_PHONE, CONTACT_PHONE_HREF } from '@/lib/contactDetails';
+import { homepageImages } from '@/lib/pageImages';
+import PageImageStructuredData from '@/components/seo/PageImageStructuredData';
 import styles from './AdvisoryHome.module.css';
 
 export default function AdvisoryHome({ locale }: { locale: 'en' | 'fa' }) {
@@ -10,6 +13,7 @@ export default function AdvisoryHome({ locale }: { locale: 'en' | 'fa' }) {
   const consultationHref = isPersian ? '/enquire' : '/contact';
   return (
     <div className={styles.home} dir={isPersian ? 'rtl' : 'ltr'} lang={locale}>
+      <PageImageStructuredData path={isPersian ? '/fa' : '/'} />
       <section className={styles.hero} aria-labelledby="advisory-hero-title">
         <div className={styles.heroInner}>
           <div className={styles.heroText}>
@@ -24,7 +28,7 @@ export default function AdvisoryHome({ locale }: { locale: 'en' | 'fa' }) {
           <figure className={styles.heroPhoto}>
             <div className={styles.heroImage}>
               {/* Andrea Piacquadio / Pexels, photo 3860641. */}
-              <Image src="/images/advisory/advisory-meeting.webp" fill preload sizes="(max-width: 760px) 94vw, (max-width: 1100px) 47vw, 560px" alt={copy.heroAlt} />
+              <Image src={homepageImages.meeting.src} fill preload sizes="(max-width: 760px) 94vw, (max-width: 1100px) 47vw, 560px" alt={homepageImages.meeting.alt[locale]} />
             </div>
             <figcaption><MapPin aria-hidden="true" size={16} />{copy.heroCaption}</figcaption>
           </figure>
@@ -79,7 +83,7 @@ export default function AdvisoryHome({ locale }: { locale: 'en' | 'fa' }) {
       <section className={styles.feature} aria-labelledby="advisory-spain-title">
         <div className={styles.featureImage}>
           {/* Roman Odintsov / Pexels, photo 5933280. */}
-          <Image src="/images/advisory/city-walk.webp" fill sizes="(max-width: 760px) 94vw, 46vw" alt={copy.spainAlt} />
+          <Image src={homepageImages.cityWalk.src} fill sizes="(max-width: 760px) 94vw, 46vw" alt={homepageImages.cityWalk.alt[locale]} />
         </div>
         <div className={styles.featureText}>
           <h2 id="advisory-spain-title">{copy.spainTitle}</h2>
@@ -105,13 +109,14 @@ export default function AdvisoryHome({ locale }: { locale: 'en' | 'fa' }) {
             <Link href={consultationHref} className={styles.primary}>{copy.consultation}<ArrowUpRight aria-hidden="true" size={18} /></Link>
             <div className={styles.contactLinks}>
               <a href="mailto:info@plucogroup.com" dir="ltr">info@plucogroup.com</a>
+              <a href={CONTACT_PHONE_HREF}><bdi dir="ltr">{CONTACT_PHONE}</bdi></a>
               <a href="https://wa.me/48730962085">{copy.whatsapp}</a>
               <Link href="/about-us">{copy.about}</Link>
             </div>
           </div>
           <div className={styles.contactImage}>
             {/* Egor Komarov / Pexels, photo 17741460. */}
-            <Image src="/images/advisory/warsaw-old-town.webp" sizes="(max-width: 760px) 94vw, 43vw" fill alt={copy.warsawAlt} />
+            <Image src={homepageImages.warsaw.src} sizes="(max-width: 760px) 94vw, 43vw" fill alt={homepageImages.warsaw.alt[locale]} />
           </div>
         </div>
       </section>

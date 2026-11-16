@@ -11,5 +11,7 @@ export function localizedPath(path: string, persian: boolean) {
 }
 export function languageAlternates(path: string, base: string) {
   const pair = languageRoutes.find(route => route.en === path || route.fa === path);
-  return pair ? { en: base + (pair.en === '/' ? '' : pair.en), fa: base + pair.fa, 'x-default': base + (pair.en === '/' ? '' : pair.en) } : undefined;
+  if (!pair) return undefined;
+  const en = new URL(pair.en, base).href;
+  return { en, fa: new URL(pair.fa, base).href, 'x-default': en };
 }

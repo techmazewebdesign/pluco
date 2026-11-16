@@ -55,6 +55,7 @@ export default function EUCompanyRegistration() {
   return (
     <div className="min-h-screen bg-white">
       <PageHero
+        service="eu-company-registration"
         eyebrow={isRTL ? 'ثبت شرکت در اروپا' : 'EU COMPANY REGISTRATION'}
         title={isRTL ? 'تأسیس شرکت اروپایی و ساختاردهی شرکتی برای کارآفرینان بین‌المللی' : 'European Company Formation and Corporate Structuring for International Entrepreneurs'}
         subtitle={isRTL ? 'PLUCO GROUP به موکلین بین‌المللی در زمینه ثبت شرکت در اروپا، ساختاردهی شرکتی، آماده‌سازی اسناد، آمادگی بانکی و هماهنگی حقوقی پس از ثبت کمک می‌کند.' : 'PLUCO GROUP assists international clients with EU company registration, corporate structuring, document preparation, bank-readiness and post-incorporation legal coordination.'}

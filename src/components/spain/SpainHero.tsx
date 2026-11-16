@@ -17,6 +17,7 @@
  */
 
 import Image from 'next/image';
+import { spainPhoto } from '@/lib/pageImages';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, SearchCheck, FileText, UserCheck } from 'lucide-react';
 
@@ -126,10 +127,11 @@ export default function SpainHero({ isRTL, onRequestAssessment, onViewPackages }
           }
         >
           <Image
-            src="/images/digital_nomad_hero.png"
-            alt="Remote work setup on a Spanish balcony overlooking the city at sunset"
+            src={spainPhoto.src}
+            alt={spainPhoto.alt[isRTL ? 'fa' : 'en']}
+            sizes="100vw"
             fill
-            priority
+            preload
             className={`object-cover ${isRTL ? 'object-left' : 'object-right'}`}
           />
         </motion.div>

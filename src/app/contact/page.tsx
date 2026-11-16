@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MapPin, Clock, ArrowRight } from 'lucide-react';
+import { Mail, MapPin, Clock, ArrowRight, Phone } from 'lucide-react';
 import ConsultationProcess from '@/components/sections/ConsultationProcess';
 import DiscreetFirstContact from '@/components/sections/DiscreetFirstContact';
 import LegalDisclaimer from '@/components/shared/LegalDisclaimer';
 import PrivateEnquiryFormModal from '@/components/shared/PrivateEnquiryFormModal';
+import { CONTACT_PHONE, CONTACT_PHONE_HREF } from '@/lib/contactDetails';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function ContactPage() {
@@ -53,6 +54,12 @@ export default function ContactPage() {
                     lines: ['info@plucogroup.com', 'General enquiries & consultations'],
                   },
                   {
+                    Icon: Phone,
+                    title: isRTL ? 'تلفن' : 'Phone',
+                    lines: [CONTACT_PHONE],
+                    href: CONTACT_PHONE_HREF,
+                  },
+                  {
                     Icon: MapPin,
                     title: 'Office',
                     lines: ['Ksawerów 3', '02-656 Warsaw, Poland', 'By appointment only'],
@@ -62,7 +69,7 @@ export default function ContactPage() {
                     title: 'Business Hours',
                     lines: ['Mon – Fri: 9:00 AM – 6:00 PM CET', 'International clients accommodated across time zones'],
                   },
-                ].map(({ Icon, title, lines }) => (
+                ].map(({ Icon, title, lines, href }) => (
                   <div key={title} className="flex items-start gap-4">
                     <div
                       className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
@@ -76,7 +83,9 @@ export default function ContactPage() {
                       </p>
                       {lines.map(line => (
                         <p key={line} className="text-xs leading-relaxed" style={{ color: '#5E6470' }}>
-                          {line}
+                          {href ? (
+                            <a href={href} dir="ltr" className="underline underline-offset-2">{line}</a>
+                          ) : line}
                         </p>
                       ))}
                     </div>

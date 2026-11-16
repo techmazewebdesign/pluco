@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import ServiceHeroImage from '@/components/shared/ServiceHeroImage';
 import { notFound } from 'next/navigation';
 import { PERSIAN_SERVICES, isPersianServiceSlug } from '@/lib/plucoPersianServices';
 import { createPageMetadata, SITE_URL } from '@/lib/siteMetadata';
@@ -22,11 +23,14 @@ export default async function Page({params}: Props) {
       {'@type':'ListItem',position:2,name:service.shortTitle,item:SITE_URL+path}]}] };
   return <article lang="fa" dir="rtl" className="bg-[#F7F5EF] text-[#172033]">
     <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(schema).replace(/</g,'\\u003c')}} />
-    <header className="bg-[#071C3C] px-5 py-16 text-white"><div className="mx-auto max-w-5xl">
-      <nav aria-label="مسیر صفحه"><Link href="/fa" className="underline">خدمات فارسی</Link></nav>
-      <h1 className="mt-6 text-3xl font-bold leading-relaxed sm:text-5xl">{service.title}</h1>
-      <p className="mt-6 text-lg leading-9">{service.description}</p>
-      <Link href={service.englishPath} hrefLang="en" className="mt-6 inline-block underline">English version</Link>
+    <header className="bg-[#071C3C] px-5 py-16 text-white"><div className="mx-auto grid max-w-6xl items-center gap-7 lg:grid-cols-[1.25fr_1fr] lg:gap-10">
+      <div>
+        <nav aria-label="مسیر صفحه"><Link href="/fa" className="underline">خدمات فارسی</Link></nav>
+        <h1 className="mt-6 text-3xl font-bold leading-relaxed sm:text-5xl">{service.title}</h1>
+        <p className="mt-6 text-lg leading-9">{service.description}</p>
+        <Link href={service.englishPath} hrefLang="en" className="mt-6 inline-block underline">English version</Link>
+      </div>
+      <ServiceHeroImage service={service.englishPath.slice(1)} lang="fa" />
     </div></header>
     <div className="mx-auto max-w-5xl space-y-10 px-5 py-12 sm:px-8">
       <section><h2 className="text-2xl font-bold">این خدمت برای چه کسانی مناسب است؟</h2><p className="mt-4 leading-9">{service.audience}</p></section>

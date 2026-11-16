@@ -1,29 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SITE_URL } from "@/lib/siteMetadata";
+import ServiceHeroImage from '@/components/shared/ServiceHeroImage';
+import { createPageMetadata } from "@/lib/siteMetadata";
 
-const path = "/iranian-clients";
-const url = `${SITE_URL}${path}`;
-const persianUrl = `${SITE_URL}/fa/iranians-abroad`;
-
-export const metadata: Metadata = {
-  title: { absolute: "European immigration, banking and business support for Iranian clients | PLUCO GROUP" },
-  description:
-    "General information about PLUCO GROUP support for Iranian clients considering European residency, company formation, banking compliance and cross-border matters.",
-  alternates: {
-    canonical: url,
-    languages: { en: url, fa: persianUrl, "x-default": url },
-  },
-  openGraph: {
-    title: "European immigration, banking and business support for Iranian clients | PLUCO GROUP",
-    description:
-      "General information about European residency, company formation, banking compliance and cross-border matters.",
-    url,
-    locale: "en_US",
-    alternateLocale: ["fa_IR"],
-    type: "website",
-  },
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "European Residency, Banking and Business Support for Iranian Clients | PLUCO GROUP",
+  description: "Explore Pluco Group’s English and Farsi support for Iranian clients planning European residency, preparing banking documents or establishing a business.",
+  path: "/iranian-clients",
+});
 
 const services = [
   ["European residency planning", "Compare relevant residence options against work, family, income and documentation circumstances.", "/eu-residency"],
@@ -37,11 +21,14 @@ export default function IranianClientsPage() {
   return (
     <main className="bg-[#F7F5EF] text-[#172033]">
       <section className="bg-[#071C3C] text-white">
-        <div className="mx-auto max-w-5xl px-5 py-16 sm:px-8 lg:py-24">
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#E3C783]">For Iranian clients worldwide</p>
-          <h1 className="mt-5 max-w-4xl text-4xl font-black leading-tight sm:text-6xl">European immigration, banking and business support for Iranian clients</h1>
-          <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200">A factual starting point for families, professionals and entrepreneurs facing European residency, banking, company or cross-border questions.</p>
-          <Link href="/fa/iranians-abroad" hrefLang="fa" className="mt-8 inline-block rounded-full border border-[#E3C783] px-6 py-3 font-bold text-[#E3C783]">مطالعه به فارسی</Link>
+        <div className="mx-auto grid max-w-6xl items-center gap-7 px-5 py-16 sm:px-8 lg:grid-cols-[1.25fr_1fr] lg:gap-10 lg:py-24">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#E3C783]">For Iranian clients worldwide</p>
+            <h1 className="mt-5 max-w-4xl text-4xl font-black leading-tight sm:text-6xl">European immigration, banking and business support for Iranian clients</h1>
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200">A factual starting point for families, professionals and entrepreneurs facing European residency, banking, company or cross-border questions.</p>
+            <Link href="/fa/iranians-abroad" hrefLang="fa" className="mt-8 inline-block rounded-full border border-[#E3C783] px-6 py-3 font-bold text-[#E3C783]">مطالعه به فارسی</Link>
+          </div>
+          <ServiceHeroImage service="iranian-clients" lang="en" />
         </div>
       </section>
 

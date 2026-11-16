@@ -152,6 +152,7 @@ export default function EUResidency() {
   return (
     <div className="min-h-screen bg-white">
       <PageHero
+        service="eu-residency"
         eyebrow={isRTL ? 'اقامت اروپا' : 'EU RESIDENCY'}
         title={isRTL ? 'راهکارهای اقامت اروپایی برای خانواده‌های بین‌المللی، سرمایه‌گذاران و کارآفرینان' : 'European Residency Solutions for International Families, Investors and Entrepreneurs'}
         subtitle={isRTL ? 'PLUCO GROUP پشتیبانی حقوقی و استراتژیک محرمانه‌ای را برای موکلین با ارزش خالص بالا که به دنبال اقامت قانونی اروپایی از طریق سرمایه‌گذاری، تجارت، استقلال مالی، دورکاری، برنامه‌ریزی مرتبط با ملک و ساختارهای جابجایی خانوادگی هستند، ارائه می‌دهد.' : 'PLUCO GROUP provides discreet legal and strategic support for high-net-worth clients seeking lawful European residence through investment, business, financial independence, remote work, property-linked planning and family relocation structures.'}

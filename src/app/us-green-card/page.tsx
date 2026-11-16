@@ -80,6 +80,7 @@ export default function USGreenCard() {
   return (
     <div className="min-h-screen bg-white">
       <PageHero
+        service="us-green-card"
         eyebrow={isRTL ? 'مهاجرت به آمریکا' : 'US IMMIGRATION'}
         title={isRTL ? 'برنامه‌ریزی اقامت دائم آمریکا برای سرمایه‌گذاران، کارآفرینان و خانواده‌های ثروتمند' : 'US Permanent Residence Planning for Investors, Entrepreneurs and High-Net-Worth Families'}
         subtitle={isRTL ? 'PLUCO GROUP هماهنگی حقوقی استراتژیک برای موکلینی که گزینه‌های اقامت دائم آمریکا از جمله مسیرهای مهاجرتی مبتنی بر سرمایه‌گذاری مانند برنامه EB-5 را بررسی می‌کنند، ارائه می‌دهد.' : 'PLUCO GROUP provides strategic legal coordination for clients exploring US permanent residence options, including investment-based immigration pathways such as the EB-5 Immigrant Investor Programme.'}

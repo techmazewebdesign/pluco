@@ -65,6 +65,7 @@ export default function DisputeResolution() {
   return (
     <div className="min-h-screen bg-white">
       <PageHero
+        service="dispute-resolution"
         eyebrow={isRTL ? 'حل اختلاف' : 'DISPUTE RESOLUTION'}
         title={isRTL ? 'حل اختلاف استراتژیک برای امور موکلین خصوصی و تجاری بین‌المللی' : 'Strategic Dispute Resolution for Cross-Border Private Client and Business Matters'}
         subtitle={isRTL ? 'PLUCO GROUP از موکلین خصوصی، کارآفرینان و شرکت‌ها در حل اختلافات بین‌المللی حساس از طریق استراتژی حقوقی، مستندسازی و هماهنگی با مشاور متخصص پشتیبانی می‌کند.' : 'PLUCO GROUP supports private clients, entrepreneurs and companies in resolving sensitive international disputes through legal strategy, negotiation, documentation and coordination with specialist counsel where required.'}

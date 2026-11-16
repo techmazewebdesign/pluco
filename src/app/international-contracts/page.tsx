@@ -41,6 +41,7 @@ export default function InternationalContracts() {
   return (
     <div className="min-h-screen bg-white">
       <PageHero
+        service="international-contracts"
         eyebrow={isRTL ? 'قراردادهای بین‌المللی' : 'INTERNATIONAL CONTRACTS'}
         title={isRTL ? 'قراردادهای بین‌المللی تنظیم، بررسی و مذاکره شده با دقت حقوقی' : 'Cross-Border Contracts Drafted, Reviewed and Negotiated with Legal Precision'}
         subtitle={isRTL ? 'PLUCO GROUP به موکلین خصوصی، کارآفرینان، سرمایه‌گذاران و شرکت‌ها در زمینه قراردادهای بین‌المللی، اسناد معاملاتی و مدیریت ریسک حقوقی کمک می‌کند.' : 'PLUCO GROUP assists private clients, entrepreneurs, investors and companies with international contracts, transaction documents and legal risk management.'}

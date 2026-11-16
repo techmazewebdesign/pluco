@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { SITE_URL } from '@/lib/siteMetadata';
 import { languageAlternates } from '@/lib/languageRoutes';
+import { getPageImages } from '@/lib/pageImages';
 import { PERSIAN_SERVICES } from '@/lib/plucoPersianServices';
 
 const BASE_URL = SITE_URL;
@@ -45,7 +46,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   })));
   return publicPages.map(({ url, priority, changeFrequency }) => {
     const languages = languageAlternates(url, BASE_URL);
+    const pageImages = getPageImages(url);
     return { url: `${BASE_URL}${url}`, priority, changeFrequency,
-      ...(languages ? { alternates: { languages } } : {}) };
+      ...(languages ? { alternates: { languages } } : {}),
+      ...(pageImages ? { images: pageImages.images.map(({ src }) => new URL(src, BASE_URL).href) } : {}),
+    };
   });
 }

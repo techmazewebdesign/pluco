@@ -21,7 +21,6 @@ export const advisoryContent = {
     processLink: 'How we help',
     servicesLink: 'Find your service',
     contactLink: 'Get in touch',
-    heroAlt: 'A smiling woman discussing a document with others in a bright office',
     heroCaption: 'Warsaw, Poland · Working across borders',
     processTitle: 'From your first question to a plan you can act on',
     steps: [
@@ -40,7 +39,6 @@ export const advisoryContent = {
     spainTitle: 'Considering a move to Spain?',
     spainBody: 'If you work remotely, we can help you review whether the digital nomad visa fits your situation and identify what you’ll need to prepare.',
     spainLink: 'Explore the Spain digital nomad visa',
-    spainAlt: 'A smiling couple walking together on a city street',
     insightsTitle: 'Helpful reading before you decide',
     articles: [
       { label: 'Publications and legal insights', href: '/publications' },
@@ -51,7 +49,6 @@ export const advisoryContent = {
     contactText: 'Tell us what you’re trying to achieve and where you need help. We’ll explain how we can assist and what to expect next.',
     whatsapp: 'WhatsApp',
     about: 'About Pluco Group',
-    warsawAlt: 'People crossing Warsaw’s colourful Old Town square on a sunny day',
   },
   fa: {
     category: 'مشاوره مهاجرت اروپا و امور فرامرزی برای ایرانیان',
@@ -63,7 +60,6 @@ export const advisoryContent = {
     processLink: 'چطور کمک می‌کنیم',
     servicesLink: 'خدمات ما',
     contactLink: 'تماس با ما',
-    heroAlt: 'گفت‌وگو درباره یک سند در جلسه‌ای دوستانه در دفتر روشن',
     heroCaption: 'ورشو، لهستان · مشاوره فرامرزی',
     processTitle: 'از اولین سؤال تا برنامه‌ای برای اقدام',
     steps: [
@@ -82,7 +78,6 @@ export const advisoryContent = {
     spainTitle: 'به زندگی در اسپانیا فکر می‌کنید؟',
     spainBody: 'اگر دورکار هستید، به شما کمک می‌کنیم بررسی کنید که آیا ویزای نومد دیجیتال با شرایطتان سازگار است و چه مدارکی باید آماده کنید.',
     spainLink: 'آشنایی با ویزای نومد دیجیتال اسپانیا',
-    spainAlt: 'زوجی خندان که در خیابانی شهری قدم می‌زنند',
     insightsTitle: 'راهنماهایی برای تصمیم‌گیری',
     articles: [
       { label: 'راهنمای ایرانیان خارج از کشور', href: '/fa/iranians-abroad' },
@@ -96,7 +91,6 @@ export const advisoryContent = {
     contactText: 'بگویید چه هدفی دارید و در کدام بخش به کمک نیاز دارید. توضیح می‌دهیم چه کمکی از ما برمی‌آید و قدم بعدی چیست.',
     whatsapp: 'واتس‌اپ',
     about: 'درباره پلوکو گروپ',
-    warsawAlt: 'میدان رنگارنگ شهر قدیمی ورشو در یک روز آفتابی',
   },
 };
 

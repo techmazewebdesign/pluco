@@ -1,0 +1,44 @@
+.phone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  min-height: 1.75rem;
+  padding-inline: .7rem;
+  border: 1px solid #e3c783;
+  border-radius: 999px;
+  background: #f2dfad;
+  color: #071c3c;
+  font-size: .75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition: background-color 150ms ease;
+}
+
+.phone:hover {
+  background: #fff1cc;
+}
+
+.phone:focus-visible {
+  outline: 2px solid #fff1cc;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .phone {
+    animation: phone-entrance 560ms cubic-bezier(.2, .8, .2, 1) 180ms both;
+  }
+}
+
+@keyframes phone-entrance {
+  from {
+    opacity: 0;
+    transform: translateY(-.45rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

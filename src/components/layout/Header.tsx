@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, LogOut, User } from 'lucide-react';
+import { Menu, X, ChevronDown, LogOut, Phone, User } from 'lucide-react';
 import Link from 'next/link';
 import { localizedPath } from '@/lib/languageRoutes';
 import Image from 'next/image';
@@ -10,6 +10,8 @@ import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import { CONTACT_PHONE, CONTACT_PHONE_HREF } from '@/lib/contactDetails';
+import styles from './Header.module.css';
 
 export default function Header() {
   const { t, isRTL } = useLanguage();
@@ -63,13 +65,21 @@ export default function Header() {
       className="fixed top-0 left-0 right-0 z-50"
       style={{ backgroundColor: '#071C3C', borderBottom: '1px solid #0B234A' }}
     >
-      {/* ── Top bar: language switcher ── */}
+      {/* Language and phone bar */}
       <div
         className="border-b px-4 sm:px-6 lg:px-8 py-2 flex items-center"
         style={{ borderColor: '#0B234A', backgroundColor: '#051530', position: 'relative', zIndex: 60 }}
       >
-        <div className="max-w-7xl mx-auto w-full flex items-center">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3">
           <LanguageSwitcher />
+          <a
+            href={CONTACT_PHONE_HREF}
+            aria-label={isRTL ? `تماس با پلوکو گروپ، ${CONTACT_PHONE}` : `Call Pluco Group at ${CONTACT_PHONE}`}
+            className={styles.phone}
+          >
+            <Phone aria-hidden="true" size={14} />
+            <bdi dir="ltr">{CONTACT_PHONE}</bdi>
+          </a>
         </div>
       </div>
 

@@ -1,17 +1,21 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
+import ServiceHeroImage from './ServiceHeroImage';
 
 interface PageHeroProps {
   eyebrow?: string;
   title: string;
   subtitle?: string;
+  service?: string;
 }
 
-export default function PageHero({ eyebrow, title, subtitle }: PageHeroProps) {
+export default function PageHero({ eyebrow, title, subtitle, service }: PageHeroProps) {
+  const { lang } = useLanguage();
   return (
     <section className="pt-28 pb-14" style={{ backgroundColor: '#071C3C' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8${service ? ' grid items-center gap-7 lg:grid-cols-[1.25fr_1fr] lg:gap-12' : ''}`}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -38,6 +42,7 @@ export default function PageHero({ eyebrow, title, subtitle }: PageHeroProps) {
             </p>
           )}
         </motion.div>
+        {service && <ServiceHeroImage service={service} lang={lang} />}
       </div>
     </section>
   );

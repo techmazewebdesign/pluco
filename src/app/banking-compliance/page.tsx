@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import ServiceHeroImage from '@/components/shared/ServiceHeroImage';
 import { Landmark, ShieldCheck, FileText, BarChart3, ArrowRight } from 'lucide-react';
 
 const services = [
@@ -16,7 +17,7 @@ export default function BankingCompliance() {
     <div className="min-h-screen bg-white">
       {/* Page header */}
       <section className="pt-28 pb-14" style={{ backgroundColor: '#071C3C' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-7xl items-center gap-7 px-4 sm:px-6 lg:grid-cols-[1.25fr_1fr] lg:gap-12 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#C9A35A' }}>OUR SERVICES</p>
             <h1 className="text-4xl md:text-5xl font-serif text-white mb-4">Banking Compliance</h1>
@@ -24,6 +25,7 @@ export default function BankingCompliance() {
               Advisory on regulatory compliance, risk frameworks and governance for businesses and financial institutions operating internationally.
             </p>
           </motion.div>
+          <ServiceHeroImage service="banking-compliance" lang="en" />
         </div>
       </section>
 

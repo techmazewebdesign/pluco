@@ -34,6 +34,7 @@ export default function BusinessSolutions() {
   return (
     <div className="min-h-screen bg-white">
       <PageHero
+        service="business-solutions"
         eyebrow={isRTL ? 'راهکارهای تجاری' : 'BUSINESS SOLUTIONS'}
         title={isRTL ? 'راهکارهای استراتژیک تجاری، رشد دیجیتال و توسعه بازار اروپایی' : 'Strategic Business, Digital Growth and European Market Expansion Solutions'}
         subtitle={isRTL ? 'PLUCO GROUP با شرکای تجاری منتخب همکاری می‌کند تا از کارآفرینان و شرکت‌ها در ورود به بازار اروپا، توسعه کسب‌وکار، رشد دیجیتال، اتوماسیون و توسعه عملیاتی پشتیبانی کند.' : 'PLUCO GROUP works with selected business partners to support entrepreneurs and companies with European market entry, business development, digital growth, automation and operational expansion.'}
