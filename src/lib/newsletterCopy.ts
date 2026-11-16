@@ -1,0 +1,46 @@
+export const newsletterCopy = {
+  en: {
+    title: 'Pluco Group newsletter',
+    link: 'Subscribe to our newsletter',
+    description: 'Receive updates on European residency, cross-border matters and new Pluco Group publications.',
+    email: 'Email address',
+    consent: 'I agree to receive the Pluco Group newsletter by email. I can unsubscribe at any time.',
+    privacy: 'Newsletter privacy notice',
+    subscribe: 'Subscribe',
+    sending: 'Submitting…',
+    submitted: 'If this address needs confirmation, check your inbox for the confirmation email.',
+    limited: 'Too many requests. Please try again later.',
+    error: 'We couldn’t complete your request. Please try again.',
+    confirm: 'Confirm your subscription',
+    confirmationEmail: 'You requested the Pluco Group newsletter. Confirm your email address below to subscribe. The link expires in 48 hours. If you didn’t request this, you can ignore this email.',
+    confirmed: 'You’re subscribed to the Pluco Group newsletter.',
+    unsubscribe: 'Unsubscribe',
+    unsubscribed: 'You’re unsubscribed from the Pluco Group newsletter.',
+    invalid: 'This link is invalid or has expired. You can request a new confirmation from the newsletter form.',
+    back: 'Back to the newsletter',
+  },
+  fa: {
+    title: 'خبرنامه گروه پلوکو',
+    link: 'عضویت در خبرنامه',
+    description: 'تازه‌ها درباره اقامت اروپا، امور فرامرزی و مطالب تازه گروه پلوکو را دریافت کنید.',
+    email: 'نشانی ایمیل',
+    consent: 'با دریافت خبرنامه گروه پلوکو از طریق ایمیل موافقم. هر زمان می‌توانم عضویتم را لغو کنم.',
+    privacy: 'حریم خصوصی خبرنامه',
+    subscribe: 'عضویت',
+    sending: 'در حال ارسال…',
+    submitted: 'اگر این نشانی نیاز به تأیید دارد، ایمیل تأیید را در صندوق ورودی خود بررسی کنید.',
+    limited: 'تعداد درخواست‌ها زیاد است. لطفاً بعداً دوباره تلاش کنید.',
+    error: 'درخواست شما انجام نشد. لطفاً دوباره تلاش کنید.',
+    confirm: 'عضویت خود را تأیید کنید',
+    confirmationEmail: 'شما درخواست عضویت در خبرنامه گروه پلوکو را ثبت کرده‌اید. برای عضویت، نشانی ایمیل خود را از طریق دکمه زیر تأیید کنید. این پیوند پس از ۴۸ ساعت منقضی می‌شود. اگر شما این درخواست را ثبت نکرده‌اید، می‌توانید این ایمیل را نادیده بگیرید.',
+    confirmed: 'عضویت شما در خبرنامه گروه پلوکو تأیید شد.',
+    unsubscribe: 'لغو عضویت',
+    unsubscribed: 'عضویت شما در خبرنامه گروه پلوکو لغو شد.',
+    invalid: 'این پیوند نامعتبر است یا منقضی شده است. می‌توانید از فرم خبرنامه درخواست تأیید تازه‌ای ثبت کنید.',
+    back: 'بازگشت به خبرنامه',
+  },
+} as const;
+
+export function newsletterLocale(value: unknown) {
+  return value === 'fa' ? 'fa' : 'en';
+}

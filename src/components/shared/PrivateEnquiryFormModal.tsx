@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { trackPublicLead } from '@/lib/publicAnalytics';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, CheckCircle, ArrowRight, Lock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -37,6 +38,7 @@ const ff = "'Vazirmatn', Tahoma, Arial, sans-serif";
 // Canonical values are kept in English (used for submission and matched by admin dashboards);
 // only the displayed label is translated.
 const SERVICE_OPTIONS: { value: string; en: string; fa: string }[] = [
+  { value: 'São Tomé and Príncipe Citizenship by Investment', en: 'São Tomé and Príncipe Citizenship by Investment', fa: 'تابعیت سائوتومه و پرنسیپ از طریق سرمایه‌گذاری' },
   { value: 'New Identity / Second Citizenship', en: 'New Identity / Second Citizenship', fa: 'هویت جدید / تابعیت دوم' },
   { value: 'EU Residency', en: 'EU Residency', fa: 'اقامت اروپا' },
   { value: 'Spain Digital Nomad Visa / Remote Residency Support', en: 'Spain Digital Nomad Visa / Remote Residency Support', fa: 'ویزای دیجیتال نومد / پشتیبانی اقامت ریموت' },
@@ -175,14 +177,7 @@ export default function PrivateEnquiryFormModal({
 
       const data = await response.json();
       if (data.success) {
-        const analyticsWindow = window as Window & {
-          gtag?: (...args: unknown[]) => void;
-        };
-        analyticsWindow.gtag?.('event', 'generate_lead', {
-          method: 'private_enquiry',
-          service: form.service,
-          page_path: window.location.pathname,
-        });
+        trackPublicLead(form.service, isRTL ? 'fa' : 'en', 'private_enquiry_modal');
         setSubmitted(true);
         setTimeout(() => {
           setSubmitted(false);

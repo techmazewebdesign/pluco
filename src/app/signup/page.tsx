@@ -52,13 +52,13 @@ export default function SignupPage() {
       return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       setValidationError(isRTL ? 'لطفا ایمیل معتبر وارد کنید' : 'Please enter a valid email');
       return;
     }
 
-    if (!formData.password || formData.password.length < 6) {
-      setValidationError(isRTL ? 'رمز عبور باید حداقل 6 حرف باشد' : 'Password must be at least 6 characters');
+    if (!formData.password || formData.password.length < 8) {
+      setValidationError(isRTL ? 'رمز عبور باید حداقل 8 حرف باشد' : 'Password must be at least 8 characters');
       return;
     }
 
@@ -75,7 +75,7 @@ export default function SignupPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name.trim(),
-          email: formData.email.trim(),
+          email: formData.email.trim().toLowerCase(),
           password: formData.password,
           role: formData.role,
         }),
@@ -91,8 +91,8 @@ export default function SignupPage() {
 
       setSuccessMessage(
         isRTL
-          ? 'حساب کاربری ایجاد شد! ایمیل تایید به آدرس شما ارسال شد. لطفا پوشه spam را بررسی کنید.'
-          : 'Account created! We sent a verification email. Check your inbox and spam folder.'
+          ? 'حساب کاربری ایجاد شد! درخواست دسترسی مشاور پس از بررسی تیم تأیید می‌شود. ایمیل تایید به آدرس شما ارسال شد. لطفا پوشه spam را بررسی کنید.'
+          : 'Account created! Consultant access requires team approval. We sent a verification email. Check your inbox and spam folder.'
       );
 
       setTimeout(() => {

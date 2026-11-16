@@ -4,12 +4,24 @@ const structuredData = {
   '@context': 'https://schema.org',
   '@graph': [
     {
-      '@type': 'Organization',
+      '@type': ['Organization', 'LegalService'],
       '@id': `${SITE_URL}/#organization`,
       name: 'PLUCO GROUP Sp. z o.o.',
+      alternateName: 'PLUCO GROUP',
       url: SITE_URL,
       logo: `${SITE_URL}/images/logo-pluco.png`,
       email: 'info@plucogroup.com',
+      areaServed: ['EU', 'PL', 'ES', 'US'],
+      knowsLanguage: ['en', 'fa'],
+      knowsAbout: [
+        'European immigration law',
+        'EU residency by investment',
+        'Second citizenship',
+        'Spain digital nomad visa',
+        'EB-5 investor visa',
+        'EU company registration',
+        'Cross-border banking compliance',
+      ],
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Ksawerów 3',

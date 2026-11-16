@@ -6,10 +6,13 @@ import { Resend } from 'resend';
 
 export const runtime = 'nodejs';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export async function GET(request: NextRequest) {
   try {
+    if (!resend) {
+      return NextResponse.json({ error: 'Email service not configured' }, { status: 503 });
+    }
     // Verify cron secret token (optional security)
     const cronSecret = request.headers.get('authorization');
     const expectedSecret = process.env.CRON_SECRET || 'default-secret';

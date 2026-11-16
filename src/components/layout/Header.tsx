@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, LogOut, User } from 'lucide-react';
 import Link from 'next/link';
+import { localizedPath } from '@/lib/languageRoutes';
 import Image from 'next/image';
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -24,6 +25,7 @@ export default function Header() {
   };
 
   const services = [
+    { key: 'nav.saoTomeCitizenship' as const,     href: '/sao-tome-citizenship-by-investment' },
     { key: 'nav.newIdentity' as const,             href: '/new-identity' },
     { key: 'nav.euPropertyPurchase' as const,      href: '/eu-property-purchase' },
     { key: 'nav.euResidency' as const,             href: '/eu-residency' },
@@ -38,7 +40,6 @@ export default function Header() {
 
   const mobileBase = [
     { key: 'nav.home' as const,                    href: '/' },
-    { key: 'nav.ourPeople' as const,               href: '/our-people' },
     ...services,
     { key: 'nav.publications' as const,            href: '/publications' },
   ];
@@ -77,7 +78,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center flex-shrink-0">
+          <Link href={isRTL ? '/fa' : '/'} className="flex items-center flex-shrink-0">
             <Image
               src="/images/logo-pluco.png"
               alt="Pluco Group Sp. z o.o."
@@ -91,17 +92,8 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-5 xl:gap-6" dir={isRTL ? 'rtl' : 'ltr'}>
             {/* Home */}
-            <Link href="/" className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
+            <Link href={isRTL ? '/fa' : '/'} className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
               {t('nav.home')}
-              <span
-                className={`absolute bottom-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${isRTL ? 'right-0' : 'left-0'}`}
-                style={{ backgroundColor: '#C9A35A' }}
-              />
-            </Link>
-
-            {/* Our People */}
-            <Link href="/our-people" className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
-              {t('nav.ourPeople')}
               <span
                 className={`absolute bottom-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${isRTL ? 'right-0' : 'left-0'}`}
                 style={{ backgroundColor: '#C9A35A' }}
@@ -135,7 +127,7 @@ export default function Header() {
                     {services.map((item) => (
                       <Link
                         key={item.href}
-                        href={item.href}
+                        href={localizedPath(item.href, isRTL)}
                         onClick={() => setIsServicesOpen(false)}
                         className="block px-4 py-2.5 text-xs font-medium transition-colors hover:text-white"
                         style={{ color: '#CBD5E0' }}
@@ -227,7 +219,7 @@ export default function Header() {
               {mobileAll.map((item) => (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={localizedPath(item.href, isRTL)}
                   className="block px-3 py-2.5 text-sm font-medium rounded transition-colors"
                   style={{ color: '#CBD5E0' }}
                   onClick={() => setIsMenuOpen(false)}

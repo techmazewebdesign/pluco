@@ -13,6 +13,7 @@ interface ConsultationFormProps {
 }
 
 const SERVICES = [
+  'São Tomé and Príncipe Citizenship by Investment',
   'EU Residency',
   'Second Citizenship / New Identity',
   'Banking Support',

@@ -212,9 +212,11 @@ export async function POST(req: NextRequest) {
     const { data: confirmationEmail, error: confirmationError } = await resend.emails.send({
       from: fromAddress,
       to: email,
+      bcc: toAddress,
+      replyTo: toAddress,
       subject: isFarsi
         ? 'تأیید استعلام شما – PLUCO GROUP'
-        : 'Your Enquiry Has Been Received – PLUCO GROUP',
+        : 'We Have Received Your Email – PLUCO GROUP',
       html: isFarsi ? `
         <div style="font-family:Tahoma,Arial,sans-serif;max-width:600px;margin:0 auto;direction:rtl;text-align:right">
           <div style="background:#071C3C;padding:24px 32px;border-bottom:3px solid #C9A35A">
@@ -223,7 +225,7 @@ export async function POST(req: NextRequest) {
           </div>
           <div style="padding:32px;background:#fff">
             <p style="color:#1E2430;font-size:15px;line-height:1.7">${fullName} عزیز،</p>
-            <p style="color:#374151;font-size:14px;line-height:1.8">استعلام شما با موفقیت دریافت شد. تیم PLUCO GROUP ظرف ۲ روز کاری با شما تماس خواهد گرفت.</p>
+            <p style="color:#374151;font-size:14px;line-height:1.8">از تماس شما با PLUCO GROUP سپاسگزاریم. ایمیل شما را دریافت کرده‌ایم و در اسرع وقت با شما تماس خواهیم گرفت.</p>
             <div style="background:#F8F9FA;border-right:4px solid #C9A35A;padding:16px;border-radius:4px;margin:24px 0">
               <p style="color:#64748B;font-size:12px;margin:0 0 6px">خدمات درخواستی:</p>
               <p style="color:#1E2430;font-size:14px;margin:0;font-weight:600">${service || '—'}</p>
@@ -244,7 +246,7 @@ export async function POST(req: NextRequest) {
           <div style="padding:32px;background:#fff">
             <p style="color:#1E2430;font-size:15px;line-height:1.7">Dear ${fullName},</p>
             <p style="color:#374151;font-size:14px;line-height:1.8">
-              Thank you for contacting PLUCO GROUP. Your enquiry has been received and a member of our team will be in touch within 2 business days.
+              Thank you for contacting PLUCO GROUP. We have received your email and will contact you as soon as possible.
             </p>
             <div style="background:#F8F9FA;border-left:4px solid #C9A35A;padding:16px;border-radius:4px;margin:24px 0">
               <p style="color:#64748B;font-size:12px;margin:0 0 6px;text-transform:uppercase;letter-spacing:.05em">Service Requested</p>

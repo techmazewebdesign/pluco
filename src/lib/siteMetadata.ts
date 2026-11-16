@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
+import { languageAlternates } from "./languageRoutes";
 
 export const SITE_URL = "https://www.plucogroup.com";
 export const SITE_NAME = "PLUCO GROUP";
-export const SITE_TITLE = "PLUCO GROUP – European Immigration Law & Private Client Advisory";
+export const SITE_TITLE = "European Residency & Private Client Advisory | PLUCO GROUP";
 export const SITE_DESCRIPTION =
-  "Discreet legal and strategic advisory for internationally mobile individuals and families.";
+  "European residency advisory, Spain digital nomad visa support, banking documentation and company formation for international families and entrepreneurs. English and Farsi support.";
 export const DEFAULT_SOCIAL_IMAGE = "/images/pluco-social-preview.png";
 export const DEFAULT_SOCIAL_IMAGE_ALT =
-  "PLUCO GROUP – European Immigration Law & Private Client Advisory";
+  "European Residency & Private Client Advisory | PLUCO GROUP";
 
 type PageMetadataOptions = {
   title?: string;
@@ -18,6 +19,7 @@ type PageMetadataOptions = {
   locale?: string;
   alternateLocales?: string[];
   robots?: Metadata["robots"];
+  keywords?: string[];
 };
 
 export function createPageMetadata({
@@ -29,6 +31,7 @@ export function createPageMetadata({
   locale = "en_US",
   alternateLocales = ["fa_IR"],
   robots,
+  keywords,
 }: PageMetadataOptions = {}): Metadata {
   const canonicalUrl = new URL(path, SITE_URL).toString();
   const socialImageUrl = new URL(image, SITE_URL).toString();
@@ -38,7 +41,9 @@ export function createPageMetadata({
     description,
     alternates: {
       canonical: canonicalUrl,
+      languages: languageAlternates(path, SITE_URL),
     },
+    keywords,
     robots,
     openGraph: {
       title,

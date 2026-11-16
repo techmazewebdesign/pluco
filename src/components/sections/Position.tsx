@@ -68,11 +68,11 @@ export default function Position() {
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
-                href="/our-people"
+                href={isRTL ? "/fa" : "/about-us"}
                 className="inline-flex items-center gap-2 px-7 py-3 text-sm font-medium rounded border transition-all whitespace-nowrap hover:brightness-110"
                 style={{ borderColor: '#C9A35A', color: '#C9A35A' }}
               >
-                {t('ui.ourPeople')}
+                {isRTL ? 'درباره خدمات ما' : 'About our services'}
                 <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
               </Link>
             </motion.div>

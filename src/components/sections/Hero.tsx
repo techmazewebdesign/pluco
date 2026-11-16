@@ -145,7 +145,7 @@ export default function Hero() {
             className="absolute left-0 top-0 bottom-0 w-0.5 z-10 origin-top"
             style={{ backgroundColor: '#C9A35A' }}
           />
-          <Image src="/images/hero-pluco.jpg" alt="European legal advisory" fill className="object-cover" priority />
+          <Image src="/images/hero-pluco.jpg" alt={isRTL ? "نمای شهر ورشو و ساختمان کاخ فرهنگ در غروب" : "Warsaw skyline and the Palace of Culture at dusk"} fill className="object-cover" priority />
         </motion.div>
       </section>
 
@@ -164,7 +164,7 @@ export default function Hero() {
                 className="flex items-center justify-center gap-3 py-6 px-6 rounded-lg cursor-default"
               >
                 <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.6 }}>
-                  <Image src={item.icon} alt={item.labelKey} width={32} height={32} className="flex-shrink-0" />
+                  <Image src={item.icon} alt="" width={32} height={32} className="flex-shrink-0" />
                 </motion.div>
                 <span
                   className="text-sm font-medium"

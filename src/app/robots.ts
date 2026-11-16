@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { SITE_URL } from '@/lib/siteMetadata';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,6 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: [
         '/api/',
+        '/sales-team/',
         '/admin/',
         '/agent/',
         '/dashboard/',
@@ -27,7 +29,7 @@ export default function robots(): MetadataRoute.Robots {
         '/verify-otp',
       ],
     },
-    sitemap: 'https://www.plucogroup.com/sitemap.xml',
-    host: 'https://www.plucogroup.com',
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }

@@ -13,7 +13,7 @@ const publicationsByCategory = {
       {
         title: 'Second Class Citizen',
         author: 'Reza Ostad',
-        role: 'International Banking, Compliance and Human Rights Lawyer',
+        role: 'International Banking, Compliance and Human Rights Author',
         desc: 'Examines financial discrimination, banking exclusion and the legal challenges faced by individuals from sanctioned jurisdictions. The book explores how banking compliance, nationality, human rights and access to financial services increasingly intersect in the modern world.',
         details: ['English language', 'Paperback', '297 pages', 'Price: 39 EUR'],
         status: 'available',
@@ -70,7 +70,7 @@ const publicationsByCategory = {
       {
         title: 'شهروند درجه دوم',
         author: 'رضا استاد',
-        role: 'وکیل بین‌المللی بانکداری، انطباق و حقوق بشر',
+        role: 'نویسنده حوزه بانکداری بین‌المللی، انطباق و حقوق بشر',
         desc: 'تبعیض مالی، محرومیت بانکی و چالش‌های حقوقی افراد از حوزه‌های قضایی تحریم‌شده را بررسی می‌کند. این کتاب نشان می‌دهد چگونه انطباق بانکی، ملیت، حقوق بشر و دسترسی به خدمات مالی در جهان مدرن به طور فزاینده‌ای با هم تلاقی می‌یابند.',
         details: ['زبان انگلیسی', 'جلد کاغذی', '۲۹۷ صفحه', 'قیمت: ۳۹ یورو'],
         status: 'available',
@@ -107,6 +107,18 @@ const publicationsByCategory = {
     ],
     'بینش‌های بانکی و انطباق': [
       {
+        title: 'به‌روزرسانی حقوقی چارچوب تابعیت سائوتومه و پرنسیپ',
+        desc: 'یادداشت خبری PLUCO GROUP درباره ساختار مقرراتی مسیر تابعیت از طریق سرمایه‌گذاری یا کمک مالی.',
+        status: 'available',
+        href: '/fa/news/sao-tome-citizenship-by-investment-regulation-update',
+      },
+      {
+        title: 'صندوق تحول ملی و اهمیت شفافیت مالی',
+        desc: 'تحلیل PLUCO GROUP درباره شفافیت مالی، بررسی دقیق و ثبت قابل ردیابی در این مسیر.',
+        status: 'available',
+        href: '/fa/news/sao-tome-citizenship-by-investment-fund-transparency',
+      },
+      {
         title: 'مهاجرت سرمایه‌گذاری و ریسک حقوقی',
         desc: 'ارزیابی ریسک حقوقی در برنامه‌های مهاجرتی مبتنی بر سرمایه‌گذاری، شامل تعهدات بررسی دقیق، الزامات انطباق و مستندسازی منبع وجوه.',
         status: 'coming-soon',
@@ -114,6 +126,24 @@ const publicationsByCategory = {
       },
     ],
     'یادداشت‌های مهاجرت و تحرک': [
+      {
+        title: 'راهنمای تابعیت سائوتومه و پرنسیپ برای ایرانیان',
+        desc: 'راهنمای عملی PLUCO GROUP برای بررسی شرایط، ریسک‌ها و مراحل مسیر تابعیت سائوتومه و پرنسیپ از طریق سرمایه‌گذاری.',
+        status: 'available',
+        href: '/fa/publications/sao-tome-citizenship-by-investment-for-iranians',
+      },
+      {
+        title: 'هزینه و مراحل تابعیت سائوتومه و پرنسیپ',
+        desc: 'توضیح شفاف درباره تفاوت میان حداقل‌های برنامه، هزینه‌های اداری و حق‌الزحمه مشاوره در هر پرونده.',
+        status: 'available',
+        href: '/fa/publications/sao-tome-citizenship-by-investment-costs-process',
+      },
+      {
+        title: 'مدارک و بررسی انطباق برای پرونده سائوتومه و پرنسیپ',
+        desc: 'چک‌لیست اولیه برای آماده‌سازی مدارک هویتی، خانوادگی، مالی و سوابق برای متقاضیان ایرانی.',
+        status: 'available',
+        href: '/fa/publications/sao-tome-citizenship-by-investment-documents-compliance',
+      },
       {
         title: 'استراتژی اقامت و تحرک اروپایی',
         desc: 'یادداشت‌های استراتژیک درباره مسیرهای اقامت اروپایی، برنامه‌ریزی تحرک و استراتژی‌های مهاجرت بلندمدت برای موکلین و خانواده‌های متحرک بین‌المللی.',
@@ -178,7 +208,7 @@ export default function Publications() {
                       {isRTL ? (featuredPub as any).author || 'رضا استاد' : 'Reza Ostad'}
                     </p>
                     <p className="text-xs mb-6" style={{ color: '#5E6470', fontFamily: isRTL ? ff : undefined }}>
-                      {isRTL ? (featuredPub as any).role || 'وکیل بین‌المللی بانکداری، انطباق و حقوق بشر' : 'International Banking, Compliance and Human Rights Lawyer'}
+                      {isRTL ? (featuredPub as any).role || 'نویسنده حوزه بانکداری بین‌المللی، انطباق و حقوق بشر' : 'International Banking, Compliance and Human Rights Author'}
                     </p>
                     <p className="text-sm leading-relaxed mb-6" style={{ color: '#374151', fontFamily: isRTL ? ff : undefined }}>
                       {featuredPub.desc}
@@ -233,7 +263,7 @@ export default function Publications() {
                   style={{ backgroundColor: catIndex % 2 === 1 ? '#FFFFFF' : '#F8F9FA' }}
                 >
                   <h3 className="text-sm font-bold mb-3 leading-snug" style={{ color: '#1E2430', fontFamily: isRTL ? ff : undefined }}>
-                    {pub.title}
+                    {'href' in pub ? <Link href={pub.href!} className="hover:text-[#C9A35A] transition-colors">{pub.title}</Link> : pub.title}
                   </h3>
                   <p className="text-xs leading-relaxed mb-5 flex-grow" style={{ color: '#5E6470', fontFamily: isRTL ? ff : undefined }}>
                     {pub.desc}

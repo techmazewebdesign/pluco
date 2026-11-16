@@ -1,19 +1,10 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { createPageMetadata } from '@/lib/siteMetadata';
-
-export const metadata: Metadata = {
-  ...createPageMetadata({
-    title: 'Banking & Compliance Advisory for International Clients | PLUCO GROUP',
-    description: 'Strategic banking and compliance support for international private clients facing account closures, source-of-funds reviews, and cross-border financial scrutiny. Specializing in banking discrimination, documentation, and regulatory compliance.',
-    path: '/banking',
-  }),
-  keywords: 'banking compliance, international private clients, source of funds, source of wealth, banking discrimination, compliance documentation, cross-border finance',
-};
-
-export default function BankingLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return children;
+import { ENGLISH_SERVICE_CONTENT } from '@/lib/englishServiceContent';
+import ServiceOverview from '@/components/seo/ServiceOverview';
+const path = '/banking';
+const service = ENGLISH_SERVICE_CONTENT[path];
+export const metadata: Metadata = createPageMetadata({ title: service.title + ' | PLUCO GROUP', description: service.description, path });
+export default function ServiceLayout({children}: {children: React.ReactNode}) {
+  return <>{children}<ServiceOverview path={path} /></>;
 }

@@ -87,7 +87,7 @@ export default function FinancialDiscrimination() {
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <h2 className="text-3xl md:text-4xl font-serif text-white mb-5">Experiencing Financial Discrimination?</h2>
             <p className="text-gray-300 text-sm mb-8 max-w-2xl mx-auto">Contact us in confidence. We will assess your situation and advise on the most effective course of action.</p>
-            <Link href="/contact" className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-lg transition-all hover:brightness-110" style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>
+            <Link href="/enquire" className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-lg transition-all hover:brightness-110" style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}>
               Request a Confidential Consultation <ArrowRight className="w-4 h-4" />
             </Link>
           </motion.div>

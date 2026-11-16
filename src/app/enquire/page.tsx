@@ -78,6 +78,15 @@ export default function EnquirePage() {
 
       const data = await response.json();
       if (data.success) {
+        const analyticsWindow = window as Window & { dataLayer?: Array<Record<string, unknown>> };
+        analyticsWindow.dataLayer = analyticsWindow.dataLayer || [];
+        analyticsWindow.dataLayer.push({
+          event: 'generate_lead',
+          form_name: 'enquiry_page',
+          lead_type: 'private_enquiry',
+          service: form.service,
+          language: isRTL ? 'fa' : 'en',
+        });
         setSubmitted(true);
       } else {
         setError(data.error || 'Failed to submit enquiry. Please try again.');
@@ -170,6 +179,7 @@ export default function EnquirePage() {
                     <select name="service" required value={form.service} onChange={handleChange} className={inputClass}>
                       <option value="">Select a service</option>
                       <option>New Identity / Second Citizenship</option>
+                      <option>São Tomé and Príncipe Citizenship by Investment</option>
                       <option>EU Residency</option>
                       <option>EU Property Purchase</option>
                       <option>US Green Card / EB-5</option>

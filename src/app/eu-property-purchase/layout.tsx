@@ -1,12 +1,10 @@
-import type { Metadata } from "next";
-import { createPageMetadata } from "@/lib/siteMetadata";
-
-export const metadata: Metadata = createPageMetadata({
-  title: "European Property Purchase Advisory | PLUCO GROUP",
-  description: "European property purchase planning, legal due diligence coordination, fund-transfer documentation and residence-linked property strategies.",
-  path: "/eu-property-purchase",
-});
-
-export default function EuPropertyPurchaseLayout({ children }: { children: React.ReactNode }) {
-  return children;
+import type { Metadata } from 'next';
+import { createPageMetadata } from '@/lib/siteMetadata';
+import { ENGLISH_SERVICE_CONTENT } from '@/lib/englishServiceContent';
+import ServiceOverview from '@/components/seo/ServiceOverview';
+const path = '/eu-property-purchase';
+const service = ENGLISH_SERVICE_CONTENT[path];
+export const metadata: Metadata = createPageMetadata({ title: service.title + ' | PLUCO GROUP', description: service.description, path });
+export default function ServiceLayout({children}: {children: React.ReactNode}) {
+  return <>{children}<ServiceOverview path={path} /></>;
 }

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   User, FolderOpen, MessageSquare, CreditCard,
   LogOut, Menu, X, Home, Bell, CheckCheck, Ticket as TicketIcon,
@@ -40,6 +40,7 @@ export default function DashboardShell({
   const { user, signOut } = useAuth();
   const { isRTL } = useLanguage();
   const pathname = usePathname();
+  const selectedTab = useSearchParams().get('tab');
   const router = useRouter();
   const ff = "'Vazirmatn', Tahoma, Arial, sans-serif";
 
@@ -134,12 +135,12 @@ export default function DashboardShell({
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {NAV.map(item => {
           const isProfile = item.href === '/dashboard/profile' && pathname === '/dashboard/profile';
-          const isDashMain = item.href === '/dashboard' && !item.tab && pathname === '/dashboard';
+          const isDashMain = item.href === '/dashboard' && pathname === '/dashboard' && (item.tab ? selectedTab === item.tab : !selectedTab);
           const isActive = isProfile || isDashMain;
           return (
             <Link
               key={`${item.href}-${item.label}`}
-              href={item.href}
+              href={item.tab ? `${item.href}?tab=${item.tab}` : item.href}
               onClick={() => setMobileOpen(false)}
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors"
               style={{

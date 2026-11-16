@@ -52,14 +52,14 @@ export default function BusinessSolutions() {
               <div className="h-px mb-6" style={{ backgroundColor: '#C9A35A', width: 60 }} />
               <p className="text-sm leading-relaxed mb-4" style={{ color: '#374151', fontFamily: isRTL ? ff : undefined }}>
                 {isRTL
-                  ? <>برای موکلین تجاری منتخبی که به زیرساخت دیجیتال، سیستم‌های جذب مشتری، اتوماسیون، گردش‌های کاری با پشتیبانی هوش مصنوعی، توسعه بازار اروپایی یا تحول دیجیتال نیاز دارند، PLUCO GROUP ممکن است موکلین را به <strong>گروه مشاوره DESIVO</strong> معرفی کند.</>
-                  : <>For selected business clients requiring digital infrastructure, customer acquisition systems, automation, AI-supported workflows, European market expansion or digital transformation, PLUCO GROUP may refer clients to <strong>DESIVO Consulting Group</strong>.</>
+                  ? <>برای موکلین تجاری منتخبی که به زیرساخت دیجیتال، سیستم‌های جذب مشتری، اتوماسیون، گردش‌های کاری با پشتیبانی هوش مصنوعی، توسعه بازار اروپایی یا تحول دیجیتال نیاز دارند، PLUCO GROUP از طریق <strong>دپارتمان DESIVO</strong> خود از این خدمات پشتیبانی می‌کند.</>
+                  : <>For selected business clients requiring digital infrastructure, customer acquisition systems, automation, AI-supported workflows, European market expansion or digital transformation, PLUCO GROUP provides these services through its <strong>DESIVO department</strong>.</>
                 }
               </p>
               <p className="text-sm leading-relaxed mb-6" style={{ color: '#374151', fontFamily: isRTL ? ff : undefined }}>
                 {isRTL
-                  ? 'DESIVO یک گروه مشاوره مستقل است که در جذب مشتری سیستماتیک، اتوماسیون کسب‌وکار و توسعه بازار دیجیتال اروپایی تخصص دارد. PLUCO GROUP ممکن است معرفی یا هماهنگی استراتژیک را در جایی که نیازهای موکل با خدمات DESIVO همسو است، تسهیل کند.'
-                  : 'DESIVO is an independent consulting group specialising in systematic customer acquisition, business automation and European digital market expansion. PLUCO GROUP may facilitate introductions or strategic coordination where client needs align with DESIVO\'s services.'
+                  ? 'DESIVO دپارتمان خدمات رشد دیجیتال و سیستم‌های کسب‌وکار PLUCO GROUP است. این دپارتمان از طریق دامنه‌های رسمی desivo.de و desivo.pl فعالیت می‌کند و خدمات آن در چارچوب شرایط، محدوده کار و تعهدات کتبی مربوط ارائه می‌شود.'
+                  : 'DESIVO is PLUCO GROUP\'s department for digital growth and business systems. The department operates through the official domains desivo.de and desivo.pl, and its services are delivered under the applicable written scope, terms and engagement arrangements.'
                 }
               </p>
               <a href="https://www.desivo.de" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-lg transition-all hover:brightness-110" style={{ backgroundColor: '#071C3C', color: '#C9A35A' }}>
@@ -89,8 +89,8 @@ export default function BusinessSolutions() {
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="rounded-xl p-6" style={{ backgroundColor: '#F1F5F9', border: '1px solid #E5E7EB' }}>
             <p className="text-xs leading-relaxed" style={{ color: '#64748B', fontFamily: isRTL ? ff : undefined }}>
               {isRTL
-                ? <><strong style={{ color: '#1E2430' }}>سلب مسئولیت مشارکت: </strong>خدمات DESIVO به صورت جداگانه توسط گروه مشاوره DESIVO ارائه می‌شود. PLUCO GROUP ممکن است معرفی یا هماهنگی استراتژیک را در موارد مرتبط هماهنگ کند، اما تعامل، قیمت‌گذاری، عملکرد و نتایج DESIVO تابع شرایط و ضوابط خود DESIVO می‌باشد.</>
-                : <><strong style={{ color: '#1E2430' }}>Partnership Disclaimer: </strong>DESIVO services are provided separately by DESIVO Consulting Group. PLUCO GROUP may coordinate introductions or strategic alignment where relevant, but DESIVO engagement, pricing, performance and deliverables remain subject to DESIVO's own terms and conditions.</>
+                ? <><strong style={{ color: '#1E2430' }}>یادداشت ساختار گروه: </strong>DESIVO دپارتمان PLUCO GROUP است و PLUCO GROUP دامنه‌های desivo.de و desivo.pl را به‌عنوان کانال‌های رسمی خدمات DESIVO تأیید می‌کند. محدوده خدمات، قیمت‌گذاری، عملکرد و تعهدات هر پروژه در توافق کتبی مربوط مشخص می‌شود.</>
+                : <><strong style={{ color: '#1E2430' }}>Group Structure Notice: </strong>DESIVO is a department of PLUCO GROUP. PLUCO GROUP confirms desivo.de and desivo.pl as the official service domains for DESIVO. The scope, pricing, performance and deliverables of each project are defined in the applicable written engagement.</>
               }
             </p>
           </motion.div>

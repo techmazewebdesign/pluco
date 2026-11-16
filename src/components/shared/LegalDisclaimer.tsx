@@ -8,7 +8,7 @@ export default function LegalDisclaimer() {
   const { isRTL } = useLanguage();
   const ff = "'Vazirmatn', Tahoma, Arial, sans-serif";
 
-  const disclaimerEn = `Information on this website is provided for general informational purposes only and does not constitute legal advice. Submitting an enquiry does not create a lawyer-client relationship. PLUCO GROUP does not guarantee visa, residence, citizenship, banking, investment, court, government, or institutional outcomes. All services are subject to eligibility review, conflict checks, compliance checks, applicable law, and formal engagement.`;
+  const disclaimerEn = `Information on this website is provided for general informational purposes only and does not constitute legal, tax, financial, immigration or investment advice. Submitting an enquiry does not create a lawyer-client relationship. Regulated legal work is undertaken only where a formal engagement identifies the appropriately qualified professional and applicable professional rules; otherwise PLUCO GROUP provides coordination and strategic support with independent licensed advisers. PLUCO GROUP does not guarantee visa, residence, citizenship, banking, investment, court, government, or institutional outcomes.`;
 
   const disclaimerFa = `اطلاعات موجود در این وب‌سایت فقط برای اطلاع عمومی است و تشکیل مشاوره حقوقی نمی‌دهد. ارسال استعلام رابطه‌ای وکیل و موکل را ایجاد نمی‌کند. PLUCO GROUP نتیجه‌ی ویزا، اقامت، شهروندی، بانکی، سرمایه‌گذاری، دادگاه، دولتی یا نهادی را تضمین نمی‌کند. تمام خدمات مشروط به بررسی شرایط واجد شرایط، بررسی تعارض منافع، بررسی انطباق، قوانین قابل اجرا و تعهد رسمی است.`;
 

@@ -1,16 +1,41 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { languageRoutes } from '@/lib/languageRoutes';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function LanguageSwitcher() {
   const { lang, setLang } = useLanguage();
+  const pathname = usePathname();
+  const pair = languageRoutes.find(({ en, fa }) => en === pathname || fa === pathname);
   const [mounted, setMounted] = useState(false);
 
   // Only render interactively after client hydration
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  if (pair) {
+    return (
+      <nav aria-label="Language" className="flex items-center overflow-hidden rounded-full border border-[#1E3A5F] text-xs font-semibold">
+        {(['en', 'fa'] as const).map(language => (
+          <Link
+            key={language}
+            href={pair[language]}
+            hrefLang={language}
+            lang={language}
+            aria-current={lang === language ? 'page' : undefined}
+            aria-label={language === 'en' ? 'English' : 'فارسی'}
+            className={`px-2.5 py-[3px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-white ${lang === language ? 'bg-[#C9A35A] text-[#071C3C]' : 'text-slate-300 hover:text-white'}`}
+          >
+            {language === 'en' ? 'EN' : 'فارسی'}
+          </Link>
+        ))}
+      </nav>
+    );
+  }
 
   const isFa = mounted ? lang === 'fa' : false;
 

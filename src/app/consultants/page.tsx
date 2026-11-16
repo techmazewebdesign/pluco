@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { motion } from 'framer-motion';
@@ -24,7 +24,6 @@ interface ConsultantCard {
 
 export default function ConsultantsPage() {
   const [consultants, setConsultants] = useState<ConsultantCard[]>([]);
-  const [filteredConsultants, setFilteredConsultants] = useState<ConsultantCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -52,7 +51,6 @@ export default function ConsultantsPage() {
         } as ConsultantCard));
 
         setConsultants(consultantsList);
-        setFilteredConsultants(consultantsList);
       } catch (err) {
         console.error('Error loading consultants:', err);
         setError('Failed to load consultants');
@@ -64,8 +62,8 @@ export default function ConsultantsPage() {
     loadConsultants();
   }, []);
 
-  // Filter consultants based on search and selected product type
-  useEffect(() => {
+  // Derive the visible list without a second state update after rendering.
+  const filteredConsultants = useMemo(() => {
     let filtered = consultants;
 
     // Filter by search query (name or email)
@@ -84,13 +82,14 @@ export default function ConsultantsPage() {
       );
     }
 
-    setFilteredConsultants(filtered);
+    return filtered;
   }, [searchQuery, selectedProductType, consultants]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
+          <h1 className="sr-only">PLUCO GROUP Consultants</h1>
           <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#C9A35A' }} />
           <p style={{ color: '#5E6470' }}>Loading consultants...</p>
         </div>

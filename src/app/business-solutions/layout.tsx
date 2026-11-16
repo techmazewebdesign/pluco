@@ -1,12 +1,10 @@
-import type { Metadata } from "next";
-import { createPageMetadata } from "@/lib/siteMetadata";
-
-export const metadata: Metadata = createPageMetadata({
-  title: "European Business Solutions | PLUCO GROUP",
-  description: "European market expansion, digital infrastructure, automation and operational systems for internationally active businesses.",
-  path: "/business-solutions",
-});
-
-export default function BusinessSolutionsLayout({ children }: { children: React.ReactNode }) {
-  return children;
+import type { Metadata } from 'next';
+import { createPageMetadata } from '@/lib/siteMetadata';
+import { ENGLISH_SERVICE_CONTENT } from '@/lib/englishServiceContent';
+import ServiceOverview from '@/components/seo/ServiceOverview';
+const path = '/business-solutions';
+const service = ENGLISH_SERVICE_CONTENT[path];
+export const metadata: Metadata = createPageMetadata({ title: service.title + ' | PLUCO GROUP', description: service.description, path });
+export default function ServiceLayout({children}: {children: React.ReactNode}) {
+  return <>{children}<ServiceOverview path={path} /></>;
 }

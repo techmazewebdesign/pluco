@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -7,6 +8,7 @@ import RTLWrapper from "@/components/shared/RTLWrapper";
 import SiteShell from "@/components/layout/SiteShell";
 import ChatbotWidget from "@/components/chatbot/ChatbotWidget";
 import ConsentManager from "@/components/privacy/ConsentManager";
+import OrganizationStructuredData from "@/components/seo/OrganizationStructuredData";
 import {
   createPageMetadata,
   SITE_DESCRIPTION,
@@ -21,13 +23,13 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: SITE_TITLE,
-    template: "%s | PLUCO GROUP",
+    template: "%s",
   },
   description: SITE_DESCRIPTION,
   keywords: [
-    "European immigration law", "private client advisory", "EU residency", "second citizenship",
+    "European residency advisory", "private client advisory", "EU residency", "second citizenship",
     "EU property purchase", "banking compliance", "dispute resolution", "international contracts",
-    "EB-5 investor", "EU company registration", "Warsaw law firm", "cross-border legal advisory",
+    "EB-5 investor", "EU company registration", "cross-border legal advisory",
     "high net worth immigration", "Pluco Group",
   ],
   authors: [{ name: "PLUCO GROUP Sp. z o.o." }],
@@ -46,10 +48,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = (await headers()).get("x-site-locale") === "fa" ? "fa" : "en";
+
   return (
-    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+    <html lang={locale} dir={locale === "fa" ? "rtl" : "ltr"} className="h-full antialiased" suppressHydrationWarning>
       <body className="min-h-full">
+        <OrganizationStructuredData />
         <AuthProvider>
           <AgentProvider>
             <LanguageProvider>

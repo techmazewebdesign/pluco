@@ -63,7 +63,7 @@ export default function ConsultationCTA() {
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
-                href="/contact"
+                href="/enquire"
                 className="inline-flex items-center gap-2 px-8 py-3 text-sm font-semibold rounded transition-all hover:brightness-110"
                 style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
               >

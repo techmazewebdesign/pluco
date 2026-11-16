@@ -1,7 +1,10 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { type Lang, type TranslationKey, t as translate } from '@/lib/translations';
+
+import { languageRoutes } from '@/lib/languageRoutes';
 
 interface LanguageContextValue {
   lang: Lang;
@@ -18,28 +21,40 @@ const LanguageContext = createContext<LanguageContextValue>({
 });
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>('en');
+  const [selection, setSelection] = useState<{ pathname: string; lang: Lang } | null>(null);
+  const pathname = usePathname();
+  const router = useRouter();
+  // Discard a page-only override when navigation leaves its URL. This guarded
+  // render adjustment also prevents a stale override reappearing on browser back.
+  if (selection && selection.pathname !== pathname) {
+    setSelection(null);
+  }
+  const pair = languageRoutes.find((routes) => routes.en === pathname || routes.fa === pathname);
+  // URL language wins on every navigation, including ordinary Links and history.
+  // A manual toggle on a generic page cannot leak into another page.
+  const lang: Lang = pathname === '/fa' || pathname.startsWith('/fa/')
+    ? 'fa'
+    : pair ? 'en' : selection?.pathname === pathname ? selection.lang : 'en';
 
-  // Read persisted preference on mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('pluco_lang') as Lang | null;
-      if (stored === 'en' || stored === 'fa') {
-        setLangState(stored);
-      }
-    } catch {
-      // localStorage unavailable (private mode etc.)
-    }
-  }, []);
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+  }, [lang]);
 
+  // The URL determines the initial language for server output and hydration.
   const setLang = useCallback((next: Lang) => {
-    try {
-      localStorage.setItem('pluco_lang', next);
-    } catch {
-      // ignore
+    const routes = languageRoutes.find((routes) => routes.en === pathname || routes.fa === pathname);
+    if (routes) {
+      router.push(routes[next]);
+    } else if (next === 'en' && pathname.startsWith('/fa/')) {
+      // Persian-only articles have no translated article equivalent.
+      router.push('/');
+    } else {
+      // A generic page's presentation toggle belongs only to that URL.
+      // Navigation to another English URL always starts in English.
+      setSelection({ pathname, lang: next });
     }
-    setLangState(next);
-  }, []);
+  }, [pathname, router]);
 
   const t = useCallback((key: TranslationKey) => translate(key, lang), [lang]);
 

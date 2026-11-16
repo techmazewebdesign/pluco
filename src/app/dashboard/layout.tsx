@@ -16,7 +16,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) router.push('/client-sign-in');
+    if (!loading && !user) router.replace('/login');
+    if (!loading && user && !user.emailVerified) router.replace('/login');
   }, [user, loading, router]);
 
   // Check if user is admin and redirect
@@ -24,8 +25,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!user) return;
     const checkAdmin = async () => {
       try {
-        const snap = await getDoc(doc(db, 'agents', user.uid));
-        if (snap.exists() && snap.data()?.role === 'admin') {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        if (snap.exists() && (snap.data()?.role === 'admin' || snap.data()?.isAdmin === true || snap.data()?.is_admin === true)) {
           setIsAdmin(true);
           router.push('/admin/dashboard');
           return;
@@ -51,7 +52,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     load();
   }, [user, router]);
 
-  if (loading || !user) {
+  if (loading || !user || !user.emailVerified || isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#071C3C' }}>
         <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#C9A35A' }} />

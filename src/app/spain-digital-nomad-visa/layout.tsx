@@ -1,17 +1,10 @@
-import type { Metadata } from "next";
-import { createPageMetadata } from "@/lib/siteMetadata";
-
-const TITLE = "Spain Digital Nomad Visa";
-const DESCRIPTION = "Structured preparation, documentation coordination and legal partner handoff for the Spain Digital Nomad Visa — Bronze, Silver and Gold support packages for employees, freelancers, business owners and families.";
-
-export const metadata: Metadata = createPageMetadata({
-  title: TITLE,
-  description: DESCRIPTION,
-  path: "/spain-digital-nomad-visa",
-  image: "/images/spain-digital-nomad-social-preview.png",
-  imageAlt: "PLUCO GROUP – Spain Digital Nomad Visa advisory",
-});
-
-export default function SpainDigitalNomadVisaLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+import type { Metadata } from 'next';
+import { createPageMetadata } from '@/lib/siteMetadata';
+import { ENGLISH_SERVICE_CONTENT } from '@/lib/englishServiceContent';
+import ServiceOverview from '@/components/seo/ServiceOverview';
+const path = '/spain-digital-nomad-visa';
+const service = ENGLISH_SERVICE_CONTENT[path];
+export const metadata: Metadata = createPageMetadata({ title: service.title + ' | PLUCO GROUP', description: service.description, path, image: '/images/spain-digital-nomad-social-preview.png', imageAlt: 'Spain digital nomad visa preparation by PLUCO GROUP' });
+export default function ServiceLayout({children}: {children: React.ReactNode}) {
+  return <>{children}<ServiceOverview path={path} /></>;
 }

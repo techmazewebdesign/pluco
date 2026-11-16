@@ -1,6 +1,9 @@
 'use client';
 
 import Script from 'next/script';
+import { usePathname } from 'next/navigation';
+import { PRIVATE_ROUTE } from '@/lib/publicAnalytics';
+import PublicPageTracking from '@/components/seo/PublicPageTracking';
 import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -13,7 +16,7 @@ type ConsentRecord = {
 type ConsentState = 'loading' | 'unset' | 'accepted' | 'rejected';
 
 const CONSENT_KEY = 'pluco_cookie_consent';
-const GA_ID = 'G-56MTBRMS79';
+const GTM_ID = 'GTM-PTKTQHTH';
 export const OPEN_COOKIE_SETTINGS_EVENT = 'pluco:open-cookie-settings';
 
 const copy = {
@@ -64,6 +67,7 @@ function clearGoogleAnalyticsCookies() {
 
 export default function ConsentManager() {
   const { lang, isRTL } = useLanguage();
+  const pathname = usePathname();
   const [consent, setConsent] = useState<ConsentState>('loading');
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -92,11 +96,11 @@ export default function ConsentManager() {
 
   return (
     <>
-      {consent === 'accepted' ? (
+      {consent === 'accepted' && !PRIVATE_ROUTE.test(pathname) ? (
         <>
-          <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
-          <Script id="pluco-ga-gtag" strategy="afterInteractive">
-            {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}',{anonymize_ip:true});`}
+          <PublicPageTracking />
+          <Script id="pluco-google-tag-manager" strategy="afterInteractive">
+            {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');`}
           </Script>
         </>
       ) : null}

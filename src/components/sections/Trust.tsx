@@ -29,8 +29,8 @@ const trustItems = [
   {
     titleEn: 'Senior-Led & Experienced',
     titleFa: 'رهبری ارشد و تجربه‌شده',
-    descEn: 'Led by Reza Ostad, an international banking, compliance and immigration lawyer. Your matters are handled by experienced professionals, not junior staff.',
-    descFa: 'تحت رهبری رضا استاد، وکیل بین‌المللی متخصص در بانکداری، انطباق و مهاجرت. امور شما توسط متخصصین مجرب رسیدگی می‌شود.',
+    descEn: 'Led by Reza Ostad, an international banking, compliance and immigration adviser. Your matters are handled by experienced professionals, not junior staff.',
+    descFa: 'تحت رهبری رضا استاد، مشاور بین‌المللی متخصص در بانکداری، انطباق و مهاجرت. امور شما توسط متخصصین مجرب رسیدگی می‌شود.',
     Icon: Users,
   },
   {

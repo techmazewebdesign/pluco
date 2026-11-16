@@ -1,12 +1,10 @@
-import type { Metadata } from "next";
-import { createPageMetadata } from "@/lib/siteMetadata";
-
-export const metadata: Metadata = createPageMetadata({
-  title: "US Green Card & EB-5 Advisory | PLUCO GROUP",
-  description: "Strategic legal coordination for US permanent residence and investment-based immigration pathways, including the EB-5 programme.",
-  path: "/us-green-card",
-});
-
-export default function UsGreenCardLayout({ children }: { children: React.ReactNode }) {
-  return children;
+import type { Metadata } from 'next';
+import { createPageMetadata } from '@/lib/siteMetadata';
+import { ENGLISH_SERVICE_CONTENT } from '@/lib/englishServiceContent';
+import ServiceOverview from '@/components/seo/ServiceOverview';
+const path = '/us-green-card';
+const service = ENGLISH_SERVICE_CONTENT[path];
+export const metadata: Metadata = createPageMetadata({ title: service.title + ' | PLUCO GROUP', description: service.description, path });
+export default function ServiceLayout({children}: {children: React.ReactNode}) {
+  return <>{children}<ServiceOverview path={path} /></>;
 }

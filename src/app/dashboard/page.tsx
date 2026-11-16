@@ -7,7 +7,7 @@ import {
   CheckCircle, AlertCircle, Upload, Loader2, User,
   ChevronRight, FolderOpen, Calendar, X, Eye,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { doc, getDoc, collection, getDocs, orderBy, query, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
@@ -36,7 +36,12 @@ export default function Dashboard() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [documents, setDocuments] = useState<UploadedDoc[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'documents' | 'messages' | 'invoices'>('overview');
+  const [dataError, setDataError] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
+  const searchParams = useSearchParams();
+  const selectedTab = searchParams.get('tab');
+  const activeTab = selectedTab === 'documents' || selectedTab === 'messages' || selectedTab === 'invoices' ? selectedTab : 'overview';
+  const setActiveTab = (tab: 'overview' | 'documents' | 'messages' | 'invoices') => router.replace(tab === 'overview' ? '/dashboard' : `/dashboard?tab=${tab}`, { scroll: false });
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -56,25 +61,25 @@ export default function Dashboard() {
     const load = async () => {
       setDataLoading(true);
       try {
-        const [profileSnap, caseSnap] = await Promise.all([
+        const results = await Promise.allSettled([
           getDoc(doc(db, 'clients', user.uid)),
           getDoc(doc(db, 'cases', user.uid)),
-        ]);
-        if (profileSnap.exists()) setProfile(profileSnap.data() as ClientProfile);
-        if (caseSnap.exists()) setCaseData(caseSnap.data() as Case);
-        const [msgSnap, invSnap, docSnap] = await Promise.all([
           getDocs(query(collection(db, 'messages', user.uid, 'thread'), orderBy('timestamp', 'desc'))),
           getDocs(query(collection(db, 'invoices', user.uid, 'items'), orderBy('issuedAt', 'desc'))),
           getDocs(query(collection(db, 'documents', user.uid, 'files'), orderBy('uploadedAt', 'desc'))),
         ]);
-        setMessages(msgSnap.docs.map(d => ({ id: d.id, ...d.data() } as Message)));
-        setInvoices(invSnap.docs.map(d => ({ id: d.id, ...d.data() } as Invoice)));
-        setDocuments(docSnap.docs.map(d => ({ id: d.id, ...d.data() } as UploadedDoc)));
-      } catch (e) { console.error(e); }
+        const [profileResult, caseResult, messageResult, invoiceResult, documentResult] = results;
+        if (profileResult.status === 'fulfilled') setProfile(profileResult.value.exists() ? profileResult.value.data() as ClientProfile : null);
+        if (caseResult.status === 'fulfilled') setCaseData(caseResult.value.exists() ? caseResult.value.data() as Case : null);
+        if (messageResult.status === 'fulfilled') setMessages(messageResult.value.docs.map(d => ({ id: d.id, ...d.data() } as Message)));
+        if (invoiceResult.status === 'fulfilled') setInvoices(invoiceResult.value.docs.map(d => ({ id: d.id, ...d.data() } as Invoice)));
+        if (documentResult.status === 'fulfilled') setDocuments(documentResult.value.docs.map(d => ({ id: d.id, ...d.data() } as UploadedDoc)));
+        setDataError(results.some(result => result.status === 'rejected'));
+      } catch (e) { console.error(e); setDataError(true); }
       finally { setDataLoading(false); }
     };
     load();
-  }, [user]);
+  }, [user, loadAttempt]);
 
   const handleFileSelect = (file: File) => {
     if (file.size > 20 * 1024 * 1024) { setUploadError(isRTL ? 'حداکثر ۲۰ مگابایت' : 'Max 20MB'); return; }
@@ -130,6 +135,11 @@ export default function Dashboard() {
 
   return (
     <div style={{ backgroundColor: '#F8F9FA', minHeight: '100vh' }}>
+      {dataError ? <div role="alert" className="mx-4 my-4 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+        <p>{isRTL ? 'بخشی از اطلاعات بارگذاری نشد. اطلاعات موجود نمایش داده می‌شود. دوباره تلاش کنید یا با تیم پرونده تماس بگیرید.' : 'Some information could not be loaded. Available information is shown. Try again or contact your case team.'}</p>
+        <button type="button" disabled={dataLoading} className="mt-2 font-bold underline disabled:opacity-50" onClick={() => setLoadAttempt(attempt => attempt + 1)}>{isRTL ? 'تلاش دوباره' : 'Try again'}</button>
+      </div> : null}
+
       {/* Header with Role Badge */}
       <div className="border-b bg-white" style={{ borderColor: '#E5E7EB' }}>
         <div className="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">

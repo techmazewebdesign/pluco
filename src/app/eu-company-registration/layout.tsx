@@ -1,12 +1,10 @@
-import type { Metadata } from "next";
-import { createPageMetadata } from "@/lib/siteMetadata";
-
-export const metadata: Metadata = createPageMetadata({
-  title: "EU Company Registration | PLUCO GROUP",
-  description: "EU jurisdiction selection, company formation, corporate structuring, banking preparation and ongoing compliance coordination.",
-  path: "/eu-company-registration",
-});
-
-export default function EuCompanyRegistrationLayout({ children }: { children: React.ReactNode }) {
-  return children;
+import type { Metadata } from 'next';
+import { createPageMetadata } from '@/lib/siteMetadata';
+import { ENGLISH_SERVICE_CONTENT } from '@/lib/englishServiceContent';
+import ServiceOverview from '@/components/seo/ServiceOverview';
+const path = '/eu-company-registration';
+const service = ENGLISH_SERVICE_CONTENT[path];
+export const metadata: Metadata = createPageMetadata({ title: service.title + ' | PLUCO GROUP', description: service.description, path });
+export default function ServiceLayout({children}: {children: React.ReactNode}) {
+  return <>{children}<ServiceOverview path={path} /></>;
 }

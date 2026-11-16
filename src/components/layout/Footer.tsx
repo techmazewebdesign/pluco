@@ -1,6 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import NewsletterSignup from './NewsletterSignup';
+import { newsletterCopy } from '@/lib/newsletterCopy';
+import { localizedPath } from '@/lib/languageRoutes';
 import { MapPin, Mail, FileText } from 'lucide-react';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -10,6 +13,7 @@ export default function Footer() {
   const { t, isRTL } = useLanguage();
 
   const services = [
+    [t('nav.saoTomeCitizenship'),     '/sao-tome-citizenship-by-investment'],
     [t('nav.newIdentity'),            '/new-identity'],
     [t('nav.euResidency'),            '/eu-residency'],
     [t('nav.spainDigitalNomad'),      '/spain-digital-nomad-visa'],
@@ -23,11 +27,17 @@ export default function Footer() {
   ];
 
   const quickLinks = [
-    [t('nav.ourPeople'),          '/our-people'],
+    ['About Us',                  '/about-us'],
+    [isRTL ? 'راهنمای ایرانیان خارج از کشور' : 'Services for Iranian clients', '/iranian-clients'],
+    [isRTL ? 'مشاوران' : 'Consultants', '/consultants'],
     [t('nav.publications'),       '/publications'],
+    ['Industries',                '/industries'],
+    ['Banking Compliance',        '/banking-compliance'],
+    ['Financial Discrimination',  '/financial-discrimination'],
     [t('nav.clientSignIn'),       '/client-sign-in'],
     ['Contact',                   '/contact'],
     [t('footer.privacyPolicy'),   '/privacy-policy'],
+    ['Legal Notice',              '/imprint'],
     [t('footer.legalDisclaimer'), '/disclaimer'],
   ];
 
@@ -49,6 +59,9 @@ export default function Footer() {
             </div>
             <p className="text-sm mb-2 leading-snug" style={{ color: '#C9A35A', fontFamily: isRTL ? "'Vazirmatn', Tahoma, Arial, sans-serif" : undefined }}>
               {t('footer.tagline')}
+            </p>
+            <p className="text-xs leading-relaxed mt-4" style={{ color: '#CBD5E0', fontFamily: isRTL ? "'Vazirmatn', Tahoma, Arial, sans-serif" : undefined }}>
+              {isRTL ? <>DESIVO، دپارتمان رشد دیجیتال و سیستم‌های کسب‌وکار PLUCO GROUP است. <a href="https://desivo.de" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">desivo.de</a> · <a href="https://desivo.pl" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">desivo.pl</a></> : <>DESIVO is PLUCO GROUP's digital growth and business systems department. <a href="https://desivo.de" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">desivo.de</a> · <a href="https://desivo.pl" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">desivo.pl</a></>}
             </p>
           </div>
 
@@ -83,7 +96,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {services.map(([label, href]) => (
                 <li key={href}>
-                  <Link href={href} className="text-xs transition-colors hover:text-white" style={{ color: '#CBD5E0' }}>
+                  <Link href={localizedPath(href, isRTL)} className="text-xs transition-colors hover:text-white" style={{ color: '#CBD5E0' }}>
                     {label}
                   </Link>
                 </li>
@@ -97,9 +110,14 @@ export default function Footer() {
               {t('footer.quickLinks')}
             </h4>
             <ul className="space-y-2">
+              <li>
+                <a href="#newsletter" className="text-xs text-[#E0BB75] underline-offset-2 hover:underline">
+                  {newsletterCopy[isRTL ? 'fa' : 'en'].link}
+                </a>
+              </li>
               {quickLinks.map(([label, href]) => (
                 <li key={href}>
-                  <Link href={href} className="text-xs transition-colors hover:text-white" style={{ color: '#CBD5E0' }}>
+                  <Link href={localizedPath(href, isRTL)} className="text-xs transition-colors hover:text-white" style={{ color: '#CBD5E0' }}>
                     {label}
                   </Link>
                 </li>
@@ -107,6 +125,8 @@ export default function Footer() {
             </ul>
           </div>
         </div>
+
+        <NewsletterSignup isRTL={isRTL} />
 
         {/* Legal Disclaimer */}
         <div className="border-t pt-6 mb-4" style={{ borderColor: '#0B234A' }}>
@@ -127,6 +147,8 @@ export default function Footer() {
           <p className="text-xs" style={{ color: '#64748B' }}>
             © {new Date().getFullYear()} Pluco Group Sp. z o.o. {t('footer.copyright')} &nbsp;·&nbsp;
             <Link href="/privacy-policy" className="hover:text-white transition-colors" style={{ color: '#64748B' }}>{t('footer.privacyPolicy')}</Link>
+            &nbsp;·&nbsp;
+            <Link href="/imprint" className="hover:text-white transition-colors" style={{ color: '#64748B' }}>Legal Notice</Link>
             &nbsp;·&nbsp;
             <Link href="/disclaimer" className="hover:text-white transition-colors" style={{ color: '#64748B' }}>{t('footer.legalDisclaimer')}</Link>
             &nbsp;·&nbsp;

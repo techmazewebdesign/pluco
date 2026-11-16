@@ -12,6 +12,7 @@ export const translations = {
   'nav.publications':           { en: 'Publications',                 fa: 'انتشارات' },
   'nav.clientSignIn':           { en: 'Client Sign In',               fa: 'ورود موکل' },
   'nav.newIdentity':            { en: 'New Identity',                 fa: 'هویت جدید' },
+  'nav.saoTomeCitizenship':     { en: 'São Tomé & Príncipe Citizenship by Investment', fa: 'تابعیت سائوتومه و پرنسیپ از طریق سرمایه‌گذاری' },
   'nav.euPropertyPurchase':     { en: 'EU Property Purchase',         fa: 'خرید ملک در اروپا' },
   'nav.euResidency':            { en: 'EU Residency',                 fa: 'اقامت اروپا' },
   'nav.spainDigitalNomad':      { en: 'Spain Digital Nomad Visa',     fa: 'ویزای نومد دیجیتال اسپانیا' },

@@ -16,6 +16,7 @@ interface InquiryFormProps {
 }
 
 const SERVICES = [
+  'São Tomé and Príncipe Citizenship by Investment',
   'EU Residency',
   'Second Citizenship',
   'US Green Card / EB-5',

@@ -123,7 +123,7 @@ export default function LoginPage() {
         if (user.email) {
           try {
             const userEmailLower = user.email.toLowerCase();
-            const userRef = doc(db, 'users', userEmailLower);
+            const userRef = doc(db, 'users', uid);
 
             await setDoc(userRef, {
               uid: uid,
@@ -458,8 +458,8 @@ export default function LoginPage() {
         createdVia: 'google',
       };
 
-      // Create in users collection with email as document ID for consistency
-      const userRef = doc(db, 'users', userEmailLower);
+      // Own profile documents use the authenticated UID.
+      const userRef = doc(db, 'users', uid);
       await setDoc(userRef, newUserProfile, { merge: true });
 
       console.log('✓ Created new user profile for:', userEmailLower);
