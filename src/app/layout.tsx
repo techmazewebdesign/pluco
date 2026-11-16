@@ -64,10 +64,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </SiteShell>
                 <ConsentManager />
               </RTLWrapper>
+              <ChatbotWidget />
             </LanguageProvider>
           </AgentProvider>
         </AuthProvider>
-        <ChatbotWidget />
       </body>
     </html>
   );
