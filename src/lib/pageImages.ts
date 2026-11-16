@@ -7,6 +7,7 @@ type PageImage = {
   width: number;
   height: number;
   alt: Record<ImageLocale, string>;
+  socialKey?: string;
 };
 
 export const homepageImages = {
@@ -48,8 +49,12 @@ const servicePhotos: Partial<Record<string, PageImage>> = {
     alt: { en: 'A family walking along a sunny European street', fa: 'خانواده‌ای در حال قدم زدن در خیابانی آفتابی در اروپا' },
   },
   'new-identity': {
-    src: '/images/services/new-identity.webp', width: 1200, height: 840,
-    alt: { en: 'A passport and a map spread out on a table', fa: 'گذرنامه و نقشه روی میز' },
+    src: '/images/services/second-citizenship-passport.webp', width: 1200, height: 840,
+    socialKey: 'second-citizenship-passport',
+    alt: {
+      en: 'An unbranded green passport booklet beside a map and pen',
+      fa: 'دفترچه سبز گذرنامه بدون نشان کشور، کنار نقشه و خودکار',
+    },
   },
   'us-green-card': {
     src: '/images/services/us-green-card.webp', width: 1200, height: 840,
@@ -107,5 +112,5 @@ export function getPageImages(path: string) {
   }
 
   const photo = servicePhoto(slug);
-  return photo ? { lang, socialKey: slug, images: [photo] } : undefined;
+  return photo ? { lang, socialKey: photo.socialKey ?? slug, images: [photo] } : undefined;
 }
