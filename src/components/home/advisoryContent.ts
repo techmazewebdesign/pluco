@@ -1,0 +1,105 @@
+import { Building2, Compass, Handshake, Landmark } from 'lucide-react';
+import { localizedPath } from '@/lib/languageRoutes';
+
+const servicePaths = [
+  ['/eu-residency', '/spain-digital-nomad-visa', '/new-identity', '/sao-tome-citizenship-by-investment', '/us-green-card'],
+  ['/banking', '/banking-compliance', '/financial-discrimination'],
+  ['/eu-company-registration', '/international-contracts', '/business-solutions'],
+  ['/dispute-resolution', '/eu-property-purchase'],
+];
+
+export const serviceIcons = [Compass, Landmark, Building2, Handshake];
+
+export const advisoryContent = {
+  en: {
+    category: 'European immigration & private client advisory',
+    title: 'The right advice opens doors.',
+    lead: 'Pluco Group helps individuals, families and businesses understand their options, address cross-border problems and take the next step with confidence.',
+    consultation: 'Request a confidential consultation',
+    explore: 'Explore services',
+    navigation: 'On this page',
+    processLink: 'How we help',
+    servicesLink: 'Find your service',
+    contactLink: 'Get in touch',
+    heroAlt: 'A smiling woman discussing a document with others in a bright office',
+    heroCaption: 'Warsaw, Poland · Working across borders',
+    processTitle: 'From your first question to a plan you can act on',
+    steps: [
+      { title: 'Tell us what you need', description: 'Share your goal, the countries involved and what is holding things up. We’ll identify what needs a closer look.' },
+      { title: 'Understand your options', description: 'We explain the routes worth exploring, the documents you may need and the issues to address first.' },
+      { title: 'Take the next step', description: 'We help put the plan into action, including preparing documents and coordinating with local specialists where needed.' },
+    ],
+    servicesTitle: 'What can we help you with?',
+    servicesIntro: 'Start with the area that best matches your situation.',
+    services: [
+      { title: 'Residency & citizenship', description: 'Plan where you and your family can live, work or build a future.', links: ['European residency', 'Spain digital nomad visa', 'Second citizenship & identity planning', 'São Tomé and Príncipe citizenship', 'US investor green card'] },
+      { title: 'Banking & compliance', description: 'Prepare for bank checks, organise source-of-funds documents and address barriers to banking.', links: ['Banking access', 'Banking compliance', 'Financial discrimination'] },
+      { title: 'Business & contracts', description: 'Set up a company, enter European markets or get clarity on an international agreement.', links: ['EU company registration', 'International contracts', 'Business solutions'] },
+      { title: 'Disputes & property', description: 'Understand your options in a dispute or get help reviewing a cross-border property purchase.', links: ['Dispute resolution', 'European property purchase'] },
+    ],
+    spainTitle: 'Considering a move to Spain?',
+    spainBody: 'If you work remotely, we can help you review whether the digital nomad visa fits your situation and identify what you’ll need to prepare.',
+    spainLink: 'Explore the Spain digital nomad visa',
+    spainAlt: 'A smiling couple walking together on a city street',
+    insightsTitle: 'Helpful reading before you decide',
+    articles: [
+      { label: 'Publications and legal insights', href: '/publications' },
+      { label: 'Information for Iranian clients', href: '/iranian-clients' },
+      { label: 'Read in Persian', href: '/fa' },
+    ],
+    contactTitle: 'Start with a confidential conversation.',
+    contactText: 'Tell us what you’re trying to achieve and where you need help. We’ll explain how we can assist and what to expect next.',
+    whatsapp: 'WhatsApp',
+    about: 'About Pluco Group',
+    warsawAlt: 'People crossing Warsaw’s colourful Old Town square on a sunny day',
+  },
+  fa: {
+    category: 'مشاوره مهاجرت اروپا و امور فرامرزی برای ایرانیان',
+    title: 'مشاوره درست، راه را باز می‌کند.',
+    lead: 'پلوکو گروپ به افراد، خانواده‌ها و کسب‌وکارها کمک می‌کند گزینه‌هایشان را بشناسند، مشکلات فرامرزی را پیگیری کنند و با اطمینان قدم بعدی را بردارند.',
+    consultation: 'درخواست مشاوره محرمانه',
+    explore: 'مشاهده خدمات',
+    navigation: 'در این صفحه',
+    processLink: 'چطور کمک می‌کنیم',
+    servicesLink: 'خدمات ما',
+    contactLink: 'تماس با ما',
+    heroAlt: 'گفت‌وگو درباره یک سند در جلسه‌ای دوستانه در دفتر روشن',
+    heroCaption: 'ورشو، لهستان · مشاوره فرامرزی',
+    processTitle: 'از اولین سؤال تا برنامه‌ای برای اقدام',
+    steps: [
+      { title: 'موضوعتان را با ما در میان بگذارید', description: 'از هدفتان، کشورهای مرتبط و مانعی که با آن روبه‌رو هستید بگویید تا مشخص کنیم چه مواردی نیاز به بررسی دقیق‌تر دارند.' },
+      { title: 'گزینه‌هایتان را بشناسید', description: 'مسیرهای قابل بررسی، مدارک موردنیاز و موضوعاتی را که باید ابتدا پیگیری شوند، توضیح می‌دهیم.' },
+      { title: 'قدم بعدی را بردارید', description: 'در آماده‌سازی مدارک، اجرای برنامه و در صورت نیاز، هماهنگی با متخصصان محلی به شما کمک می‌کنیم.' },
+    ],
+    servicesTitle: 'در چه زمینه‌ای می‌توانیم کمک کنیم؟',
+    servicesIntro: 'موضوعی را انتخاب کنید که به شرایط شما نزدیک‌تر است.',
+    services: [
+      { title: 'اقامت و تابعیت', description: 'برای زندگی، کار و آینده خانواده‌تان در کشور دیگر برنامه‌ریزی کنید.', links: ['اقامت اروپا', 'ویزای نومد دیجیتال اسپانیا', 'تابعیت دوم و برنامه‌ریزی هویتی', 'تابعیت سائوتومه و پرنسیپ', 'مهاجرت سرمایه‌گذاری آمریکا'] },
+      { title: 'بانک و انطباق', description: 'برای بررسی‌های بانکی آماده شوید، مدارک منبع وجوه را مرتب کنید و موانع دسترسی بانکی را پیگیری کنید.', links: ['دسترسی به خدمات بانکی', 'انطباق بانکی', 'تبعیض مالی'] },
+      { title: 'شرکت و قرارداد', description: 'برای ثبت شرکت، ورود به بازار اروپا یا بررسی یک قرارداد بین‌المللی راهنمایی بگیرید.', links: ['ثبت شرکت در اروپا', 'قراردادهای بین‌المللی', 'راهکارهای کسب‌وکار'] },
+      { title: 'حل اختلاف و خرید ملک', description: 'گزینه‌های حل اختلاف را بررسی کنید یا برای بررسی حقوقی خرید ملک در خارج از کشور کمک بگیرید.', links: ['حل اختلاف', 'خرید ملک در اروپا'] },
+    ],
+    spainTitle: 'به زندگی در اسپانیا فکر می‌کنید؟',
+    spainBody: 'اگر دورکار هستید، به شما کمک می‌کنیم بررسی کنید که آیا ویزای نومد دیجیتال با شرایطتان سازگار است و چه مدارکی باید آماده کنید.',
+    spainLink: 'آشنایی با ویزای نومد دیجیتال اسپانیا',
+    spainAlt: 'زوجی خندان که در خیابانی شهری قدم می‌زنند',
+    insightsTitle: 'راهنماهایی برای تصمیم‌گیری',
+    articles: [
+      { label: 'راهنمای ایرانیان خارج از کشور', href: '/fa/iranians-abroad' },
+      { label: 'تابعیت سائوتومه و پرنسیپ برای ایرانیان', href: '/fa/publications/sao-tome-citizenship-by-investment-for-iranians' },
+      { label: 'هزینه و مراحل دریافت تابعیت سائوتومه', href: '/fa/publications/sao-tome-citizenship-by-investment-costs-process' },
+      { label: 'مدارک و انطباق برای تابعیت سائوتومه', href: '/fa/publications/sao-tome-citizenship-by-investment-documents-compliance' },
+      { label: 'مقررات تابعیت سائوتومه', href: '/fa/news/sao-tome-citizenship-by-investment-regulation-update' },
+      { label: 'شفافیت مالی برنامه تابعیت سائوتومه', href: '/fa/news/sao-tome-citizenship-by-investment-fund-transparency' },
+    ],
+    contactTitle: 'با یک گفت‌وگوی محرمانه شروع کنید.',
+    contactText: 'بگویید چه هدفی دارید و در کدام بخش به کمک نیاز دارید. توضیح می‌دهیم چه کمکی از ما برمی‌آید و قدم بعدی چیست.',
+    whatsapp: 'واتس‌اپ',
+    about: 'درباره پلوکو گروپ',
+    warsawAlt: 'میدان رنگارنگ شهر قدیمی ورشو در یک روز آفتابی',
+  },
+};
+
+export function advisoryServicePath(group: number, link: number, isPersian: boolean) {
+  return localizedPath(servicePaths[group][link], isPersian);
+}
