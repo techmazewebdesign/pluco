@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import NewsletterSignup from './NewsletterSignup';
+import { newsletterCopy } from '@/lib/newsletterCopy';
 import { MapPin, Mail, FileText } from 'lucide-react';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -96,6 +98,11 @@ export default function Footer() {
               {t('footer.quickLinks')}
             </h4>
             <ul className="space-y-2">
+              <li>
+                <a href="#newsletter" className="text-xs text-[#E0BB75] underline-offset-2 hover:underline">
+                  {newsletterCopy[isRTL ? 'fa' : 'en'].link}
+                </a>
+              </li>
               {quickLinks.map(([label, href]) => (
                 <li key={href}>
                   <Link href={href} className="text-xs transition-colors hover:text-white" style={{ color: '#CBD5E0' }}>
@@ -106,6 +113,8 @@ export default function Footer() {
             </ul>
           </div>
         </div>
+
+        <NewsletterSignup isRTL={isRTL} />
 
         {/* Legal Disclaimer */}
         <div className="border-t pt-6 mb-4" style={{ borderColor: '#0B234A' }}>

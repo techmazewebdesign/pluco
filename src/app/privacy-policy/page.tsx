@@ -63,6 +63,27 @@ export default function PrivacyPolicy() {
                 </ul>
               </div>
 
+              <div id="newsletter-privacy-en" className="scroll-mt-28">
+                <h2 className="text-2xl font-serif text-navy-900 mb-4">Newsletter</h2>
+                <p className="leading-relaxed">
+                  Pluco Group uses your email address, language preference and consent record to manage your
+                  newsletter subscription. We send the newsletter based on your consent and only after you confirm
+                  your address. We use Firebase to store subscriptions and Resend to deliver confirmation emails.
+                  You can withdraw your consent using the unsubscribe link or by contacting info@plucogroup.com.
+                  Confirmation links expire after 48 hours.
+                </p>
+              </div>
+
+              <div id="newsletter-privacy-fa" lang="fa" dir="rtl" className="scroll-mt-28">
+                <h2 className="text-2xl font-serif text-navy-900 mb-4">حریم خصوصی خبرنامه</h2>
+                <p className="leading-relaxed">
+                  گروه پلوکو از نشانی ایمیل، زبان انتخابی و سابقه رضایت شما برای مدیریت عضویت در خبرنامه استفاده می‌کند.
+                  خبرنامه با رضایت شما و پس از تأیید نشانی ایمیل ارسال می‌شود. برای ذخیره اطلاعات عضویت از Firebase و
+                  برای ارسال ایمیل تأیید از Resend استفاده می‌کنیم. می‌توانید با پیوند لغو عضویت یا از طریق تماس با
+                  <bdi>info@plucogroup.com</bdi> رضایت خود را پس بگیرید. پیوند تأیید پس از ۴۸ ساعت منقضی می‌شود.
+                </p>
+              </div>
+
               <div>
                 <h2 className="text-2xl font-serif text-navy-900 mb-4">Information Sharing</h2>
                 <p className="leading-relaxed mb-4">
