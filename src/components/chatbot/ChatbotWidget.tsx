@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -11,36 +11,19 @@ const ChatWindow = dynamic(() => import('./ChatWindow'), { ssr: false });
 export default function ChatbotWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [sessionId, setSessionId] = useState<string>('');
-  const [isMounted, setIsMounted] = useState(false);
-
-  // Initialize session on component mount
-  useEffect(() => {
-    try {
-      console.log('[Chatbot] ChatbotWidget mounted and initializing...');
-      setIsMounted(true);
-
-      // Generate or retrieve session ID from localStorage
-      if (typeof window !== 'undefined') {
-        let storedSessionId = localStorage.getItem('chatbot_session_id');
-        if (!storedSessionId) {
-          storedSessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-          localStorage.setItem('chatbot_session_id', storedSessionId);
-          console.log('[Chatbot] Created new session:', storedSessionId);
-        } else {
-          console.log('[Chatbot] Using existing session:', storedSessionId);
-        }
-        setSessionId(storedSessionId);
-        console.log('[Chatbot] Session ID set and component should be visible');
-      }
-    } catch (error) {
-      console.error('[Chatbot] Initialization error:', error);
-    }
-  }, []);
-
-  if (!isMounted) return null;
-
   const toggleChat = () => {
-    setIsOpen(!isOpen);
+    if (!sessionId) {
+      let id = `session_${Date.now()}_${crypto.randomUUID()}`;
+      try {
+        const stored = localStorage.getItem('chatbot_session_id');
+        if (stored) id = stored;
+        else localStorage.setItem('chatbot_session_id', id);
+      } catch {
+        // The current chat can continue without local storage.
+      }
+      setSessionId(id);
+    }
+    setIsOpen(open => !open);
   };
 
   return (
@@ -58,7 +41,8 @@ export default function ChatbotWidget() {
           backgroundColor: '#071C3C',
           color: '#FFFFFF',
         }}
-        aria-label="Open chat"
+        aria-label={isOpen ? "Hide chat" : "Open chat"}
+        aria-expanded={isOpen}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
