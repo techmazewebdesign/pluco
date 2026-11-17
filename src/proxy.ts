@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { localeForPath } from "@/lib/languageRoutes";
 
 export function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-site-locale", request.nextUrl.pathname === "/fa" || request.nextUrl.pathname.startsWith("/fa/") ? "fa" : "en");
+  requestHeaders.set("x-site-locale", localeForPath(request.nextUrl.pathname));
 
   return NextResponse.next({
     request: { headers: requestHeaders },

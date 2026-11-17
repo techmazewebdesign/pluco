@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { PRIVATE_ROUTE } from '@/lib/publicAnalytics';
 import PublicPageTracking from '@/components/seo/PublicPageTracking';
 import { useEffect, useState } from 'react';
+import { localizedPath } from '@/lib/languageRoutes';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 type ConsentRecord = {
@@ -24,6 +25,11 @@ const copy = {
     label: 'Confidential by design', title: 'Your privacy, clearly handled.',
     description: 'We use optional analytics to improve this website. Google Analytics remains off until you choose to allow it.',
     reject: 'Essential only', accept: 'Accept all', privacy: 'Privacy policy',
+  },
+  pl: {
+    label: 'Prywatność', title: 'Ustawienia prywatności',
+    description: 'Opcjonalna analityka pomaga nam ulepszać serwis. Google Analytics jest wyłączone, dopóki nie wyrazisz zgody.',
+    reject: 'Tylko niezbędne', accept: 'Zaakceptuj wszystkie', privacy: 'Polityka prywatności',
   },
   fa: {
     label: 'محرمانگی در طراحی', title: 'حریم خصوصی شما، شفاف و محترمانه.',
@@ -112,7 +118,7 @@ export default function ConsentManager() {
             <span className="pluco-consent__label">{text.label}</span>
             <strong id="pluco-consent-title">{text.title}</strong>
             <p id="pluco-consent-description">{text.description}</p>
-            <a href="/privacy-policy">{text.privacy}</a>
+            <a href={localizedPath("/privacy-policy", lang)}>{text.privacy}</a>
           </div>
           <div className="pluco-consent__actions">
             <button type="button" onClick={() => choose(false)}>{text.reject}</button>

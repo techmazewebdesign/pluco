@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, LogOut, Phone, User } from 'lucide-react';
 import Link from 'next/link';
-import { localizedPath } from '@/lib/languageRoutes';
+import { homePaths, localizedPath } from '@/lib/languageRoutes';
 import Image from 'next/image';
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,7 +14,7 @@ import { CONTACT_PHONE, CONTACT_PHONE_HREF } from '@/lib/contactDetails';
 import styles from './Header.module.css';
 
 export default function Header() {
-  const { t, isRTL } = useLanguage();
+  const { t, lang, isRTL } = useLanguage();
   const { user, signOut, loading } = useAuth();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -74,7 +74,7 @@ export default function Header() {
           <LanguageSwitcher />
           <a
             href={CONTACT_PHONE_HREF}
-            aria-label={isRTL ? `تماس با پلوکو گروپ، ${CONTACT_PHONE}` : `Call Pluco Group at ${CONTACT_PHONE}`}
+            aria-label={isRTL ? `تماس با پلوکو گروپ، ${CONTACT_PHONE}` : lang === 'pl' ? `Zadzwoń do Pluco Group: ${CONTACT_PHONE}` : `Call Pluco Group at ${CONTACT_PHONE}`}
             className={styles.phone}
           >
             <Phone aria-hidden="true" size={14} />
@@ -88,7 +88,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
 
           {/* Logo */}
-          <Link href={isRTL ? '/fa' : '/'} className="flex items-center flex-shrink-0">
+          <Link href={homePaths[lang]} className="flex items-center flex-shrink-0">
             <Image
               src="/images/logo-pluco.png"
               alt="Pluco Group Sp. z o.o."
@@ -102,7 +102,7 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-5 xl:gap-6" dir={isRTL ? 'rtl' : 'ltr'}>
             {/* Home */}
-            <Link href={isRTL ? '/fa' : '/'} className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
+            <Link href={homePaths[lang]} className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
               {t('nav.home')}
               <span
                 className={`absolute bottom-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${isRTL ? 'right-0' : 'left-0'}`}
@@ -137,7 +137,7 @@ export default function Header() {
                     {services.map((item) => (
                       <Link
                         key={item.href}
-                        href={localizedPath(item.href, isRTL)}
+                        href={localizedPath(item.href, lang)}
                         onClick={() => setIsServicesOpen(false)}
                         className="block px-4 py-2.5 text-xs font-medium transition-colors hover:text-white"
                         style={{ color: '#CBD5E0' }}
@@ -153,7 +153,7 @@ export default function Header() {
             </div>
 
             {/* Publications */}
-            <Link href="/publications" className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
+            <Link href={localizedPath("/publications", lang)} className="text-xs font-medium py-2 relative group transition-colors whitespace-nowrap text-white">
               {t('nav.publications')}
               <span
                 className={`absolute bottom-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${isRTL ? 'right-0' : 'left-0'}`}
@@ -169,14 +169,14 @@ export default function Header() {
                   className="px-5 py-1.5 text-xs font-semibold rounded border transition-colors whitespace-nowrap"
                   style={{ borderColor: '#C9A35A', color: '#C9A35A' }}
                 >
-                  {isRTL ? 'ورود' : 'Login'}
+                  {isRTL ? 'ورود' : lang === 'pl' ? 'Zaloguj się' : 'Login'}
                 </Link>
                 <Link
                   href="/signup"
                   className="px-5 py-1.5 text-xs font-semibold rounded transition-colors whitespace-nowrap text-white"
                   style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
                 >
-                  {isRTL ? 'ثبت نام' : 'Sign up'}
+                  {isRTL ? 'ثبت نام' : lang === 'pl' ? 'Zarejestruj się' : 'Sign up'}
                 </Link>
               </>
             ) : (
@@ -187,7 +187,7 @@ export default function Header() {
                   style={{ borderColor: '#C9A35A', color: '#C9A35A' }}
                 >
                   <User className="w-4 h-4" />
-                  {isRTL ? 'پنل' : 'Dashboard'}
+                  {isRTL ? 'پنل' : lang === 'pl' ? 'Panel' : 'Dashboard'}
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -195,7 +195,7 @@ export default function Header() {
                   style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
                 >
                   <LogOut className="w-4 h-4" />
-                  {isRTL ? 'خروج' : 'Logout'}
+                  {isRTL ? 'خروج' : lang === 'pl' ? 'Wyloguj się' : 'Logout'}
                 </button>
               </>
             )}
@@ -229,7 +229,7 @@ export default function Header() {
               {mobileAll.map((item) => (
                 <Link
                   key={item.href}
-                  href={localizedPath(item.href, isRTL)}
+                  href={localizedPath(item.href, lang)}
                   className="block px-3 py-2.5 text-sm font-medium rounded transition-colors"
                   style={{ color: '#CBD5E0' }}
                   onClick={() => setIsMenuOpen(false)}
@@ -250,7 +250,7 @@ export default function Header() {
                       style={{ color: '#C9A35A' }}
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      {isRTL ? 'ورود' : 'Login'}
+                      {isRTL ? 'ورود' : lang === 'pl' ? 'Zaloguj się' : 'Login'}
                     </Link>
                     <Link
                       href="/signup"
@@ -258,7 +258,7 @@ export default function Header() {
                       style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      {isRTL ? 'ثبت نام' : 'Sign up'}
+                      {isRTL ? 'ثبت نام' : lang === 'pl' ? 'Zarejestruj się' : 'Sign up'}
                     </Link>
                   </>
                 ) : (
@@ -270,7 +270,7 @@ export default function Header() {
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <User className="w-4 h-4" />
-                      {isRTL ? 'پنل' : 'Dashboard'}
+                      {isRTL ? 'پنل' : lang === 'pl' ? 'Panel' : 'Dashboard'}
                     </Link>
                     <button
                       onClick={() => {
@@ -281,7 +281,7 @@ export default function Header() {
                       style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
                     >
                       <LogOut className="w-4 h-4" />
-                      {isRTL ? 'خروج' : 'Logout'}
+                      {isRTL ? 'خروج' : lang === 'pl' ? 'Wyloguj się' : 'Logout'}
                     </button>
                   </>
                 )}

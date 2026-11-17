@@ -2,10 +2,10 @@
 
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import { localizedPath, type SiteLocale } from '@/lib/languageRoutes';
 import { newsletterCopy } from '@/lib/newsletterCopy';
 
-export default function NewsletterSignup({ isRTL }: { isRTL: boolean }) {
-  const locale = isRTL ? 'fa' : 'en';
+export default function NewsletterSignup({ locale }: { locale: SiteLocale }) {
   const copy = newsletterCopy[locale];
   const [status, setStatus] = useState<'idle' | 'sending' | 'submitted' | 'limited' | 'error'>('idle');
 
@@ -49,7 +49,7 @@ export default function NewsletterSignup({ isRTL }: { isRTL: boolean }) {
           <input id="newsletter-consent" name="consent" type="checkbox" required className="mt-1 size-4 shrink-0 accent-[#E0BB75]" />
           <label htmlFor="newsletter-consent">{copy.consent}</label>
         </div>
-        <Link href={`/privacy-policy#newsletter-privacy-${locale}`} className="mt-2 inline-block text-sm text-slate-200 underline underline-offset-2 hover:text-white">{copy.privacy}</Link>
+        <Link href={`${localizedPath('/privacy-policy', locale)}#newsletter-privacy-${locale}`} className="mt-2 inline-block text-sm text-slate-200 underline underline-offset-2 hover:text-white">{copy.privacy}</Link>
         <p role="status" className="mt-2 text-sm text-[#E0BB75]">
           {status === 'submitted' || status === 'limited' || status === 'error' ? copy[status] : ''}
         </p>

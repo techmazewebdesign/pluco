@@ -1,9 +1,10 @@
+import { homePaths, type SiteLocale } from '@/lib/languageRoutes';
 import { applyNewsletterAction, parseNewsletterAction } from '@/lib/newsletter';
 import { newsletterCopy, newsletterLocale } from '@/lib/newsletterCopy';
 
 type Action = NonNullable<ReturnType<typeof parseNewsletterAction>>;
 
-function page(locale: 'en' | 'fa', message: string, status = 200, action?: Action) {
+function page(locale: SiteLocale, message: string, status = 200, action?: Action) {
   const copy = newsletterCopy[locale];
   const form = action ? `<form method="post" action="/api/newsletter/manage">
     <input type="hidden" name="action" value="${action.action}">
@@ -21,7 +22,7 @@ function page(locale: 'en' | 'fa', message: string, status = 200, action?: Actio
         a{display:inline-block;margin-top:1rem;color:#e0bb75}
       </style>
     </head><body><main><h1>${copy.title}</h1><p>${message}</p>${form}
-      <a href="${locale === 'fa' ? '/fa' : '/'}#newsletter">${copy.back}</a>
+      <a href="${homePaths[locale]}#newsletter">${copy.back}</a>
     </main></body></html>`, {
     status,
     headers: {

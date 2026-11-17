@@ -10,7 +10,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { OPEN_COOKIE_SETTINGS_EVENT } from '@/components/privacy/ConsentManager';
 
 export default function Footer() {
-  const { t, isRTL } = useLanguage();
+  const { t, lang, isRTL } = useLanguage();
 
   const services = [
     [t('nav.saoTomeCitizenship'),     '/sao-tome-citizenship-by-investment'],
@@ -27,17 +27,17 @@ export default function Footer() {
   ];
 
   const quickLinks = [
-    ['About Us',                  '/about-us'],
-    [isRTL ? 'راهنمای ایرانیان خارج از کشور' : 'Services for Iranian clients', '/iranian-clients'],
-    [isRTL ? 'مشاوران' : 'Consultants', '/consultants'],
+    [lang === 'pl' ? 'O nas' : 'About Us',                  '/about-us'],
+    [isRTL ? 'راهنمای ایرانیان خارج از کشور' : lang === 'pl' ? 'Wsparcie dla klientów z Iranu' : 'Services for Iranian clients', '/iranian-clients'],
+    [isRTL ? 'مشاوران' : lang === 'pl' ? 'Konsultanci' : 'Consultants', '/consultants'],
     [t('nav.publications'),       '/publications'],
-    ['Industries',                '/industries'],
-    ['Banking Compliance',        '/banking-compliance'],
-    ['Financial Discrimination',  '/financial-discrimination'],
+    [lang === 'pl' ? 'Klienci i branże' : 'Industries',                '/industries'],
+    [lang === 'pl' ? 'Dokumentacja zgodności bankowej' : 'Banking Compliance',        '/banking-compliance'],
+    [lang === 'pl' ? 'Bariery w dostępie do usług finansowych' : 'Financial Discrimination',  '/financial-discrimination'],
     [t('nav.clientSignIn'),       '/client-sign-in'],
-    ['Contact',                   '/contact'],
+    [lang === 'pl' ? 'Kontakt' : 'Contact',                   '/contact'],
     [t('footer.privacyPolicy'),   '/privacy-policy'],
-    ['Legal Notice',              '/imprint'],
+    [lang === 'pl' ? 'Informacje o operatorze' : 'Legal Notice',              '/imprint'],
     [t('footer.legalDisclaimer'), '/disclaimer'],
   ];
 
@@ -61,7 +61,7 @@ export default function Footer() {
               {t('footer.tagline')}
             </p>
             <p className="text-xs leading-relaxed mt-4" style={{ color: '#CBD5E0', fontFamily: isRTL ? "'Vazirmatn', Tahoma, Arial, sans-serif" : undefined }}>
-              {isRTL ? <>DESIVO، دپارتمان رشد دیجیتال و سیستم‌های کسب‌وکار PLUCO GROUP است. <a href="https://desivo.de" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">desivo.de</a> · <a href="https://desivo.pl" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">desivo.pl</a></> : <>DESIVO is PLUCO GROUP's digital growth and business systems department. <a href="https://desivo.de" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">desivo.de</a> · <a href="https://desivo.pl" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">desivo.pl</a></>}
+              {isRTL ? <>DESIVO، دپارتمان رشد دیجیتال و سیستم‌های کسب‌وکار PLUCO GROUP است. <a href="https://desivo.de" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">desivo.de</a> · <a href="https://desivo.pl" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">desivo.pl</a></> : <>{lang === 'pl' ? 'DESIVO to dział Pluco Group zajmujący się rozwojem cyfrowym i systemami biznesowymi.' : "DESIVO is PLUCO GROUP’s digital growth and business systems department."} <a href="https://desivo.de" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">desivo.de</a> · <a href="https://desivo.pl" target="_blank" rel="noopener noreferrer" className="underline hover:text-white">desivo.pl</a></>}
             </p>
           </div>
 
@@ -96,7 +96,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {services.map(([label, href]) => (
                 <li key={href}>
-                  <Link href={localizedPath(href, isRTL)} className="text-xs transition-colors hover:text-white" style={{ color: '#CBD5E0' }}>
+                  <Link href={localizedPath(href, lang)} className="text-xs transition-colors hover:text-white" style={{ color: '#CBD5E0' }}>
                     {label}
                   </Link>
                 </li>
@@ -112,12 +112,12 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <a href="#newsletter" className="text-xs text-[#E0BB75] underline-offset-2 hover:underline">
-                  {newsletterCopy[isRTL ? 'fa' : 'en'].link}
+                  {newsletterCopy[lang].link}
                 </a>
               </li>
               {quickLinks.map(([label, href]) => (
                 <li key={href}>
-                  <Link href={localizedPath(href, isRTL)} className="text-xs transition-colors hover:text-white" style={{ color: '#CBD5E0' }}>
+                  <Link href={localizedPath(href, lang)} className="text-xs transition-colors hover:text-white" style={{ color: '#CBD5E0' }}>
                     {label}
                   </Link>
                 </li>
@@ -126,7 +126,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <NewsletterSignup isRTL={isRTL} />
+        <NewsletterSignup locale={lang} />
 
         {/* Legal Disclaimer */}
         <div className="border-t pt-6 mb-4" style={{ borderColor: '#0B234A' }}>
@@ -146,11 +146,11 @@ export default function Footer() {
         <div className="text-center">
           <p className="text-xs" style={{ color: '#64748B' }}>
             © {new Date().getFullYear()} Pluco Group Sp. z o.o. {t('footer.copyright')} &nbsp;·&nbsp;
-            <Link href="/privacy-policy" className="hover:text-white transition-colors" style={{ color: '#64748B' }}>{t('footer.privacyPolicy')}</Link>
+            <Link href={localizedPath("/privacy-policy", lang)} className="hover:text-white transition-colors" style={{ color: '#64748B' }}>{t('footer.privacyPolicy')}</Link>
             &nbsp;·&nbsp;
-            <Link href="/imprint" className="hover:text-white transition-colors" style={{ color: '#64748B' }}>Legal Notice</Link>
+            <Link href={localizedPath("/imprint", lang)} className="hover:text-white transition-colors" style={{ color: '#64748B' }}>{lang === 'pl' ? 'Informacje o operatorze' : 'Legal Notice'}</Link>
             &nbsp;·&nbsp;
-            <Link href="/disclaimer" className="hover:text-white transition-colors" style={{ color: '#64748B' }}>{t('footer.legalDisclaimer')}</Link>
+            <Link href={localizedPath("/disclaimer", lang)} className="hover:text-white transition-colors" style={{ color: '#64748B' }}>{t('footer.legalDisclaimer')}</Link>
             &nbsp;·&nbsp;
             <button type="button" onClick={() => window.dispatchEvent(new Event(OPEN_COOKIE_SETTINGS_EVENT))} className="hover:text-white transition-colors" style={{ padding: 0, border: 0, background: 'transparent', color: '#64748B', cursor: 'pointer' }}>{t('footer.cookieSettings')}</button>
           </p>

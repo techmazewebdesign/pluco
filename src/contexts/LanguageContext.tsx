@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 import { usePathname, useRouter } from 'next/navigation';
 import { type Lang, type TranslationKey, t as translate } from '@/lib/translations';
 
-import { languageRoutes } from '@/lib/languageRoutes';
+import { homePaths, localeForPath, routeForLanguage } from '@/lib/languageRoutes';
 
 interface LanguageContextValue {
   lang: Lang;
@@ -29,12 +29,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   if (selection && selection.pathname !== pathname) {
     setSelection(null);
   }
-  const pair = languageRoutes.find((routes) => routes.en === pathname || routes.fa === pathname);
+  const pair = routeForLanguage(pathname);
   // URL language wins on every navigation, including ordinary Links and history.
   // A manual toggle on a generic page cannot leak into another page.
-  const lang: Lang = pathname === '/fa' || pathname.startsWith('/fa/')
-    ? 'fa'
-    : pair ? 'en' : selection?.pathname === pathname ? selection.lang : 'en';
+  const lang: Lang = pair || localeForPath(pathname) !== 'en'
+    ? localeForPath(pathname)
+    : selection?.pathname === pathname ? selection.lang : 'en';
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -43,12 +43,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // The URL determines the initial language for server output and hydration.
   const setLang = useCallback((next: Lang) => {
-    const routes = languageRoutes.find((routes) => routes.en === pathname || routes.fa === pathname);
-    if (routes) {
-      router.push(routes[next]);
-    } else if (next === 'en' && pathname.startsWith('/fa/')) {
-      // Persian-only articles have no translated article equivalent.
-      router.push('/');
+    const routes = routeForLanguage(pathname);
+    const target = routes?.[next];
+    if (target) {
+      router.push(target);
+    } else if (next === 'pl' || routes || localeForPath(pathname) !== 'en') {
+      router.push(homePaths[next]);
     } else {
       // A generic page's presentation toggle belongs only to that URL.
       // Navigation to another English URL always starts in English.

@@ -5,12 +5,13 @@ import { advisoryContent, advisoryServicePath, serviceIcons } from './advisoryCo
 import { CONTACT_PHONE, CONTACT_PHONE_HREF } from '@/lib/contactDetails';
 import { homepageImages } from '@/lib/pageImages';
 import PageImageStructuredData from '@/components/seo/PageImageStructuredData';
+import { localizedPath, type SiteLocale } from '@/lib/languageRoutes';
 import styles from './AdvisoryHome.module.css';
 
-export default function AdvisoryHome({ locale }: { locale: 'en' | 'fa' }) {
+export default function AdvisoryHome({ locale }: { locale: SiteLocale }) {
   const isPersian = locale === 'fa';
   const copy = advisoryContent[locale];
-  const consultationHref = isPersian ? '/enquire' : '/contact';
+  const consultationHref = locale === 'pl' ? '/pl/enquire' : isPersian ? '/enquire' : '/contact';
   return (
     <div className={styles.home} dir={isPersian ? 'rtl' : 'ltr'} lang={locale}>
       <PageImageStructuredData path={isPersian ? '/fa' : '/'} />
@@ -69,7 +70,7 @@ export default function AdvisoryHome({ locale }: { locale: 'en' | 'fa' }) {
                   <ul>
                     {links.map((label, index) => (
                       <li key={label}>
-                        <Link href={advisoryServicePath(group, index, isPersian)}>{label}<ArrowRight size={16} aria-hidden="true" /></Link>
+                        <Link href={advisoryServicePath(group, index, locale)}>{label}<ArrowRight size={16} aria-hidden="true" /></Link>
                       </li>
                     ))}
                   </ul>
@@ -88,7 +89,7 @@ export default function AdvisoryHome({ locale }: { locale: 'en' | 'fa' }) {
         <div className={styles.featureText}>
           <h2 id="advisory-spain-title">{copy.spainTitle}</h2>
           <p>{copy.spainBody}</p>
-          <Link href={advisoryServicePath(0, 1, isPersian)} className={styles.textLink}>{copy.spainLink}<ArrowRight aria-hidden="true" size={18} /></Link>
+          <Link href={advisoryServicePath(0, 1, locale)} className={styles.textLink}>{copy.spainLink}<ArrowRight aria-hidden="true" size={18} /></Link>
         </div>
       </section>
 
@@ -111,7 +112,7 @@ export default function AdvisoryHome({ locale }: { locale: 'en' | 'fa' }) {
               <a href="mailto:info@plucogroup.com" dir="ltr">info@plucogroup.com</a>
               <a href={CONTACT_PHONE_HREF}><bdi dir="ltr">{CONTACT_PHONE}</bdi></a>
               <a href="https://wa.me/48730962085">{copy.whatsapp}</a>
-              <Link href="/about-us">{copy.about}</Link>
+              <Link href={localizedPath("/about-us", locale)}>{copy.about}</Link>
             </div>
           </div>
           <div className={styles.contactImage}>

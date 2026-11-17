@@ -1,7 +1,9 @@
 // Translation dictionary — English complete, Persian placeholders marked TODO_FA
 // Add Persian strings progressively; never auto-translate.
 
-export type Lang = 'en' | 'fa';
+import type { SiteLocale } from './languageRoutes';
+
+export type Lang = SiteLocale;
 
 export const translations = {
 
@@ -94,10 +96,39 @@ export const translations = {
 
 export type TranslationKey = keyof typeof translations;
 
+const polishTranslations: Partial<Record<TranslationKey, string>> = {
+  'nav.home': 'Strona główna',
+  'nav.ourPeople': 'Nasz zespół',
+  'nav.services': 'Usługi',
+  'nav.publications': 'Publikacje',
+  'nav.clientSignIn': 'Strefa klienta',
+  'nav.newIdentity': 'Drugie obywatelstwo',
+  'nav.saoTomeCitizenship': 'Obywatelstwo Wysp Świętego Tomasza i Książęcej',
+  'nav.euPropertyPurchase': 'Zakup nieruchomości w Europie',
+  'nav.euResidency': 'Pobyt w Europie',
+  'nav.spainDigitalNomad': 'Wiza dla cyfrowych nomadów w Hiszpanii',
+  'nav.usGreenCard': 'Imigracja inwestycyjna do USA',
+  'nav.banking': 'Bankowość',
+  'nav.disputeResolution': 'Spory transgraniczne',
+  'nav.internationalContracts': 'Umowy międzynarodowe',
+  'nav.businessSolutions': 'Wsparcie dla firm',
+  'nav.euCompanyRegistration': 'Rejestracja spółki w UE',
+  'footer.tagline': 'Doradztwo w sprawach pobytowych i transgranicznych dla rodzin, przedsiębiorców i klientów indywidualnych.',
+  'footer.contact': 'Kontakt',
+  'footer.services': 'Usługi',
+  'footer.quickLinks': 'Szybkie linki',
+  'footer.privacyPolicy': 'Polityka prywatności',
+  'footer.legalDisclaimer': 'Zastrzeżenia prawne',
+  'footer.disclaimer': 'Treści serwisu mają ogólny charakter informacyjny. Warunki świadczenia usług zależą od zakresu pisemnego zlecenia, oceny sprawy i obowiązujących przepisów.',
+  'footer.copyright': 'Wszelkie prawa zastrzeżone.',
+  'footer.cookieSettings': 'Ustawienia plików cookie',
+};
+
 /** Returns the translated string for a given key and language. */
 export function t(key: TranslationKey, lang: Lang): string {
   const entry = translations[key];
   if (!entry) return key;
+  if (lang === 'pl') return polishTranslations[key] ?? entry.en;
   const value = entry[lang];
   // Fall back to English if Persian placeholder not yet filled
   if (value === 'TODO_FA') return entry['en'];

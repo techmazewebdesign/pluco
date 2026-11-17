@@ -1,4 +1,6 @@
 'use client';
+
+import { localeForPath } from '@/lib/languageRoutes';
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { PRIVATE_ROUTE } from '@/lib/publicAnalytics';
@@ -14,7 +16,7 @@ export default function PublicPageTracking() {
     // The container already sends the first page_view. Record clean route
     // metadata for future GTM reporting without adding a duplicate page_view.
     analytics.dataLayer.push({ event: 'pluco_public_page', page_path: path,
-      page_language: path === '/fa' || path.startsWith('/fa/') ? 'fa' : 'en',
+      page_language: localeForPath(path),
       page_location: window.location.origin + path });
     last.current = path;
   }, [path]);

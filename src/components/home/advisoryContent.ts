@@ -1,5 +1,5 @@
 import { Building2, Compass, Handshake, Landmark } from 'lucide-react';
-import { localizedPath } from '@/lib/languageRoutes';
+import { localizedPath, type SiteLocale } from '@/lib/languageRoutes';
 
 const servicePaths = [
   ['/eu-residency', '/spain-digital-nomad-visa', '/new-identity', '/sao-tome-citizenship-by-investment', '/us-green-card'],
@@ -50,6 +50,44 @@ export const advisoryContent = {
     whatsapp: 'WhatsApp',
     about: 'About Pluco Group',
   },
+  pl: {
+    category: 'Pobyt w Europie i doradztwo transgraniczne',
+    title: 'Dobra rada otwiera drzwi.',
+    lead: 'Pluco Group pomaga osobom prywatnym, rodzinom i firmom zrozumieć dostępne możliwości, uporządkować sprawy transgraniczne i zrobić kolejny krok.',
+    consultation: 'Poproś o poufną konsultację',
+    explore: 'Zobacz usługi',
+    navigation: 'Na tej stronie',
+    processLink: 'Jak pomagamy',
+    servicesLink: 'Znajdź usługę',
+    contactLink: 'Skontaktuj się z nami',
+    heroCaption: 'Warszawa, Polska · Sprawy transgraniczne',
+    processTitle: 'Od pierwszego pytania do planu działania',
+    steps: [
+      { title: 'Opowiedz nam o sprawie', description: 'Wskaż swój cel, kraje związane ze sprawą oraz przeszkodę, którą chcesz rozwiązać.' },
+      { title: 'Poznaj możliwości', description: 'Wyjaśnimy, które ścieżki warto rozważyć, jakie dokumenty przygotować i czym zająć się najpierw.' },
+      { title: 'Zrób kolejny krok', description: 'Pomożemy przygotować dokumenty i w razie potrzeby skoordynujemy dalsze działania z lokalnymi specjalistami.' },
+    ],
+    servicesTitle: 'W czym możemy pomóc?',
+    servicesIntro: 'Wybierz temat najbardziej zbliżony do Twojej sytuacji.',
+    services: [
+      { title: 'Pobyt i obywatelstwo', description: 'Zaplanuj, gdzie Ty i Twoja rodzina chcecie mieszkać, pracować lub prowadzić działalność.', links: ['Pobyt w Europie', 'Wiza dla cyfrowych nomadów w Hiszpanii', 'Drugie obywatelstwo', 'Obywatelstwo Wysp Świętego Tomasza i Książęcej', 'Imigracja inwestycyjna do USA'] },
+      { title: 'Bankowość i zgodność', description: 'Przygotuj się do weryfikacji bankowej, uporządkuj dokumenty dotyczące źródła środków i wyjaśnij bariery w dostępie do usług.', links: ['Dostęp do usług bankowych', 'Dokumentacja zgodności bankowej', 'Bariery w dostępie do usług finansowych'] },
+      { title: 'Firmy i umowy', description: 'Załóż spółkę, zaplanuj wejście na rynek europejski lub przygotuj międzynarodową umowę do analizy.', links: ['Rejestracja spółki w UE', 'Umowy międzynarodowe', 'Wsparcie dla firm'] },
+      { title: 'Spory i nieruchomości', description: 'Poznaj możliwe kroki w sporze lub przygotuj zakup nieruchomości za granicą.', links: ['Spory transgraniczne', 'Zakup nieruchomości w Europie'] },
+    ],
+    spainTitle: 'Planujesz przeprowadzkę do Hiszpanii?',
+    spainBody: 'Jeśli pracujesz zdalnie, pomożemy ocenić, czy wiza dla cyfrowych nomadów pasuje do Twojej sytuacji oraz co warto przygotować.',
+    spainLink: 'Poznaj wizę dla cyfrowych nomadów w Hiszpanii',
+    insightsTitle: 'Materiały pomocne przed podjęciem decyzji',
+    articles: [
+      { label: 'Publikacje i analizy', href: '/pl/publications' },
+      { label: 'Wsparcie dla klientów z Iranu', href: '/pl/iranian-clients' },
+    ],
+    contactTitle: 'Zacznij od poufnej rozmowy.',
+    contactText: 'Powiedz nam, co chcesz osiągnąć i jakiego wsparcia potrzebujesz. Wyjaśnimy, co możemy zrobić i jak wygląda kolejny krok.',
+    whatsapp: 'WhatsApp',
+    about: 'O Pluco Group',
+  },
   fa: {
     category: 'مشاوره مهاجرت اروپا و امور فرامرزی برای ایرانیان',
     title: 'مشاوره درست، راه را باز می‌کند.',
@@ -94,6 +132,6 @@ export const advisoryContent = {
   },
 };
 
-export function advisoryServicePath(group: number, link: number, isPersian: boolean) {
-  return localizedPath(servicePaths[group][link], isPersian);
+export function advisoryServicePath(group: number, link: number, locale: SiteLocale) {
+  return localizedPath(servicePaths[group][link], locale);
 }

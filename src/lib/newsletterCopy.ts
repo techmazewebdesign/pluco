@@ -19,6 +19,26 @@ export const newsletterCopy = {
     invalid: 'This link is invalid or has expired. You can request a new confirmation from the newsletter form.',
     back: 'Back to the newsletter',
   },
+  pl: {
+    title: 'Newsletter Pluco Group',
+    link: 'Zapisz się do newslettera',
+    description: 'Otrzymuj informacje o pobycie w Europie, sprawach transgranicznych i nowych publikacjach Pluco Group.',
+    email: 'Adres e-mail',
+    consent: 'Wyrażam zgodę na otrzymywanie newslettera Pluco Group pocztą elektroniczną. Mogę zrezygnować w każdej chwili.',
+    privacy: 'Prywatność newslettera',
+    subscribe: 'Zapisz się',
+    sending: 'Wysyłanie…',
+    submitted: 'Jeśli adres wymaga potwierdzenia, sprawdź skrzynkę pocztową.',
+    limited: 'Zbyt wiele prób. Spróbuj ponownie później.',
+    error: 'Nie udało się wykonać tej czynności. Spróbuj ponownie.',
+    confirm: 'Potwierdź subskrypcję',
+    confirmationEmail: 'Otrzymaliśmy prośbę o zapis do newslettera Pluco Group. Potwierdź adres e-mail poniżej. Link wygasa po 48 godzinach. Jeśli zapis nie pochodzi od Ciebie, zignoruj tę wiadomość.',
+    confirmed: 'Subskrypcja newslettera Pluco Group została potwierdzona.',
+    unsubscribe: 'Zrezygnuj z subskrypcji',
+    unsubscribed: 'Subskrypcja newslettera Pluco Group została zakończona.',
+    invalid: 'Link jest nieprawidłowy lub wygasł. Możesz poprosić o nowy link w formularzu zapisu.',
+    back: 'Wróć do newslettera',
+  },
   fa: {
     title: 'خبرنامه گروه پلوکو',
     link: 'عضویت در خبرنامه',
@@ -42,5 +62,5 @@ export const newsletterCopy = {
 } as const;
 
 export function newsletterLocale(value: unknown) {
-  return value === 'fa' ? 'fa' : 'en';
+  return value === 'fa' || value === 'pl' ? value : 'en';
 }

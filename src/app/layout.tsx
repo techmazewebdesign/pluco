@@ -49,7 +49,8 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = (await headers()).get("x-site-locale") === "fa" ? "fa" : "en";
+  const requestedLocale = (await headers()).get("x-site-locale");
+  const locale = requestedLocale === "fa" || requestedLocale === "pl" ? requestedLocale : "en";
 
   return (
     <html lang={locale} dir={locale === "fa" ? "rtl" : "ltr"} className="h-full antialiased" suppressHydrationWarning>

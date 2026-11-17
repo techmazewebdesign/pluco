@@ -10,7 +10,7 @@ export default function ServiceHeroImage({ service, lang }: { service: string; l
 
   return (
     <figure className="min-w-0">
-      <PageImageStructuredData path={localizedPath(`/${service}`, lang === 'fa')} />
+      <PageImageStructuredData path={localizedPath(`/${service}`, lang)} />
       <div className="relative aspect-[10/7] overflow-hidden rounded-2xl bg-slate-800 sm:max-lg:aspect-[16/9]">
         <Image
           src={photo.src}
@@ -23,11 +23,11 @@ export default function ServiceHeroImage({ service, lang }: { service: string; l
         />
       </div>
       {service === 'sao-tome-citizenship-by-investment' && (
-        <figcaption className="mt-2 text-xs text-slate-300">
+        <figcaption className={`mt-2 text-xs ${lang === 'pl' ? 'text-slate-700' : 'text-slate-300'}`}>
           <a href="https://commons.wikimedia.org/wiki/File:Pico_Cao_Grande.jpg" className="underline">Yakoo1986 / Wikimedia Commons</a>
           {' · '}
           <a href="https://creativecommons.org/licenses/by-sa/4.0/" className="underline">CC BY-SA 4.0</a>
-          {lang === 'fa' ? ' · برش و تغییر اندازه' : ' · cropped and resized'}
+          {lang === 'fa' ? ' · برش و تغییر اندازه' : lang === 'pl' ? ' · wykadrowano i zmieniono rozmiar' : ' · cropped and resized'}
         </figcaption>
       )}
     </figure>

@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
   const history: Turn[] = Array.isArray(body.history)
     ? body.history.slice(-8).filter(isTurn).map((turn: Turn) => ({ role: turn.role, content: turn.content.trim().slice(0, 2000) }))
     : [];
-  const persian = /[\u0600-\u06ff]/u.test(message) || body.locale === 'fa';
+  const locale = /[\u0600-\u06ff]/u.test(message) || body.locale === 'fa' ? 'fa' : body.locale === 'pl' ? 'pl' : 'en';
   const sessionId = typeof body.sessionId === 'string' ? body.sessionId.slice(0, 150) : 'unknown';
   const apiKey = process.env.ANTHROPIC_API_KEY;
 
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         model: MODEL,
         max_tokens: 500,
         temperature: 0.3,
-        system: SYSTEM_PROMPT + (persian ? '\nAnswer in Persian.' : '\nAnswer in English.'),
+        system: SYSTEM_PROMPT + (locale === 'fa' ? '\nAnswer in Persian.' : locale === 'pl' ? '\nAnswer in Polish.' : '\nAnswer in English.'),
         messages: [...history, { role: 'user', content: message }],
       });
       const assistantMessage = response.content.flatMap(block => block.type === 'text' ? [block.text] : []).join('\n').trim();
@@ -52,6 +52,6 @@ export async function POST(request: NextRequest) {
   }
 
   const previousQuestion = history.findLast(turn => turn.role === 'user')?.content || '';
-  const assistantMessage = getChatbotAnswer(message, previousQuestion, persian);
+  const assistantMessage = getChatbotAnswer(message, previousQuestion, locale);
   return NextResponse.json({ success: true, assistantMessage, sessionId, status: 'success' });
 }

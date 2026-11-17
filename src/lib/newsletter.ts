@@ -1,3 +1,4 @@
+import type { SiteLocale } from './languageRoutes';
 import { createHash, randomBytes } from 'node:crypto';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { Resend } from 'resend';
@@ -10,7 +11,7 @@ const collection = 'newsletterSubscribers';
 const sha256 = (value: string) => createHash('sha256').update(value).digest('hex');
 const secret = () => randomBytes(32).toString('base64url');
 
-export async function requestNewsletter(email: string, locale: 'en' | 'fa', ip: string) {
+export async function requestNewsletter(email: string, locale: SiteLocale, ip: string) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) throw new Error('Newsletter mail is not configured');
 
@@ -75,7 +76,7 @@ export async function requestNewsletter(email: string, locale: 'en' | 'fa', ip: 
   }
 }
 
-function newsletterActionUrl(action: 'confirm' | 'unsubscribe', id: string, token: string, locale: 'en' | 'fa') {
+function newsletterActionUrl(action: 'confirm' | 'unsubscribe', id: string, token: string, locale: SiteLocale) {
   const url = new URL('/api/newsletter/manage', SITE_URL);
   url.search = new URLSearchParams({ action, token: `${id}.${token}`, locale }).toString();
   return url.toString();

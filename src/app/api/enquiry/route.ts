@@ -128,6 +128,7 @@ export async function POST(req: NextRequest) {
       console.log('Enquiry will continue to email without Firestore persistence.');
     }
 
+    const isPolish = language === 'Polish' || locale === 'pl';
     const isFarsi = language === 'Farsi / Persian' || language === 'فارسی' || locale === 'fa';
     const timestamp = new Date().toLocaleString('en-GB', { timeZone: 'Europe/Warsaw' });
     const fromAddress = process.env.RESEND_FROM || 'PLUCO GROUP <noreply@plucogroup.com>';
@@ -216,8 +217,8 @@ export async function POST(req: NextRequest) {
       replyTo: toAddress,
       subject: isFarsi
         ? 'تأیید استعلام شما – PLUCO GROUP'
-        : 'We Have Received Your Email – PLUCO GROUP',
-      html: isFarsi ? `
+        : isPolish ? 'Potwierdzenie otrzymania zapytania – PLUCO GROUP' : 'We Have Received Your Email – PLUCO GROUP',
+      html: isPolish ? '<div lang="pl"><h1>Otrzymaliśmy Twoje zapytanie</h1><p>Dziękujemy za kontakt z Pluco Group. Nasz zespół skontaktuje się z Tobą w sprawie dalszych kroków.</p><p>PLUCO GROUP · info@plucogroup.com</p></div>' : isFarsi ? `
         <div style="font-family:Tahoma,Arial,sans-serif;max-width:600px;margin:0 auto;direction:rtl;text-align:right">
           <div style="background:#071C3C;padding:24px 32px;border-bottom:3px solid #C9A35A">
             <h1 style="color:#C9A35A;margin:0;font-size:20px">استعلام شما دریافت شد</h1>

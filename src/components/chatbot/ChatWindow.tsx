@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Send, Loader2, AlertCircle } from 'lucide-react';
@@ -21,6 +22,14 @@ const FAQ_BUTTONS = {
     'Can Pluco help with EU residency?',
     'Can Pluco help with second citizenship?',
   ],
+  pl: [
+    'Jakie usługi oferujecie?',
+    'Jak wygląda konsultacja?',
+    'Jakie dokumenty są potrzebne?',
+    'Czy Pluco pomaga w sprawach bankowych?',
+    'Czy Pluco pomaga w sprawach pobytu w Europie?',
+    'Czy Pluco pomaga w uzyskaniu drugiego obywatelstwa?',
+  ],
   fa: [
     'چه خدماتی ارائه می‌دهید؟',
     'مشاوره چگونه انجام می‌شود؟',
@@ -38,6 +47,7 @@ interface ChatWindowProps {
 
 export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
   const { lang, isRTL } = useLanguage();
+  const isPolish = lang === 'pl';
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -54,6 +64,7 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
     role: 'assistant',
     content: isRTL
       ? 'سلام، من دستیار پلوکو هستم. می‌توانم درباره اقامت، تابعیت، امور بانکی، ثبت شرکت و مشاوره راهنمایی کلی ارائه کنم. چه سؤالی دارید؟'
+      : isPolish ? 'Dzień dobry, jestem asystentem Pluco. Mogę odpowiedzieć na ogólne pytania o pobyt, obywatelstwo, bankowość, rejestrację spółki i konsultacje. W czym mogę pomóc?'
       : 'Hello, I’m Pluco Assistant. I can answer general questions about residency, citizenship, banking, company registration and consultations. What would you like to know?',
     createdAt: '',
   };
@@ -112,7 +123,7 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
     setMessages(previous => [...previous, userMessage]);
     setInput('');
 
-    if (isBookingIntent(message)) {
+    if (!isPolish && isBookingIntent(message)) {
       setShowConsultationForm(true);
       return;
     }
@@ -153,6 +164,7 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
     } catch {
       setError(isRTL
         ? 'پاسخی دریافت نشد. دوباره تلاش کنید یا گزینه «درخواست محرمانه» را انتخاب کنید.'
+        : isPolish ? 'Nie udało się uzyskać odpowiedzi. Spróbuj ponownie lub wyślij poufne zapytanie.'
         : 'We couldn’t reply. Please try again or choose “Start Private Inquiry”.');
     } finally {
       requestInProgress.current = false;
@@ -265,7 +277,7 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
           </div>
           <div>
             <h3 className="font-semibold text-white">Pluco Assistant</h3>
-            <p className="text-xs text-gray-300">{isRTL ? 'راهنمای خدمات پلوکو' : 'General questions about Pluco services'}</p>
+            <p className="text-xs text-gray-300">{isRTL ? 'راهنمای خدمات پلوکو' : isPolish ? 'Pytania o usługi Pluco' : 'General questions about Pluco services'}</p>
           </div>
         </div>
         <button
@@ -312,7 +324,7 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
       {/* FAQ Buttons - Show if no conversation yet */}
       {!messages.some(message => message.role === 'user') && !showInquiryForm && !showConsultationForm && (
         <div className="px-4 py-3 border-t border-gray-200 bg-white">
-          <p className="text-xs text-gray-600 mb-2 font-semibold">{isRTL ? 'پرسش‌های رایج' : 'Quick questions'}</p>
+          <p className="text-xs text-gray-600 mb-2 font-semibold">{isRTL ? 'پرسش‌های رایج' : isPolish ? 'Najczęstsze pytania' : 'Quick questions'}</p>
           <div className="space-y-2">
             {FAQ_BUTTONS[lang].map((question) => (
               <button
@@ -359,21 +371,27 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
       <div className="px-4 py-3 border-t border-gray-200 bg-white space-y-2">
         {!showInquiryForm && !showConsultationForm && (
           <>
-            <button
+            {isPolish ? (
+              <Link href="/pl/enquire" className="block w-full rounded bg-[#C9A35A] py-2 text-center text-sm font-semibold text-[#071C3C]">
+                Wyślij poufne zapytanie
+              </Link>
+            ) : (
+              <button
               onClick={() => setShowConsultationForm(true)}
               className="w-full text-sm py-2 rounded font-semibold transition-all"
               style={{ backgroundColor: '#C9A35A', color: '#071C3C' }}
             >
               {isRTL ? 'درخواست محرمانه' : 'Start Private Inquiry'}
             </button>
+            )}
             <div className="flex gap-2">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.nativeEvent.isComposing && sendMessage(input)}
-                placeholder={isRTL ? 'سؤال خود را بپرسید…' : 'Ask a question…'}
-                aria-label={isRTL ? 'سؤال شما' : 'Your question'}
+                placeholder={isRTL ? 'سؤال خود را بپرسید…' : isPolish ? 'Zadaj pytanie…' : 'Ask a question…'}
+                aria-label={isRTL ? 'سؤال شما' : isPolish ? 'Twoje pytanie' : 'Your question'}
                 dir="auto"
                 maxLength={2000}
                 disabled={isLoading}
@@ -381,7 +399,7 @@ export default function ChatWindow({ sessionId, onClose }: ChatWindowProps) {
               />
               <button
                 onClick={() => sendMessage(input)}
-                aria-label={isRTL ? 'ارسال' : 'Send message'}
+                aria-label={isRTL ? 'ارسال' : isPolish ? 'Wyślij wiadomość' : 'Send message'}
                 disabled={isLoading || !input.trim()}
                 className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
               >

@@ -2,14 +2,16 @@ import { MetadataRoute } from 'next';
 import { SITE_URL } from '@/lib/siteMetadata';
 import { languageAlternates } from '@/lib/languageRoutes';
 import { getPageImages } from '@/lib/pageImages';
+import { polishSlugs } from '@/lib/polishContent';
 import { PERSIAN_SERVICES } from '@/lib/plucoPersianServices';
 
 const BASE_URL = SITE_URL;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const publicPages: { url: string; priority: number; changeFrequency: "weekly" | "monthly" | "yearly" }[] = [
-    { url: '/',                        priority: 1.0,  changeFrequency: 'weekly'  },
-    { url: '/fa', priority: 0.9, changeFrequency: 'weekly' },
+    { url: '/fa', priority: 1.0, changeFrequency: 'weekly' },
+    { url: '/en', priority: 0.9, changeFrequency: 'weekly' },
+    { url: '/pl', priority: 0.9, changeFrequency: 'weekly' },
     { url: '/iranian-clients', priority: 0.85, changeFrequency: 'monthly' },
     { url: '/fa/iranians-abroad', priority: 0.85, changeFrequency: 'monthly' },
     { url: '/new-identity',            priority: 0.9,  changeFrequency: 'monthly' },
@@ -38,11 +40,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: '/contact',                 priority: 0.7,  changeFrequency: 'monthly' },
     { url: '/enquire',                 priority: 0.7,  changeFrequency: 'monthly' },
     { url: '/privacy-policy',          priority: 0.3,  changeFrequency: 'yearly'  },
+    { url: '/imprint', priority: 0.3, changeFrequency: 'yearly' },
     { url: '/disclaimer',              priority: 0.3,  changeFrequency: 'yearly'  },
   ];
 
   publicPages.push(...Object.keys(PERSIAN_SERVICES).map(slug => ({
     url: `/fa/services/${slug}`, priority: 0.9, changeFrequency: 'monthly' as const,
+  })));
+  publicPages.push(...polishSlugs.map(slug => ({
+    url: `/pl/${slug}`, priority: 0.8, changeFrequency: 'monthly' as const,
   })));
   return publicPages.map(({ url, priority, changeFrequency }) => {
     const languages = languageAlternates(url, BASE_URL);
